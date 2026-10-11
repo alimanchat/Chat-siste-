@@ -725,8 +725,8 @@ $("backButton").addEventListener("click", function () {
 });
 $("cancelContact").addEventListener("click", () => $("contactModal").classList.remove("show"));
 $("saveContact").addEventListener("click", addContact);
+ $("messageForm").addEventListener("submit", sendMessage); 
 $("newContactName").addEventListener("keydown", e => { if (e.key === "Enter") addContact(); });
-
 $("headerMenu").addEventListener("click", () => $("sideMenu").classList.add("show"));
 $("closeSide").addEventListener("click", () => $("sideMenu").classList.remove("show"));
 $("chatMenu").addEventListener("click", function () {
