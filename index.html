@@ -107,7 +107,6 @@ body{padding:15px}
     <div style="flex:1"></div>
     <div class="header-info" style="display:none"><strong id="headerName"></strong><small id="headerStatus"></small></div>
     <button class="icon-button" id="callHistory" aria-label="История звонков">📞</button>
-    <button class="icon-button" id="headerMore" aria-label="Ещё">⋮</button>
     <div class="avatar" id="headerAvatar">👤</div>
   </div>
 
@@ -240,8 +239,16 @@ body{padding:15px}
   <div class="modal" id="sideMenu">
     <div class="modal-card">
       <h3>Меню</h3>
-      <p class="empty">Пока пусто</p>
+      <button class="primary-button" id="sideDelete" style="background:#a33">🗑 Удалить чат</button>
       <button class="secondary-button" id="closeSide" style="width:100%;margin-top:12px">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal" id="delModal">
+    <div class="modal-card">
+      <h3>Какой чат удалить?</h3>
+      <div id="delList" style="max-height:50vh;overflow-y:auto"></div>
+      <button class="secondary-button" id="closeDel" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
   </div>
 
@@ -355,6 +362,19 @@ function refreshAfterMessage(id) {
 function listenChat(contact) {
   if (!db || listening[contact.id]) return;
   listening[contact.id] = true;
+  onValue(ref(db, "users/" + contact.id), sn => {
+    const v = sn.val();
+    const c = state.contacts.find(x => x.id === contact.id);
+    if (!v || !c) return;
+    let changed = false;
+    if (v.photo && c.photo !== v.photo) { c.photo = v.photo; changed = true; }
+    if (v.name && c.name !== v.name) { c.name = v.name; changed = true; }
+    if (!changed) return;
+    saveState();
+    renderChats();
+    renderContacts();
+    if (currentView === "chatView" && state.activeContact === c.id) openContact(c.id);
+  });
   onValue(ref(db, "presence/" + contact.id), sn => {
     presence[contact.id] = sn.val();
     if (currentView === "chatView" && state.activeContact === contact.id) updateChatStatus();
@@ -723,10 +743,35 @@ $("closeMenu").addEventListener("click", () => {
 });
 
 $("menuDelete").addEventListener("click", deleteCurrentContact);
-$("headerMore").addEventListener("click", () => {
-  $("menuDelete").style.display = "none";
-  $("menuModal").classList.add("show");
+$("sideDelete").addEventListener("click", () => {
+  $("sideMenu").classList.remove("show");
+  const list = $("delList");
+  list.replaceChildren();
+  if (!state.contacts.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "Чатов пока нет.";
+    list.appendChild(e);
+  }
+  state.contacts.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "primary-button";
+    b.style.background = "#a33";
+    b.textContent = "🗑 " + c.name;
+    b.addEventListener("click", () => {
+      if (!confirm("Удалить чат «" + c.name + "»?")) return;
+      state.contacts = state.contacts.filter(x => x.id !== c.id);
+      delete state.messages[c.id];
+      saveState();
+      renderChats();
+      renderContacts();
+      $("delModal").classList.remove("show");
+    });
+    list.appendChild(b);
+  });
+  $("delModal").classList.add("show");
 });
+$("closeDel").addEventListener("click", () => $("delModal").classList.remove("show"));
 $("menuContacts").addEventListener("click", () => {
   $("menuModal").classList.remove("show");
   state.activeContact = null;
@@ -749,245 +794,4 @@ document.querySelectorAll(".nav-button[data-view]").forEach(button => {
     state.activeContact = null;
     showView(this.dataset.view);
   });
-});
-
-["contactModal", "menuModal", "sideMenu"].forEach(id => {
-  $(id).addEventListener("click", function (event) {
-    if (event.target === this) this.classList.remove("show");
-  });
-});
-
-function updateChatStatus() {
-  const pr = presence[state.activeContact];
-  $("chatStatus").textContent = pr ? (pr.on ? "онлайн" : "был(а) в " + fmtTime(pr.ts)) : "";
 }
-
-// ---------- Страница контакта ----------
-let cpId = null;
-const MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
-
-const MN = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
-
-function fmtBirth(b) {
-  if (!b) return "";
-  const [y, m, d] = b.split("-");
-  return [+d || "", MONTHS[+m - 1] || "", +y || ""].filter(Boolean).join(" ");
-}
-
-function compress(file, max, cb) {
-  const img = new Image();
-  img.onload = () => {
-    const r = Math.min(1, max / Math.max(img.width, img.height));
-    const c = document.createElement("canvas");
-    c.width = Math.round(img.width * r);
-    c.height = Math.round(img.height * r);
-    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
-    URL.revokeObjectURL(img.src);
-    cb(c.toDataURL("image/jpeg", 0.7));
-  };
-  img.onerror = () => alert("Не удалось открыть фото.");
-  img.src = URL.createObjectURL(file);
-}
-
-function openCP(id) {
-  const c = state.contacts.find(x => x.id === id);
-  if (!c) return;
-  cpId = id;
-  $("cpName").textContent = c.name;
-  const setAv = photo => {
-    const av = makeAvatar(photo, c.name);
-    av.id = "cpAvatar";
-    av.classList.add("profile-photo");
-       $("cpAvatar").replaceWith(av);
-  };
-  setAv(c.photo || "");
-  renderCPTab("bio");
-}
-
-function renderCPTab(tab) {
-  const c = state.contacts.find(x => x.id === cpId);
-  if (!c) return;
-  document.querySelectorAll(".cp-tabs button").forEach(b => {
-    b.classList.toggle("on", b.dataset.t === tab);
-  });
-  const box = $("cpContent");
-  box.replaceChildren();
-
-  const row = (label, value) => {
-    const d = document.createElement("div");
-    d.className = "row";
-    const i = document.createElement("i");
-    i.textContent = label;
-    const v = document.createElement("div");
-    v.className = "ro" + (value ? "" : " ph");
-    v.textContent = value || "не указано";
-    d.append(i, v);
-    return d;
-  };
-
-  if (tab === "bio") {
-    box.append(
-      row("📞", "+" + c.id),
-      row("🎂", fmtBirth(c.birth)),
-      row("🏙️", [c.city, c.village].filter(Boolean).join(", ")),
-      row("🎓", c.edu),
-      row("💼", c.work),
-      row("🎯", c.hobby),
-      row("👤", c.gender),
-      row("💍", c.family),
-      row("➕", c.status)
-    );
-  } else if (tab === "status") {
-    box.append(row("➕", c.status));
-  } else if (tab === "photo") {
-    if (c.photo) {
-      const img = document.createElement("img");
-      img.src = c.photo;
-      img.style.cssText = "width:100%;border-radius:12px";
-      box.appendChild(img);
-    } else {
-      box.append(row("📷", ""));
-    }
-  } else if (tab === "video") {
-    box.append(row("🎬", "Видео скоро"));
-  } else if (tab === "sms") {
-    $("cpView").classList.remove("active");
-    openContact(c.id);
-  }
-}
-
-document.querySelectorAll(".cp-tabs button").forEach(b => {
-  b.addEventListener("click", () => renderCPTab(b.dataset.t));
-});
-
-$("cpBack").addEventListener("click", () => {
-  cpId = null;
-  if (state.activeContact) openContact(state.activeContact);
-  else showView("chatsView");
-});
-
-// ---------- Вкладки, которых не было ----------
-function renderCalls() {
-  const list = $("callList");
-  if (!list) return;
-  list.replaceChildren();
-  const empty = document.createElement("div");
-  empty.className = "empty";
-  empty.textContent = "Пока нет звонков.";
-  list.appendChild(empty);
-}
-
-function loadStatuses() {
-  const list = $("stList");
-  if (!list) return;
-  list.replaceChildren();
-  const empty = document.createElement("div");
-  empty.className = "empty";
-  empty.textContent = "Статусы скоро появятся.";
-  list.appendChild(empty);
-}
-
-function loadAlbum() {
-  const grid = $("albumGrid");
-  if (!grid) return;
-  grid.replaceChildren();
-  const empty = document.createElement("div");
-  empty.className = "empty";
-  empty.textContent = "Альбом пуст.";
-  grid.appendChild(empty);
-}
-
-$("stPost").addEventListener("click", () => {
-  alert("Статусы скоро появятся.");
-});
-
-$("albumAdd").addEventListener("click", () => alert("Альбом скоро появится."));
-$("addAlbumPhoto").addEventListener("click", () => alert("Альбом скоро появится."));
-
-// ---------- Кнопки звонков (заглушки) ----------
-["callAudio", "callVideo", "callAccept", "callEnd", "callHistory"].forEach(id => {
-  const el = $(id);
-  if (el) el.addEventListener("click", () => alert("Звонки скоро появятся."));
-});
-
-// ---------- Логин по номеру (без SMS) ----------
-function startSession() {
-  if (!state.profile.phone) return;
-  try {
-    const pr = ref(db, "presence/" + state.profile.phone);
-    set(pr, { on: true, ts: serverTimestamp() });
-    onDisconnect(pr).set({ on: false, ts: serverTimestamp() });
-  } catch (e) {}
-  saveRemote().catch(() => {});
-  listenInbox();
-  updateHeader();
-}
-
-$("loginButton").addEventListener("click", () => {
-  const key = normPhone($("loginPhone").value);
-  if (!key) { alert("Введи 9 цифр после +996."); return; }
-  state.profile.phone = key;
-  saveState();
-  $("loginModal").classList.remove("show");
-  if (db) startSession();
-  showView("chatsView");
-});
-
-$("loginPhone").addEventListener("keydown", e => {
-  if (e.key === "Enter") $("loginButton").click();
-});
-
-// ---------- Инициализация ----------
-loadFirebase().then(() => {
-  loadState();
-  if (!state.profile.phone) {
-    $("loginModal").classList.add("show");
-  } else {
-    startSession();
-  }
-  updateHeader();
-  showView("chatsView");
-});
-
-})();
-  </script><!-- Счётчик посещений через Firebase -->
-<div style="text-align:center;padding:16px;color:#888;font-size:13px">
-  👀 Посетителей: <b id="visit-count" style="color:#c9a227">...</b>
-</div>
-
-<script type="module">
-  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-  import { getDatabase, ref, runTransaction, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
-
-  const firebaseConfig = {
-    apiKey: "AIzaSyCR1-javU3E3VnLJpEY5N61WggV03r24KM",
-    authDomain: "my--chat-7db98.firebaseapp.com",
-    databaseURL: "https://my--chat-7db98-default-rtdb.asia-southeast1.firebasedatabase.app",
-    projectId: "my--chat-7db98",
-    storageBucket: "my--chat-7db98.firebasestorage.app",
-    messagingSenderId: "740490057583",
-    appId: "1:740490057583:web:fddeb33ad95bf35047ba9a"
-  };
-
-  const db = getDatabase(initializeApp(firebaseConfig));
-  const el = document.getElementById("visit-count");
-  const visited = localStorage.getItem("aliman_visited");
-  const counterRef = ref(db, "analytics/total_visits");
-
-  if (visited) {
-    // уже заходил — просто показать число
-    get(counterRef).then(snap => {
-      el.textContent = snap.val() || 0;
-    }).catch(() => { el.textContent = "—"; });
-  } else {
-    // первый заход — прибавить 1
-    runTransaction(counterRef, cur => (cur || 0) + 1)
-      .then(res => {
-        el.textContent = res.snapshot.val() || 1;
-        localStorage.setItem("aliman_visited", "true");
-      })
-      .catch(() => { el.textContent = "—"; });
-  }
-</script>
-</body>
-</html> 
