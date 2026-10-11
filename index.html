@@ -798,4 +798,158 @@ function openCP(id) {
     const av = makeAvatar(photo, c.name);
     av.id = "cpAvatar";
     av.classList.add("profile-photo");
-    $("cpAvatar").replaceWith(av
+       $("cpAvatar").replaceWith(av);
+  };
+  setAv(c.photo || "");
+  renderCPTab("bio");
+}
+
+function renderCPTab(tab) {
+  const c = state.contacts.find(x => x.id === cpId);
+  if (!c) return;
+  document.querySelectorAll(".cp-tabs button").forEach(b => {
+    b.classList.toggle("on", b.dataset.t === tab);
+  });
+  const box = $("cpContent");
+  box.replaceChildren();
+
+  const row = (label, value) => {
+    const d = document.createElement("div");
+    d.className = "row";
+    const i = document.createElement("i");
+    i.textContent = label;
+    const v = document.createElement("div");
+    v.className = "ro" + (value ? "" : " ph");
+    v.textContent = value || "не указано";
+    d.append(i, v);
+    return d;
+  };
+
+  if (tab === "bio") {
+    box.append(
+      row("📞", "+" + c.id),
+      row("🎂", fmtBirth(c.birth)),
+      row("🏙️", [c.city, c.village].filter(Boolean).join(", ")),
+      row("🎓", c.edu),
+      row("💼", c.work),
+      row("🎯", c.hobby),
+      row("👤", c.gender),
+      row("💍", c.family),
+      row("➕", c.status)
+    );
+  } else if (tab === "status") {
+    box.append(row("➕", c.status));
+  } else if (tab === "photo") {
+    if (c.photo) {
+      const img = document.createElement("img");
+      img.src = c.photo;
+      img.style.cssText = "width:100%;border-radius:12px";
+      box.appendChild(img);
+    } else {
+      box.append(row("📷", ""));
+    }
+  } else if (tab === "video") {
+    box.append(row("🎬", "Видео скоро"));
+  } else if (tab === "sms") {
+    $("cpView").classList.remove("active");
+    openContact(c.id);
+  }
+}
+
+document.querySelectorAll(".cp-tabs button").forEach(b => {
+  b.addEventListener("click", () => renderCPTab(b.dataset.t));
+});
+
+$("cpBack").addEventListener("click", () => {
+  cpId = null;
+  if (state.activeContact) openContact(state.activeContact);
+  else showView("chatsView");
+});
+
+// ---------- Вкладки, которых не было ----------
+function renderCalls() {
+  const list = $("callList");
+  if (!list) return;
+  list.replaceChildren();
+  const empty = document.createElement("div");
+  empty.className = "empty";
+  empty.textContent = "Пока нет звонков.";
+  list.appendChild(empty);
+}
+
+function loadStatuses() {
+  const list = $("stList");
+  if (!list) return;
+  list.replaceChildren();
+  const empty = document.createElement("div");
+  empty.className = "empty";
+  empty.textContent = "Статусы скоро появятся.";
+  list.appendChild(empty);
+}
+
+function loadAlbum() {
+  const grid = $("albumGrid");
+  if (!grid) return;
+  grid.replaceChildren();
+  const empty = document.createElement("div");
+  empty.className = "empty";
+  empty.textContent = "Альбом пуст.";
+  grid.appendChild(empty);
+}
+
+$("stPost").addEventListener("click", () => {
+  alert("Статусы скоро появятся.");
+});
+
+$("albumAdd").addEventListener("click", () => alert("Альбом скоро появится."));
+$("addAlbumPhoto").addEventListener("click", () => alert("Альбом скоро появится."));
+
+// ---------- Кнопки звонков (заглушки) ----------
+["callAudio", "callVideo", "callAccept", "callEnd", "callHistory"].forEach(id => {
+  const el = $(id);
+  if (el) el.addEventListener("click", () => alert("Звонки скоро появятся."));
+});
+
+// ---------- Логин по номеру (без SMS) ----------
+function startSession() {
+  if (!state.profile.phone) return;
+  try {
+    const pr = ref(db, "presence/" + state.profile.phone);
+    set(pr, { on: true, ts: serverTimestamp() });
+    onDisconnect(pr).set({ on: false, ts: serverTimestamp() });
+  } catch (e) {}
+  saveRemote().catch(() => {});
+  listenInbox();
+  updateHeader();
+}
+
+$("loginButton").addEventListener("click", () => {
+  const key = normPhone($("loginPhone").value);
+  if (!key) { alert("Введи 9 цифр после +996."); return; }
+  state.profile.phone = key;
+  saveState();
+  $("loginModal").classList.remove("show");
+  if (db) startSession();
+  showView("chatsView");
+});
+
+$("loginPhone").addEventListener("keydown", e => {
+  if (e.key === "Enter") $("loginButton").click();
+});
+
+// ---------- Инициализация ----------
+loadFirebase().then(() => {
+  loadState();
+  if (!state.profile.phone) {
+    $("loginModal").classList.add("show");
+  } else {
+    startSession();
+  }
+  updateHeader();
+  showView("chatsView");
+});
+
+})();
+</script>
+</body>
+</html> 
