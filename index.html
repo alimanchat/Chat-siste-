@@ -228,7 +228,7 @@ CD5/mUAT/8ujaRu2r/43fTjxqsZCRBNdMLWBRoZ5cK7IQfeIjHyExl+MGBfOwetMSvp/EZ9SGn1aral1
         <button class="cbtn" id="callEnd" style="background:#d33">✖</button>
       </div>
     </div>
-    
+  
   <div class="modal" id="loginModal">
     <div class="modal-card" style="text-align:center">
       <h3>Вход по номеру</h3>
@@ -718,7 +718,11 @@ $("saveProfileButton").addEventListener("click", async function () {
   updateHeader();
   alert("Профиль сохранён! ❤️");
 });
-  $("addContactButton").addEventListener("click", openAddContact);
+$("addContactButton").addEventListener("click", openAddContact);
+$("backButton").addEventListener("click", function () {
+  state.activeContact = null;
+  showView("chatsView");
+});
 $("cancelContact").addEventListener("click", () => $("contactModal").classList.remove("show"));
 $("saveContact").addEventListener("click", addContact);
 $("newContactName").addEventListener("keydown", e => { if (e.key === "Enter") addContact(); });
@@ -1272,4 +1276,4 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
 </script>
 </body>
 </html>
-  </div>
+  
