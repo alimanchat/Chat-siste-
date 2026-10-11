@@ -58,7 +58,7 @@ button{cursor:pointer;border:none}
 .cbtn{width:64px;height:64px;border-radius:50%;color:#fff;font-size:28px}
 .app > .header{cursor:pointer}
 .app > .header .avatar{width:44px;height:44px;font-size:22px}
-#logo{height:32px;max-width:48%;object-fit:contain;margin-left:4px}
+#logo{height:30px;max-width:48%;object-fit:contain;margin-left:4px}
 .nav-button{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}
 .nav-button small{font-size:11px;color:#555}
 .cside{display:flex;flex-direction:column;align-items:center;gap:2px}
@@ -107,6 +107,7 @@ body{padding:15px}
     <div style="flex:1"></div>
     <div class="header-info" style="display:none"><strong id="headerName"></strong><small id="headerStatus"></small></div>
     <button class="icon-button" id="callHistory" aria-label="История звонков">📞</button>
+    <button class="icon-button" id="headerMore" aria-label="Ещё">⋮</button>
     <div class="avatar" id="headerAvatar">👤</div>
   </div>
 
@@ -240,7 +241,7 @@ body{padding:15px}
     <div class="modal-card">
       <h3>Меню</h3>
       <p class="empty">Пока пусто</p>
-      <button class="secondary-button" id="closeSide" style="width:100%">Закрыть</button>
+      <button class="secondary-button" id="closeSide" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
   </div>
 
@@ -258,7 +259,9 @@ body{padding:15px}
   <div class="modal" id="menuModal">
     <div class="modal-card">
       <h3>Меню</h3>
+      <button class="primary-button" id="menuContacts">👥 Контакты</button>
       <button class="primary-button" id="menuProfile">👤 Мой профиль</button>
+      <button class="primary-button" id="menuAlbum">📷 Альбом</button>
       <button class="primary-button" id="menuDelete" style="background:#a33">Удалить чат</button>
       <button class="secondary-button" id="closeMenu" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
@@ -267,9 +270,7 @@ body{padding:15px}
 </div>
 
 <script type="module">
-import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
-import { getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp }
-  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+let initializeApp, getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp;
 
 // ===== 1. ВСТАВЬТЕ СЮДА КОНФИГ ИЗ FIREBASE =====
 const firebaseConfig = {
@@ -297,9 +298,17 @@ const presence = {};
 
 // ---------- Firebase ----------
 let db = null;
-if (!firebaseConfig.apiKey.startsWith("ВСТАВЬ")) {
-  try { db = getDatabase(initializeApp(firebaseConfig)); }
-  catch (e) { console.error(e); }
+async function loadFirebase() {
+  try {
+    const a = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
+    const d = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
+    ({ initializeApp } = a);
+    ({ getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp } = d);
+    db = getDatabase(initializeApp(firebaseConfig));
+  } catch (e) {
+    console.error(e);
+    db = null;
+  }
 }
 
 let myUid = "";
@@ -685,17 +694,21 @@ $("newContactName").addEventListener("keydown", e => { if (e.key === "Enter") ad
 
 $("headerMenu").addEventListener("click", () => $("sideMenu").classList.add("show"));
 $("closeSide").addEventListener("click", () => $("sideMenu").classList.remove("show"));
-
-$("chatMenu").addEventListener("click", function () {
-  $("menuDelete").style.display = "block";
+$("menuDelete").addEventListener("click", deleteCurrentContact);
+$("headerMore").addEventListener("click", () => {
+  $("menuDelete").style.display = "none";
   $("menuModal").classList.add("show");
 });
-
-$("closeMenu").addEventListener("click", () => {
+$("menuContacts").addEventListener("click", () => {
   $("menuModal").classList.remove("show");
-  if (currentView !== "chatView" && currentView !== "cpView") state.activeContact = null;
+  state.activeContact = null;
+  showView("contactsView");
 });
-$("menuDelete").addEventListener("click", deleteCurrentContact);
+$("menuAlbum").addEventListener("click", () => {
+  $("menuModal").classList.remove("show");
+  state.activeContact = null;
+  showView("albumView");
+});
 
 function openProfile() {
   $("menuModal").classList.remove("show");
@@ -789,21 +802,4 @@ async function cpTab(t) {
       const sn = await get(query(ref(db, "albums/" + id), limitToLast(60)));
       if (cpId !== id) return;
       box.replaceChildren();
-      const grid = document.createElement("div");
-      grid.className = "grid";
-      sn.forEach(ch => {
-        const im = document.createElement("img");
-        im.src = ch.val().d;
-        im.alt = "";
-        grid.appendChild(im);
-      });
-      if (!grid.children.length) { say("Пока нет фото."); return; }
-      box.appendChild(grid);
-      return;
-    }
-    const v = (await get(ref(db, "users/" + id))).val() || {};
-    if (cpId !== id) return;
-    box.replaceChildren();
-    const mk = (txt, ph) => {
-      const d = document.createElement("div");
-      d.c
+      const grid = do
