@@ -950,28 +950,44 @@ loadFirebase().then(() => {
 });
 
 })();
-</script><!-- Счётчик посещений -->
+  </script><!-- Счётчик посещений через Firebase -->
 <div style="text-align:center;padding:16px;color:#888;font-size:13px">
   👀 Посетителей: <b id="visit-count" style="color:#c9a227">...</b>
 </div>
-<script>
-  const visitEl = document.getElementById("visit-count");
-  const alreadyVisited = localStorage.getItem("aliman_visited");
-  const endpoint = alreadyVisited
-    ? "https://api.counterapi.dev/v1/alimanchat/total/"
-    : "https://api.counterapi.dev/v1/alimanchat/total/up";
 
-  fetch(endpoint)
-    .then(res => res.json())
-    .then(data => {
-      if (data && typeof data.count === "number") {
-        visitEl.textContent = data.count;
-        if (!alreadyVisited) localStorage.setItem("aliman_visited", "true");
-      } else {
-        visitEl.textContent = "0";
-      }
-    })
-    .catch(() => { visitEl.textContent = "0"; });
+<script type="module">
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getDatabase, ref, runTransaction, get, set } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyCR1-javU3E3VnLJpEY5N61WggV03r24KM",
+    authDomain: "my--chat-7db98.firebaseapp.com",
+    databaseURL: "https://my--chat-7db98-default-rtdb.asia-southeast1.firebasedatabase.app",
+    projectId: "my--chat-7db98",
+    storageBucket: "my--chat-7db98.firebasestorage.app",
+    messagingSenderId: "740490057583",
+    appId: "1:740490057583:web:fddeb33ad95bf35047ba9a"
+  };
+
+  const db = getDatabase(initializeApp(firebaseConfig));
+  const el = document.getElementById("visit-count");
+  const visited = localStorage.getItem("aliman_visited");
+  const counterRef = ref(db, "analytics/total_visits");
+
+  if (visited) {
+    // уже заходил — просто показать число
+    get(counterRef).then(snap => {
+      el.textContent = snap.val() || 0;
+    }).catch(() => { el.textContent = "—"; });
+  } else {
+    // первый заход — прибавить 1
+    runTransaction(counterRef, cur => (cur || 0) + 1)
+      .then(res => {
+        el.textContent = res.snapshot.val() || 1;
+        localStorage.setItem("aliman_visited", "true");
+      })
+      .catch(() => { el.textContent = "—"; });
+  }
 </script>
 </body>
 </html> 
