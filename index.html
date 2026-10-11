@@ -269,6 +269,24 @@ body{padding:15px}
 
 </div>
 
+<script>
+(function () {
+  function show(msg) {
+    var d = document.createElement("div");
+    d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
+    d.textContent = msg;
+    d.onclick = function () { d.remove(); };
+    document.body.appendChild(d);
+  }
+  window.addEventListener("error", function (e) {
+    if (e.target && e.target.tagName === "SCRIPT") show("Скрипт не загрузился");
+    else show("Ошибка: " + e.message + " (строка " + (e.lineno || "?") + ")");
+  }, true);
+  window.addEventListener("unhandledrejection", function (e) {
+    show("Ошибка: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
+  });
+})();
+</script>
 <script type="module">
 let initializeApp, getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp;
 
@@ -783,23 +801,4 @@ function openCP(id) {
 }
 
 async function cpTab(t) {
-  document.querySelectorAll(".cp-tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
-  const box = $("cpContent");
-  box.replaceChildren();
-  const say = txt => {
-    const d = document.createElement("div");
-    d.className = "empty";
-    d.textContent = txt;
-    box.appendChild(d);
-  };
-  if (t === "sms") { openContact(cpId); return; }
-  if (t === "video") { say("Видео-альбом пока недоступен: для хранения видео нужен платный тариф Firebase."); return; }
-  if (!db) { say("Нет подключения."); return; }
-  say("Загрузка...");
-  const id = cpId;
-  try {
-    if (t === "photo") {
-      const sn = await get(query(ref(db, "albums/" + id), limitToLast(60)));
-      if (cpId !== id) return;
-      box.replaceChildren();
-      const grid = do
+  document.querySe
