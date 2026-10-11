@@ -954,26 +954,24 @@ loadFirebase().then(() => {
 <div style="text-align:center;padding:16px;color:#888;font-size:13px">
   👀 Посетителей: <b id="visit-count" style="color:#c9a227">...</b>
 </div>
-
 <script>
-  const NAMESPACE = "alimanchat.github.io";
-  const KEY = "total";
   const visitEl = document.getElementById("visit-count");
   const alreadyVisited = localStorage.getItem("aliman_visited");
-  const url = alreadyVisited
-    ? `https://api.countapi.xyz/get/${NAMESPACE}/${KEY}`
-    : `https://api.countapi.xyz/hit/${NAMESPACE}/${KEY}`;
-  fetch(url)
+  const endpoint = alreadyVisited
+    ? "https://api.counterapi.dev/v1/alimanchat/total/"
+    : "https://api.counterapi.dev/v1/alimanchat/total/up";
+
+  fetch(endpoint)
     .then(res => res.json())
     .then(data => {
-      if (data && typeof data.value === "number") {
-        visitEl.textContent = data.value;
+      if (data && typeof data.count === "number") {
+        visitEl.textContent = data.count;
         if (!alreadyVisited) localStorage.setItem("aliman_visited", "true");
       } else {
-        visitEl.textContent = "—";
+        visitEl.textContent = "0";
       }
     })
-    .catch(() => { visitEl.textContent = "—"; });
+    .catch(() => { visitEl.textContent = "0"; });
 </script>
 </body>
 </html> 
