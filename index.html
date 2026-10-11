@@ -712,6 +712,16 @@ $("newContactName").addEventListener("keydown", e => { if (e.key === "Enter") ad
 
 $("headerMenu").addEventListener("click", () => $("sideMenu").classList.add("show"));
 $("closeSide").addEventListener("click", () => $("sideMenu").classList.remove("show"));
+$("chatMenu").addEventListener("click", function () {
+  $("menuDelete").style.display = "block";
+  $("menuModal").classList.add("show");
+});
+
+$("closeMenu").addEventListener("click", () => {
+  $("menuModal").classList.remove("show");
+  if (currentView !== "chatView" && currentView !== "cpView") state.activeContact = null;
+});
+
 $("menuDelete").addEventListener("click", deleteCurrentContact);
 $("headerMore").addEventListener("click", () => {
   $("menuDelete").style.display = "none";
@@ -788,17 +798,4 @@ function openCP(id) {
     const av = makeAvatar(photo, c.name);
     av.id = "cpAvatar";
     av.classList.add("profile-photo");
-    $("cpAvatar").replaceWith(av);
-  };
-  setAv(c.photo);
-  if (db) get(ref(db, "users/" + id)).then(sn => {
-    const v = sn.val();
-    if (v && v.photo && cpId === id) setAv(v.photo);
-  }).catch(() => {});
-  showView("cpView");
-  document.querySelector("#cpView .profile-content").scrollTop = 0;
-  cpTab("bio");
-}
-
-async function cpTab(t) {
-  document.querySe
+    $("cpAvatar").replaceWith(av
