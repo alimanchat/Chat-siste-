@@ -103,6 +103,23 @@ button{cursor:pointer;border:none}
 .ftitle{font-weight:bold;margin:8px 0 2px}
 #cpName{background:#eee;border-radius:10px;padding:10px;font-size:20px;margin:0 8px!important}
 .fdesc{color:#555;margin:2px 0 4px;line-height:1.4;overflow-wrap:anywhere}
+.composer input{padding-right:150px!important}
+.mic-btn,.plus-btn{position:absolute;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 6px);width:36px;height:36px;background:transparent;font-size:22px;border-radius:50%}
+.plus-btn{right:62px;font-size:28px;color:#444}
+.mic-btn{right:100px}
+.attach{display:none;gap:10px;padding:12px;background:#f7f7f7;border-top:1px solid #eee}
+.attach.show{display:flex}
+.attach button{flex:1;display:flex;flex-direction:column;align-items:center;gap:6px;padding:14px 4px;background:#fff;border:1px solid #ddd;border-radius:14px;font-size:30px}
+.attach button small{font-size:13px;color:#444}
+#recBar{display:none;align-items:center;gap:10px;padding:10px;background:#fff;border-top:1px solid #eee;padding-bottom:max(10px,env(safe-area-inset-bottom))}
+#recBar .rt{flex:1;font-size:18px;color:#d33}
+#recBar button{width:48px;height:48px;border-radius:50%;font-size:22px;color:#fff}
+.message.bare{background:transparent;box-shadow:none;padding:0}
+.vbtn{background:transparent;font-size:16px;padding:4px 2px}
+.vround{width:150px;height:150px;border-radius:50%;overflow:hidden;background:#333;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;font-size:18px}
+.vround video{width:100%;height:100%;object-fit:cover}
+.fthumb{width:160px;max-width:100%;border-radius:12px;display:block;cursor:pointer}
+.ctcard{background:transparent;text-align:left;white-space:pre-line;font-size:15px;padding:2px}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -152,10 +169,23 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <button class="icon-button" id="chatMenu" aria-label="Меню">⋮</button>
     </div>
     <div class="messages" id="messageList"></div>
+    <div class="attach" id="attachPanel">
+      <button type="button" id="attCam">📷<small>Камера</small></button>
+      <button type="button" id="attPhoto">🖼️<small>Фото</small></button>
+      <button type="button" id="attContact">👥<small>Контакт</small></button>
+    </div>
+    <div id="recBar">
+      <button type="button" id="recCancel" style="background:#888" aria-label="Отмена">✖</button>
+      <div class="rt">🔴 <span id="recTime">0:00</span></div>
+      <button type="button" id="recSend" style="background:#2a9d4a" aria-label="Отправить">➤</button>
+    </div>
     <form class="composer" id="messageForm">
       <input id="messageInput" type="text" placeholder="Начать SMS" autocomplete="off" maxlength="2000">
+      <button class="mic-btn" type="button" id="micBtn" aria-label="Голосовое сообщение">🎤</button>
+      <button class="plus-btn" type="button" id="plusBtn" aria-label="Прикрепить">+</button>
       <button class="send-button" type="submit" aria-label="Отправить">↑</button>
     </form>
+    <input type="file" id="galInput" accept="image/*" style="display:none">
   </section>
 
   <section class="view" id="cpView">
@@ -243,7 +273,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <button class="cbtn" id="callAccept" style="background:#2a9d4a">📞</button>
         <button class="cbtn" id="callEnd" style="background:#d33">✖</button>
       </div>
-    </div>
+       </div>
   </div>
 
   <div class="modal" id="loginModal">
@@ -281,6 +311,25 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
   </div>
 
+  <div class="modal" id="vidModal" style="background:#000;flex-direction:column;gap:16px;color:#fff">
+    <video id="vidPrev" autoplay playsinline muted style="width:min(78vw,300px);height:min(78vw,300px);border-radius:50%;object-fit:cover;background:#222;transform:scaleX(-1)"></video>
+    <div id="vidTime" style="font-size:18px">0:00 / 1:00</div>
+    <div style="display:flex;gap:28px">
+      <button class="cbtn" id="vidCancel" style="background:#555">✖</button>
+      <button class="cbtn" id="vidGo" style="background:#d33">⏺</button>
+    </div>
+  </div>
+
+  <div class="modal" id="imgModal" style="background:#000;padding:0"><img id="imgFull" alt="" style="max-width:100%;max-height:100%;object-fit:contain"></div>
+
+  <div class="modal" id="pickModal">
+    <div class="modal-card">
+      <h3>Отправить контакт</h3>
+      <div id="pickList" style="max-height:50vh;overflow-y:auto"></div>
+      <button class="secondary-button" id="closePick" style="width:100%;margin-top:12px">Закрыть</button>
+    </div>
+  </div>
+
   <div class="modal" id="chatMenuModal">
     <div class="modal-card">
       <h3>Чат</h3>
@@ -302,9 +351,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   <div class="modal" id="menuModal">
     <div class="modal-card">
       <h3>Меню</h3>
-      <button class="primary-button" id="menuContacts">👥 Контакты</button>
-      <button class="primary-button" id="menuProfile">👤 Мой профиль</button>
-      <button class="primary-button" id="menuAlbum">📷 Альбом</button>
+      <button class="primary-button" id="menuBlock">🚫 Заблокировать контакт</button>
       <button class="primary-button" id="menuDelete" style="background:#a33">Удалить чат</button>
       <button class="secondary-button" id="closeMenu" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
@@ -414,13 +461,17 @@ function listenChat(contact) {
     renderContacts();
     if (currentView === "chatView" && state.activeContact === c.id) openContact(c.id);
   });
+  onValue(ref(db, "presence/" + contact.id), sn => {
+    presence[contact.id] = sn.val();
+    if (currentView === "chatView" && state.activeContact === contact.id) updateChatStatus();
+  });
   const q = query(ref(db, "chats/" + chatIdWith(contact.id) + "/messages"), limitToLast(200));
   onChildAdded(q, snap => {
     const m = snap.val();
     if (!m || typeof m.text !== "string" || isBlocked(contact.id)) return;
     const list = state.messages[contact.id] || (state.messages[contact.id] = []);
     if (state.hidden[snap.key] || list.some(x => x.key === snap.key)) return;
-    list.push({ key: snap.key, text: m.text, mine: m.from === myKey(), time: fmtTime(m.ts) });
+    list.push({ key: snap.key, text: m.text, mine: m.from === myKey(), time: fmtTime(m.ts), type: m.type, mid: m.mid, dur: m.dur, th: m.th, ct: m.ct });
     refreshAfterMessage(contact.id);
   });
 }
@@ -506,6 +557,8 @@ function updateHeader() {
 
 function showView(viewId) {
   if (viewId === "chatView" && !state.activeContact) viewId = "chatsView";
+  closeAttach();
+  if (viewId !== "chatView") { stopVoice(false); closeVid(); }
   currentView = viewId;
   document.querySelector(".app > .header").style.display = (viewId === "cpView" || viewId === "profileView" || viewId === "chatView") ? "none" : "";
   document.querySelector(".bottom-nav").style.display = (viewId === "cpView" || viewId === "chatView") ? "none" : "";
@@ -547,7 +600,7 @@ function makeContactButton(contact, showLastMessage) {
   const info = document.createElement("div");
   info.className = "contact-info";
   const name = document.createElement("strong");
-  name.textContent = contact.name;
+  name.textContent = contact.name + (isBlocked(contact.id) ? " 🚫" : "");
   const last = document.createElement("small");
   const messages = state.messages[contact.id] || [];
   last.textContent = showLastMessage
@@ -570,6 +623,7 @@ function makeContactButton(contact, showLastMessage) {
     dots.addEventListener("click", e => {
       e.stopPropagation();
       state.activeContact = contact.id;
+      $("menuBlock").textContent = isBlocked(contact.id) ? "✅ Разблокировать контакт" : "🚫 Заблокировать контакт";
       $("menuDelete").style.display = "block";
       $("menuModal").classList.add("show");
     });
@@ -621,14 +675,7 @@ function renderMessages() {
     col.className = "mcol";
     const message = document.createElement("div");
     message.className = "message" + (item.mine ? " mine" : "");
-    message.textContent = item.text;
-    message.addEventListener("click", () => {
-      if (!confirm("Удалить это сообщение?")) return;
-      state.hidden[item.key] = 1;
-      state.messages[state.activeContact] = (state.messages[state.activeContact] || []).filter(x => x.key !== item.key);
-      saveState();
-      renderMessages();
-    });
+    buildBody(message, item, state.activeContact);
     col.appendChild(message);
     if (item.mine) {
       const tick = document.createElement("small");
@@ -821,22 +868,22 @@ $("sideDelete").addEventListener("click", () => {
   $("delModal").classList.add("show");
 });
 $("closeDel").addEventListener("click", () => $("delModal").classList.remove("show"));
-$("menuContacts").addEventListener("click", () => {
+$("menuBlock").addEventListener("click", () => {
   $("menuModal").classList.remove("show");
-  state.activeContact = null;
-  showView("contactsView");
+  const id = state.activeContact;
+  const c = state.contacts.find(x => x.id === id);
+  if (!c) return;
+  if (isBlocked(id)) {
+    state.blocked = state.blocked.filter(x => x !== id);
+  } else {
+    if (!confirm("Заблокировать «" + c.name + "»? Его сообщения и звонки приходить не будут.")) return;
+    state.blocked.push(id);
+  }
+  saveState();
+  if (currentView !== "chatView" && currentView !== "cpView") state.activeContact = null;
+  renderChats();
+  renderContacts();
 });
-$("menuAlbum").addEventListener("click", () => {
-  $("menuModal").classList.remove("show");
-  state.activeContact = null;
-  showView("albumView");
-});
-
-function openProfile() {
-  $("menuModal").classList.remove("show");
-  showView("profileView");
-}
-$("menuProfile").addEventListener("click", openProfile);
 
 document.querySelectorAll(".nav-button[data-view]").forEach(button => {
   button.addEventListener("click", function () {
@@ -845,7 +892,7 @@ document.querySelectorAll(".nav-button[data-view]").forEach(button => {
   });
 });
 
-["contactModal", "menuModal", "sideMenu", "delModal", "cpMenu", "chatMenuModal"].forEach(id => {
+["contactModal", "menuModal", "sideMenu", "delModal", "cpMenu", "chatMenuModal", "pickModal"].forEach(id => {
   $(id).addEventListener("click", function (event) {
     if (event.target === this) this.classList.remove("show");
   });
@@ -1213,6 +1260,18 @@ async function startCall(video) {
   if (!peer || callRole) return;
   if (isBlocked(peer)) { alert("Контакт заблокирован."); return; }
   try {
+    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !!video });
+  } catch (e) {
+    alert("Нет доступа к микрофону или камере.");
+    return;
+  }
+  callRole = "caller";
+  callPeer = peer;
+  const c = state.contacts.find(x => x.id === peer);
+  showCall((video ? "Видеозвонок: " : "Звонок: ") + (c ? c.name : "+" + peer), false, video);
+  $("localVideo").srcObject = localStream;
+  logCall(peer, !!video, "out", true);
+  try {
     pc = newPC(peer);
     localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
     const offer = await pc.createOffer();
@@ -1324,6 +1383,285 @@ function renderCalls() {
   });
 }
 
+// ---------- Вложения, голос, кружки ----------
+const fmtDur = v => { v = Math.max(0, Math.round(+v || 0)); return Math.floor(v / 60) + ":" + String(v % 60).padStart(2, "0"); };
+const okData = (d, kinds) => typeof d === "string" && new RegExp("^data:(" + kinds + ")/").test(d);
+
+function closeAttach() { $("attachPanel").classList.remove("show"); }
+
+function askDelete(item) {
+  if (!confirm("Удалить это сообщение?")) return;
+  state.hidden[item.key] = 1;
+  state.messages[state.activeContact] = (state.messages[state.activeContact] || []).filter(x => x.key !== item.key);
+  saveState();
+  renderMessages();
+}
+
+function longPress(el, fn) {
+  let t = null;
+  el.addEventListener("touchstart", () => { t = setTimeout(fn, 700); }, { passive: true });
+  ["touchend", "touchmove", "touchcancel"].forEach(ev => el.addEventListener(ev, () => clearTimeout(t)));
+  el.addEventListener("contextmenu", e => { e.preventDefault(); fn(); });
+}
+
+async function sendRich(id, msg, dataUrl) {
+  if (!db) { alert("Нет подключения."); return; }
+  if (isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
+  const base = chatIdWith(id);
+  try {
+    if (dataUrl) {
+      const mr = push(ref(db, "media/" + base), { d: dataUrl });
+      await mr;
+      msg.mid = mr.key;
+    }
+    msg.from = myKey();
+    msg.ts = serverTimestamp();
+    await push(ref(db, "chats/" + base + "/messages"), msg);
+    set(ref(db, "inbox/" + id + "/" + myKey()), { name: state.profile.name, ts: serverTimestamp() }).catch(() => {});
+  } catch (e) {
+    alert("Не удалось отправить.");
+  }
+}
+
+function loadMedia(cid, mid) {
+  return get(ref(db, "media/" + chatIdWith(cid) + "/" + mid)).then(sn => { const v = sn.val(); return v && v.d; }).catch(() => null);
+}
+
+function blobToData(blob) {
+  return new Promise((res, rej) => { const r = new FileReader(); r.onload = () => res(r.result); r.onerror = rej; r.readAsDataURL(blob); });
+}
+
+function makeRecorder(stream, kind) {
+  const list = kind === "video" ? ["video/webm;codecs=vp8,opus", "video/webm", "video/mp4"] : ["audio/webm;codecs=opus", "audio/webm", "audio/mp4"];
+  const mime = list.find(t => MediaRecorder.isTypeSupported(t));
+  const opts = kind === "video" ? { videoBitsPerSecond: 300000, audioBitsPerSecond: 32000 } : { audioBitsPerSecond: 24000 };
+  if (mime) opts.mimeType = mime;
+  return new MediaRecorder(stream, opts);
+}
+
+function buildBody(message, item, cid) {
+  const t = item.type;
+  if (t === "voice" && item.mid) {
+    const b = document.createElement("button");
+    b.className = "vbtn";
+    const lab = p => (p ? "⏸" : "▶") + " 🎤 " + fmtDur(item.dur);
+    b.textContent = lab(false);
+    let au = null;
+    b.addEventListener("click", async () => {
+      if (au) { if (au.paused) { au.play(); b.textContent = lab(true); } else { au.pause(); b.textContent = lab(false); } return; }
+      b.textContent = "Загрузка...";
+      const d = await loadMedia(cid, item.mid);
+      if (!okData(d, "audio|video")) { b.textContent = "Не удалось загрузить"; return; }
+      au = new Audio(d);
+      au.onended = () => { b.textContent = lab(false); };
+      au.play().then(() => { b.textContent = lab(true); }).catch(() => { au = null; b.textContent = "Не удалось воспроизвести"; });
+    });
+    message.appendChild(b);
+    longPress(message, () => askDelete(item));
+  } else if (t === "video" && item.mid) {
+    message.classList.add("bare");
+    const rv = document.createElement("div");
+    rv.className = "vround";
+    rv.textContent = "▶ " + fmtDur(item.dur);
+    let vid = null;
+    rv.addEventListener("click", async () => {
+      if (vid) { if (vid.paused) vid.play(); else vid.pause(); return; }
+      rv.textContent = "…";
+      const d = await loadMedia(cid, item.mid);
+      if (!okData(d, "video")) { rv.textContent = "Ошибка"; return; }
+      vid = document.createElement("video");
+      vid.src = d;
+      vid.playsInline = true;
+      vid.autoplay = true;
+      rv.textContent = "";
+      rv.appendChild(vid);
+      vid.play().catch(() => {});
+    });
+    message.appendChild(rv);
+    longPress(message, () => askDelete(item));
+  } else if (t === "photo" && item.mid && okData(item.th, "image")) {
+    message.classList.add("bare");
+    const im = document.createElement("img");
+    im.className = "fthumb";
+    im.src = item.th;
+    im.alt = "";
+    im.addEventListener("click", async () => {
+      $("imgFull").src = item.th;
+      $("imgModal").classList.add("show");
+      const d = await loadMedia(cid, item.mid);
+      if (okData(d, "image") && $("imgModal").classList.contains("show")) $("imgFull").src = d;
+    });
+    message.appendChild(im);
+    longPress(message, () => askDelete(item));
+  } else if (t === "contact" && item.ct && /^996\d{9}$/.test(String(item.ct.id))) {
+    const id = String(item.ct.id);
+    const box = document.createElement("button");
+    box.className = "ctcard";
+    box.textContent = "👤 " + String(item.ct.name || "").slice(0, 40) + "\n+" + id;
+    box.addEventListener("click", () => {
+      if (id === myKey()) { alert("Это твой номер."); return; }
+      if (state.contacts.some(c => c.id === id)) { openContact(id); return; }
+      if (!confirm("Добавить контакт +" + id + "?")) return;
+      $("newContactName").value = id;
+      addContact();
+    });
+    message.appendChild(box);
+    longPress(message, () => askDelete(item));
+  } else {
+    message.textContent = item.text;
+    message.addEventListener("click", () => askDelete(item));
+  }
+}
+
+// --- голосовое
+let vrec = null;
+function stopVoice(send) {
+  const r = vrec;
+  if (!r) return;
+  r.send = send;
+  vrec = null;
+  clearInterval(r.timer);
+  $("recBar").style.display = "none";
+  $("messageForm").style.display = "";
+  try { if (r.mr.state !== "inactive") r.mr.stop(); } catch (e) {}
+}
+
+async function startVoice() {
+  const id = state.activeContact;
+  if (vrec || !id) return;
+  if (!db) { alert("Нет подключения."); return; }
+  if (isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
+  closeAttach();
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ audio: true }); } catch (e) { alert("Нет доступа к микрофону."); return; }
+  let mr;
+  try { mr = makeRecorder(stream, "audio"); } catch (e) { stream.getTracks().forEach(t => t.stop()); alert("Запись не поддерживается в этом браузере."); return; }
+  const chunks = [], t0 = Date.now();
+  const r = { mr: mr, send: false, timer: null };
+  mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  mr.onstop = async () => {
+    stream.getTracks().forEach(t => t.stop());
+    const dur = (Date.now() - t0) / 1000;
+    if (!r.send || dur < 1 || !chunks.length) return;
+    const type = (mr.mimeType || chunks[0].type || "audio/webm").split(";")[0];
+    const data = await blobToData(new Blob(chunks, { type: type }));
+    sendRich(id, { type: "voice", text: "🎤 Голосовое сообщение", dur: Math.round(dur) }, data);
+  };
+  vrec = r;
+  $("messageForm").style.display = "none";
+  $("recBar").style.display = "flex";
+  $("recTime").textContent = "0:00";
+  r.timer = setInterval(() => {
+    const sec = (Date.now() - t0) / 1000;
+    $("recTime").textContent = fmtDur(sec);
+    if (sec >= 120) stopVoice(true);
+  }, 250);
+  mr.start();
+}
+
+// --- кружок (видео до 1 минуты)
+let wrec = null;
+async function openVid() {
+  const id = state.activeContact;
+  if (!id || wrec) return;
+  if (!db) { alert("Нет подключения."); return; }
+  if (isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
+  closeAttach();
+  let stream;
+  try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 360 }, height: { ideal: 360 } }, audio: true }); } catch (e) { alert("Нет доступа к камере или микрофону."); return; }
+  wrec = { stream: stream, id: id, mr: null, timer: null, t0: 0, send: false };
+  $("vidPrev").srcObject = stream;
+  $("vidTime").textContent = "0:00 / 1:00";
+  $("vidGo").textContent = "⏺";
+  $("vidModal").classList.add("show");
+}
+
+function closeVid() {
+  const r = wrec;
+  if (!r) return;
+  wrec = null;
+  clearInterval(r.timer);
+  if (r.mr && r.mr.state === "recording") { r.send = false; try { r.mr.stop(); } catch (e) {} }
+  r.stream.getTracks().forEach(t => t.stop());
+  $("vidPrev").srcObject = null;
+  $("vidModal").classList.remove("show");
+}
+
+function finishVid() {
+  const r = wrec;
+  if (!r || !r.mr) return;
+  r.send = true;
+  try { r.mr.stop(); } catch (e) {}
+}
+
+$("vidGo").addEventListener("click", () => {
+  const r = wrec;
+  if (!r) return;
+  if (r.mr) { finishVid(); return; }
+  let mr;
+  try { mr = makeRecorder(r.stream, "video"); } catch (e) { alert("Запись не поддерживается в этом браузере."); return; }
+  r.mr = mr;
+  const chunks = [];
+  mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
+  mr.onstop = async () => {
+    const send = r.send, dur = (Date.now() - r.t0) / 1000;
+    closeVid();
+    if (!send || dur < 1 || !chunks.length) return;
+    const type = (mr.mimeType || chunks[0].type || "video/webm").split(";")[0];
+    const data = await blobToData(new Blob(chunks, { type: type }));
+    sendRich(r.id, { type: "video", text: "⭕ Видеосообщение", dur: Math.round(dur) }, data);
+  };
+  r.t0 = Date.now();
+  mr.start();
+  $("vidGo").textContent = "⏹";
+  r.timer = setInterval(() => {
+    const sec = (Date.now() - r.t0) / 1000;
+    $("vidTime").textContent = fmtDur(sec) + " / 1:00";
+    if (sec >= 60) finishVid();
+  }, 250);
+});
+$("vidCancel").addEventListener("click", closeVid);
+
+// --- кнопки меню вложений
+$("micBtn").addEventListener("click", startVoice);
+$("recCancel").addEventListener("click", () => stopVoice(false));
+$("recSend").addEventListener("click", () => stopVoice(true));
+$("plusBtn").addEventListener("click", () => $("attachPanel").classList.toggle("show"));
+$("attCam").addEventListener("click", openVid);
+$("attPhoto").addEventListener("click", () => { closeAttach(); $("galInput").click(); });
+$("galInput").addEventListener("change", function () {
+  const f = this.files && this.files[0];
+  this.value = "";
+  const id = state.activeContact;
+  if (!f || !f.type.startsWith("image/") || !id) return;
+  compress(f, 1000, full => compress(f, 160, th => sendRich(id, { type: "photo", text: "🖼 Фото", th: th }, full)));
+});
+$("attContact").addEventListener("click", () => {
+  closeAttach();
+  const list = $("pickList");
+  list.replaceChildren();
+  const others = state.contacts.filter(c => c.id !== state.activeContact);
+  if (!others.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "Больше контактов нет.";
+    list.appendChild(e);
+  }
+  others.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "primary-button";
+    b.textContent = "👤 " + c.name;
+    b.addEventListener("click", () => {
+      $("pickModal").classList.remove("show");
+      sendRich(state.activeContact, { type: "contact", text: "👤 Контакт: " + c.name.slice(0, 40), ct: { id: c.id, name: c.name.slice(0, 40) } });
+    });
+    list.appendChild(b);
+  });
+  $("pickModal").classList.add("show");
+});
+$("closePick").addEventListener("click", () => $("pickModal").classList.remove("show"));
+$("imgModal").addEventListener("click", function () { this.classList.remove("show"); $("imgFull").src = ""; });
+
 // ---------- Запуск ----------
 loadState();
 updateHeader();
@@ -1409,4 +1747,4 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
   }
 </script>
 </body>
-</html> 
+</html>
