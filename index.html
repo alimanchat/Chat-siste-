@@ -101,6 +101,7 @@ button{cursor:pointer;border:none}
 .fown .avatar{width:34px;height:34px;font-size:16px}
 .fimg{width:100%;border-radius:10px;display:block;background:#eee}
 .ftitle{font-weight:bold;margin:8px 0 2px}
+#cpName{background:#eee;border-radius:10px;padding:10px;font-size:20px;margin:0 8px!important}
 .fdesc{color:#555;margin:2px 0 4px;line-height:1.4;overflow-wrap:anywhere}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
@@ -159,11 +160,12 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 
   <section class="view" id="cpView">
     <button class="icon-button" id="cpBack" aria-label="Назад" style="position:absolute;top:8px;left:8px;z-index:2;background:#ffffffcc">←</button>
+    <button class="icon-button" id="cpMenuBtn" aria-label="Меню" style="position:absolute;top:8px;right:8px;z-index:2;background:#ffffffcc">⋮</button>
     <div class="profile-content" style="text-align:center">
       <div class="avatar profile-photo" id="cpAvatar">👤</div>
       <h2 id="cpName" style="margin:0"></h2>
       <div class="cp-tabs">
-        <button data-t="bio">🪪<small>Профиль</small></button>
+        <button data-t="bio">👤<small>Профиль</small></button>
         <button data-t="status">➕<small>Статус</small></button>
         <button data-t="photo">📷<small>Фото</small></button>
         <button data-t="video">🎬<small>Видео</small></button>
@@ -209,7 +211,6 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   </section>
 
   <section class="view" id="albumView">
-    <div class="section-title">Альбом</div>
     <div class="atabs">
       <button data-a="photo">📷<small>Фото</small></button>
       <button data-a="video">🎬<small>Видео</small></button>
@@ -280,6 +281,24 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
   </div>
 
+  <div class="modal" id="chatMenuModal">
+    <div class="modal-card">
+      <h3>Чат</h3>
+      <button class="primary-button" id="chatClear" style="background:#a33">🗑 Удалить все SMS</button>
+      <p style="color:#777;font-size:13px;margin:10px 0 0">Чтобы удалить одно сообщение, нажми на него.</p>
+      <button class="secondary-button" id="closeChatMenu" style="width:100%;margin-top:12px">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal" id="cpMenu">
+    <div class="modal-card">
+      <h3>Контакт</h3>
+      <button class="primary-button" id="cpBlock">🚫 Заблокировать</button>
+      <button class="primary-button" id="cpDelete" style="background:#a33">🗑 Удалить контакт</button>
+      <button class="secondary-button" id="closeCpMenu" style="width:100%;margin-top:12px">Закрыть</button>
+    </div>
+  </div>
+
   <div class="modal" id="menuModal">
     <div class="modal-card">
       <h3>Меню</h3>
@@ -334,10 +353,11 @@ const $ = id => document.getElementById(id);
 const STORAGE_KEY = "my_chat_app_v2";
 const UID_KEY = "my_chat_uid";
 
-let state = { profile: { name: "", photo: "", phone: "", birth: "", city: "", village: "", edu: "", work: "", hobby: "", gender: "", family: "", status: "" }, contacts: [], calls: [], messages: {}, activeContact: null };
+let state = { profile: { name: "", photo: "", phone: "", birth: "", city: "", village: "", edu: "", work: "", hobby: "", gender: "", family: "", status: "" }, contacts: [], calls: [], blocked: [], hidden: {}, messages: {}, activeContact: null };
 let currentView = "chatsView";
 const listening = {};
 const presence = {};
+function isBlocked(id) { return state.blocked.indexOf(id) !== -1; }
 
 // ---------- Firebase ----------
 let db = null;
@@ -394,16 +414,12 @@ function listenChat(contact) {
     renderContacts();
     if (currentView === "chatView" && state.activeContact === c.id) openContact(c.id);
   });
-  onValue(ref(db, "presence/" + contact.id), sn => {
-    presence[contact.id] = sn.val();
-    if (currentView === "chatView" && state.activeContact === contact.id) updateChatStatus();
-  });
   const q = query(ref(db, "chats/" + chatIdWith(contact.id) + "/messages"), limitToLast(200));
   onChildAdded(q, snap => {
     const m = snap.val();
-    if (!m || typeof m.text !== "string") return;
+    if (!m || typeof m.text !== "string" || isBlocked(contact.id)) return;
     const list = state.messages[contact.id] || (state.messages[contact.id] = []);
-    if (list.some(x => x.key === snap.key)) return;
+    if (state.hidden[snap.key] || list.some(x => x.key === snap.key)) return;
     list.push({ key: snap.key, text: m.text, mine: m.from === myKey(), time: fmtTime(m.ts) });
     refreshAfterMessage(contact.id);
   });
@@ -413,7 +429,7 @@ function listenInbox() {
   onChildAdded(ref(db, "inbox/" + myKey()), snap => {
     const v = snap.val();
     const id = snap.key;
-    if (!v || id === myKey()) return;
+    if (!v || id === myKey() || isBlocked(id)) return;
     let contact = state.contacts.find(c => c.id === id);
     if (!contact) {
       contact = { id: id, name: showName(v.name, id), photo: "" };
@@ -435,6 +451,8 @@ function loadState() {
       if (data && typeof data === "object") {
         state.profile = Object.assign(state.profile, data.profile || {});
         state.calls = Array.isArray(data.calls) ? data.calls : [];
+        state.blocked = Array.isArray(data.blocked) ? data.blocked : [];
+        state.hidden = data.hidden && typeof data.hidden === "object" ? data.hidden : {};
         state.contacts = Array.isArray(data.contacts) ? data.contacts.filter(c => /^996\d{9}$/.test(c.id)) : [];
       }
     }
@@ -445,7 +463,7 @@ function loadState() {
 
 function saveState() {
   try {
-    localStorage.setItem(STORAGE_KEY, JSON.stringify({ profile: state.profile, contacts: state.contacts, calls: state.calls }));
+    localStorage.setItem(STORAGE_KEY, JSON.stringify({ profile: state.profile, contacts: state.contacts, calls: state.calls, blocked: state.blocked, hidden: state.hidden }));
   } catch (error) {
     alert("Не удалось сохранить данные. Возможно, память браузера заполнена.");
   }
@@ -500,7 +518,7 @@ function showView(viewId) {
   if (viewId === "chatsView") renderChats();
   if (viewId === "contactsView") renderContacts();
   if (viewId === "profileView") updateHeader();
-  if (viewId === "statusView") loadStatuses
+  if (viewId === "statusView") loadStatuses();
   if (viewId === "albumView") loadAlbum();
   if (viewId === "callsView") renderCalls();
 }
@@ -604,6 +622,13 @@ function renderMessages() {
     const message = document.createElement("div");
     message.className = "message" + (item.mine ? " mine" : "");
     message.textContent = item.text;
+    message.addEventListener("click", () => {
+      if (!confirm("Удалить это сообщение?")) return;
+      state.hidden[item.key] = 1;
+      state.messages[state.activeContact] = (state.messages[state.activeContact] || []).filter(x => x.key !== item.key);
+      saveState();
+      renderMessages();
+    });
     col.appendChild(message);
     if (item.mine) {
       const tick = document.createElement("small");
@@ -666,6 +691,7 @@ function sendMessage(event) {
   if (!text) return;
 
   const id = state.activeContact;
+  if (isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
   input.value = "";
 
   push(ref(db, "chats/" + chatIdWith(id) + "/messages"), {
@@ -699,6 +725,7 @@ function deleteCurrentContact() {
   showView("chatsView");
 }
 
+$("choosePhotoButton").addEventListener("click", () => $("photoInput").click());
 $("photoInput").addEventListener("change", function () {
   const file = this.files && this.files[0];
   if (!file) return;
@@ -745,9 +772,18 @@ $("saveContact").addEventListener("click", addContact);
 $("newContactName").addEventListener("keydown", e => { if (e.key === "Enter") addContact(); });
 $("headerMenu").addEventListener("click", () => $("sideMenu").classList.add("show"));
 $("closeSide").addEventListener("click", () => $("sideMenu").classList.remove("show"));
-$("chatMenu").addEventListener("click", function () {
-  $("menuDelete").style.display = "block";
-  $("menuModal").classList.add("show");
+$("chatMenu").addEventListener("click", () => $("chatMenuModal").classList.add("show"));
+$("closeChatMenu").addEventListener("click", () => $("chatMenuModal").classList.remove("show"));
+$("chatClear").addEventListener("click", () => {
+  $("chatMenuModal").classList.remove("show");
+  const id = state.activeContact;
+  if (!id) return;
+  if (!confirm("Удалить все SMS в этом чате? Контакт останется.")) return;
+  (state.messages[id] || []).forEach(m => { state.hidden[m.key] = 1; });
+  state.messages[id] = [];
+  saveState();
+  renderMessages();
+  renderChats();
 });
 
 $("closeMenu").addEventListener("click", () => {
@@ -809,7 +845,7 @@ document.querySelectorAll(".nav-button[data-view]").forEach(button => {
   });
 });
 
-["contactModal", "menuModal", "sideMenu", "delModal"].forEach(id => {
+["contactModal", "menuModal", "sideMenu", "delModal", "cpMenu", "chatMenuModal"].forEach(id => {
   $(id).addEventListener("click", function (event) {
     if (event.target === this) this.classList.remove("show");
   });
@@ -851,7 +887,7 @@ function openCP(id) {
   const c = state.contacts.find(x => x.id === id);
   if (!c) return;
   cpId = id;
-  $("cpName").textContent = c.name;
+  $("cpName").textContent = c.name + (isBlocked(id) ? " 🚫" : "");
   const setAv = photo => {
     const av = makeAvatar(photo, c.name);
     av.id = "cpAvatar";
@@ -885,19 +921,11 @@ async function cpTab(t) {
   const id = cpId;
   try {
     if (t === "photo") {
-      const sn = await get(query(ref(db, "albums/" + id), limitToLast(60)));
+      const items = await getPhotos(id, () => cpId !== id);
       if (cpId !== id) return;
       box.replaceChildren();
-      const grid = document.createElement("div");
-      grid.className = "grid";
-      sn.forEach(ch => {
-        const im = document.createElement("img");
-        im.src = ch.val().d;
-        im.alt = "";
-        grid.appendChild(im);
-      });
-      if (!grid.children.length) { say("Пока нет фото."); return; }
-      box.appendChild(grid);
+      if (!items.length) { say("Пока нет фото."); return; }
+      items.forEach(([k, v]) => box.appendChild(makeCard(k, v)));
       return;
     }
     const v = (await get(ref(db, "users/" + id))).val() || {};
@@ -939,6 +967,29 @@ async function cpTab(t) {
   }
 }
 
+$("cpMenuBtn").addEventListener("click", () => {
+  $("cpBlock").textContent = isBlocked(cpId) ? "✅ Разблокировать" : "🚫 Заблокировать";
+  $("cpMenu").classList.add("show");
+});
+$("closeCpMenu").addEventListener("click", () => $("cpMenu").classList.remove("show"));
+$("cpDelete").addEventListener("click", () => {
+  $("cpMenu").classList.remove("show");
+  state.activeContact = cpId;
+  deleteCurrentContact();
+});
+$("cpBlock").addEventListener("click", () => {
+  $("cpMenu").classList.remove("show");
+  const c = state.contacts.find(x => x.id === cpId);
+  if (!c) return;
+  if (isBlocked(cpId)) {
+    state.blocked = state.blocked.filter(x => x !== cpId);
+  } else {
+    if (!confirm("Заблокировать «" + c.name + "»? Его сообщения и звонки приходить не будут.")) return;
+    state.blocked.push(cpId);
+  }
+  saveState();
+  $("cpName").textContent = c.name + (isBlocked(cpId) ? " 🚫" : "");
+});
 $("cpBack").addEventListener("click", () => showView("chatView"));
 document.querySelectorAll(".cp-tabs button").forEach(b => b.addEventListener("click", () => cpTab(b.dataset.t)));
 $("chatName").parentElement.style.cursor = "pointer";
@@ -1013,24 +1064,30 @@ async function loadAlbum() {
   if (!db) { say("Нет подключения."); return; }
   say("Загрузка...");
   try {
-    const sn = await get(query(ref(db, "feed"), limitToLast(200)));
-    const items = [];
-    const allowed = new Set([state.profile.phone, ...state.contacts.map(c => c.id)]);
-    sn.forEach(ch => { const v = ch.val(); if (v && allowed.has(v.owner)) items.push([ch.key, v]); });
-    items.reverse();
+    const items = await getPhotos(state.profile.phone, () => false);
     box.replaceChildren();
-    if (!items.length) { say("Пока нет фото от тебя и твоих контактов."); return; }
+    if (!items.length) { say("Пока нет фото."); return; }
     items.forEach(([k, v]) => box.appendChild(makeCard(k, v)));
   } catch (e) {
     box.replaceChildren();
-       say("Не удалось загрузить.");
+    say("Не удалось загрузить.");
   }
+}
+
+async function getPhotos(id, stale) {
+  const al = await get(query(ref(db, "albums/" + id), limitToLast(60)));
+  const fs = await get(query(ref(db, "feed"), limitToLast(200)));
+  if (stale()) return [];
+  const feed = fs.val() || {};
+  const items = [];
+  al.forEach(ch => { items.push([ch.key, feed[ch.key] && feed[ch.key].d ? feed[ch.key] : { owner: id, d: ch.val().d, plain: true }]); });
+  return items.reverse();
 }
 
 function makeCard(k, v) {
   const me = state.profile.phone;
   const likes = v.likes || {}, dis = v.dislikes || {}, views = v.views || {};
-  if (me && !views[me]) { views[me] = true; set(ref(db, "feed/" + k + "/views/" + me), true).catch(() => {}); }
+  if (me && !views[me] && !v.plain) { views[me] = true; set(ref(db, "feed/" + k + "/views/" + me), true).catch(() => {}); }
   const card = document.createElement("div");
   card.className = "fcard";
   const c = state.contacts.find(x => x.id === v.owner);
@@ -1073,8 +1130,19 @@ function makeCard(k, v) {
   };
   bl.addEventListener("click", () => toggle(likes, dis, "likes", "dislikes"));
   bd.addEventListener("click", () => toggle(dis, likes, "dislikes", "likes"));
+  const sv = document.createElement("button");
+  sv.textContent = "💾";
+  sv.setAttribute("aria-label", "Сохранить фото");
+  sv.addEventListener("click", () => {
+    const a = document.createElement("a");
+    a.href = v.d;
+    a.download = (v.title || "photo") + ".jpg";
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+  });
   paint();
-  act.append(bl, bd, vw);
+  if (v.plain) act.append(sv); else act.append(bl, bd, sv, vw);
   card.append(own, img);
   if (v.title) card.appendChild(tt);
   if (v.desc) card.appendChild(ds);
@@ -1143,18 +1211,7 @@ async function startCall(video) {
   if (!db) { alert("Нет подключения."); return; }
   const peer = state.activeContact;
   if (!peer || callRole) return;
-  try {
-    localStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: !!video });
-  } catch (e) {
-    alert("Нет доступа к микрофону или камере.");
-    return;
-  }
-  callRole = "caller";
-  callPeer = peer;
-  const c = state.contacts.find(x => x.id === peer);
-  showCall((video ? "Видеозвонок: " : "Звонок: ") + (c ? c.name : "+" + peer), false, video);
-  $("localVideo").srcObject = localStream;
-  logCall(peer, !!video, "out", true);
+  if (isBlocked(peer)) { alert("Контакт заблокирован."); return; }
   try {
     pc = newPC(peer);
     localStream.getTracks().forEach(t => pc.addTrack(t, localStream));
@@ -1211,7 +1268,7 @@ function listenCalls() {
   onValue(ref(db, "calls/" + myKey()), sn => {
     const v = sn.val();
     if (!v) { if (callRole === "callee") endCall(false); return; }
-    if (callRole || !v.offer || v.answer) return;
+    if (callRole || !v.offer || v.answer || isBlocked(v.from)) return;
     if (v.ts && Date.now() - v.ts > 60000) return;
     incomingCall = v;
     callRole = "callee";
@@ -1352,4 +1409,4 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
   }
 </script>
 </body>
-</html>
+</html> 
