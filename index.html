@@ -92,6 +92,20 @@ button{cursor:pointer;border:none}
 .modal-card input{width:100%;padding:13px;border:1px solid #ddd;border-radius:10px;margin:8px 0}
 .modal-actions{display:flex;gap:10px;margin-top:12px}
 .modal-actions button{flex:1}
+.atabs{display:flex;justify-content:space-around;border-bottom:1px solid #ddd;padding:6px 0}
+.atabs button{background:#fff;font-size:24px;display:flex;flex-direction:column;align-items:center;gap:2px;padding:6px 30px;border-radius:10px}
+.atabs button small{font-size:11px;color:#555}
+.atabs button.on{background:#ededed}
+.fcard{margin:0 0 22px}
+.fown{display:flex;align-items:center;gap:8px;margin-bottom:6px;font-weight:bold}
+.fown .avatar{width:34px;height:34px;font-size:16px}
+.fimg{width:100%;border-radius:10px;display:block;background:#eee}
+.ftitle{font-weight:bold;margin:8px 0 2px}
+.fdesc{color:#555;margin:2px 0 4px;line-height:1.4;overflow-wrap:anywhere}
+.fact{display:flex;gap:10px;align-items:center;margin-top:6px}
+.fact button{background:#eee;border-radius:18px;padding:7px 14px}
+.fact button.on{background:#d9fdd3}
+.fview{margin-left:auto;color:#777;font-size:13px}
 @media (min-width:700px){
 body{padding:15px}
 .app{height:calc(100dvh - 30px);border-radius:15px;box-shadow:0 3px 20px #00000010}
@@ -196,10 +210,12 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 
   <section class="view" id="albumView">
     <div class="section-title">Альбом</div>
-    <div class="profile-content">
-      <button class="primary-button" id="albumAdd">📷 Добавить фото</button>
-      <div class="grid" id="albumGrid" style="margin-top:14px"></div>
+    <div class="atabs">
+      <button data-a="photo">📷<small>Фото</small></button>
+      <button data-a="video">🎬<small>Видео</small></button>
     </div>
+    <div class="profile-content" id="feedBox" style="flex:1;min-height:0"></div>
+    <div style="padding:10px"><button class="primary-button" id="albumAdd" style="margin-top:0">➕ Добавить фото</button></div>
   </section>
 
   <section class="view" id="moreView">
@@ -484,7 +500,7 @@ function showView(viewId) {
   if (viewId === "chatsView") renderChats();
   if (viewId === "contactsView") renderContacts();
   if (viewId === "profileView") updateHeader();
-  if (viewId === "statusView") loadStatuses();
+  if (viewId === "statusView") loadStatuses
   if (viewId === "albumView") loadAlbum();
   if (viewId === "callsView") renderCalls();
 }
@@ -934,9 +950,13 @@ $("albumInput").addEventListener("change", function () {
   this.value = "";
   if (!f || !f.type.startsWith("image/")) return;
   if (!db) { alert("Нет подключения."); return; }
-  compress(f, 800, url => {
-    push(ref(db, "albums/" + state.profile.phone), { d: url, ts: serverTimestamp() })
-      .then(() => { alert("Фото добавлено в альбом."); if (currentView === "albumView") loadAlbum(); })
+  compress(f, 700, url => {
+    const title = (prompt("Название фото:", "") || "").trim().slice(0, 60);
+    const desc = (prompt("Описание фото:", "") || "").trim().slice(0, 300);
+    const me = state.profile.phone;
+    const r = push(ref(db, "feed"), { owner: me, ownerName: state.profile.name || "", title: title, desc: desc, d: url, ts: serverTimestamp() });
+    r.then(() => set(ref(db, "albums/" + me + "/" + r.key), { d: url, ts: serverTimestamp() }))
+      .then(() => { feedTab = "photo"; if (currentView === "albumView") loadAlbum(); })
       .catch(() => alert("Не удалось добавить фото."));
   });
 });
@@ -983,29 +1003,86 @@ $("stPost").addEventListener("click", async () => {
   }
 });
 
+let feedTab = "photo";
 async function loadAlbum() {
-  const g = $("albumGrid");
-  g.replaceChildren();
-  if (!db || !state.profile.phone) return;
+  const box = $("feedBox");
+  box.replaceChildren();
+  document.querySelectorAll(".atabs button").forEach(b => b.classList.toggle("on", b.dataset.a === feedTab));
+  const say = t => { const d = document.createElement("div"); d.className = "empty"; d.textContent = t; box.appendChild(d); };
+  if (feedTab === "video") { say("Видео скоро появится."); return; }
+  if (!db) { say("Нет подключения."); return; }
+  say("Загрузка...");
   try {
-    const sn = await get(query(ref(db, "albums/" + state.profile.phone), limitToLast(60)));
-    sn.forEach(ch => {
-      const im = document.createElement("img");
-      im.src = ch.val().d;
-      im.alt = "";
-      g.appendChild(im);
-    });
-    if (!g.children.length) {
-      const d = document.createElement("div");
-      d.className = "empty";
-      d.style.gridColumn = "1 / -1";
-      d.textContent = "Пока нет фото.";
-      g.appendChild(d);
-    }
+    const sn = await get(query(ref(db, "feed"), limitToLast(200)));
+    const items = [];
+    const allowed = new Set([state.profile.phone, ...state.contacts.map(c => c.id)]);
+    sn.forEach(ch => { const v = ch.val(); if (v && allowed.has(v.owner)) items.push([ch.key, v]); });
+    items.reverse();
+    box.replaceChildren();
+    if (!items.length) { say("Пока нет фото от тебя и твоих контактов."); return; }
+    items.forEach(([k, v]) => box.appendChild(makeCard(k, v)));
   } catch (e) {
-    g.textContent = "Не удалось загрузить.";
+    box.replaceChildren();
+       say("Не удалось загрузить.");
   }
 }
+
+function makeCard(k, v) {
+  const me = state.profile.phone;
+  const likes = v.likes || {}, dis = v.dislikes || {}, views = v.views || {};
+  if (me && !views[me]) { views[me] = true; set(ref(db, "feed/" + k + "/views/" + me), true).catch(() => {}); }
+  const card = document.createElement("div");
+  card.className = "fcard";
+  const c = state.contacts.find(x => x.id === v.owner);
+  const own = document.createElement("div");
+  own.className = "fown";
+  own.appendChild(makeAvatar(c ? c.photo : (v.owner === me ? state.profile.photo : ""), v.ownerName || (c && c.name) || ""));
+  const nm = document.createElement("span");
+  nm.textContent = v.owner === me ? "Я" : (c ? c.name : (v.ownerName || "+" + v.owner));
+  own.appendChild(nm);
+  const img = document.createElement("img");
+  img.className = "fimg";
+  img.src = v.d;
+  img.alt = "";
+  const tt = document.createElement("div");
+  tt.className = "ftitle";
+  tt.textContent = v.title || "";
+  const ds = document.createElement("div");
+  ds.className = "fdesc";
+  ds.textContent = v.desc || "";
+  const act = document.createElement("div");
+  act.className = "fact";
+  const bl = document.createElement("button"), bd = document.createElement("button"), vw = document.createElement("span");
+  vw.className = "fview";
+  const paint = () => {
+    bl.textContent = "👍 " + Object.keys(likes).length;
+    bd.textContent = "👎 " + Object.keys(dis).length;
+    bl.classList.toggle("on", !!likes[me]);
+    bd.classList.toggle("on", !!dis[me]);
+    vw.textContent = "Просмотр: " + Object.keys(views).length;
+  };
+  const toggle = (mine, other, mName, oName) => {
+    if (!me) return;
+    if (mine[me]) { delete mine[me]; remove(ref(db, "feed/" + k + "/" + mName + "/" + me)).catch(() => {}); }
+    else {
+      mine[me] = true;
+      set(ref(db, "feed/" + k + "/" + mName + "/" + me), true).catch(() => {});
+      if (other[me]) { delete other[me]; remove(ref(db, "feed/" + k + "/" + oName + "/" + me)).catch(() => {}); }
+    }
+    paint();
+  };
+  bl.addEventListener("click", () => toggle(likes, dis, "likes", "dislikes"));
+  bd.addEventListener("click", () => toggle(dis, likes, "dislikes", "likes"));
+  paint();
+  act.append(bl, bd, vw);
+  card.append(own, img);
+  if (v.title) card.appendChild(tt);
+  if (v.desc) card.appendChild(ds);
+  card.appendChild(act);
+  return card;
+}
+
+document.querySelectorAll(".atabs button").forEach(b => b.addEventListener("click", () => { feedTab = b.dataset.a; loadAlbum(); }));
 
 $("albumAdd").addEventListener("click", () => $("albumInput").click());
 
@@ -1029,7 +1106,7 @@ function showCall(text, ringing, video) {
 function addIce(c) {
   if (pc && pc.remoteDescription) pc.addIceCandidate(c).catch(() => {});
   else pendingIce.push(c);
-  }
+}
 
 function flushIce() {
   pendingIce.forEach(c => pc.addIceCandidate(c).catch(() => {}));
