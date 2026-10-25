@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
 <title>LimeChat</title>
 <style>
-/* === ОБНОВЛЕННЫЙ CSS (Lime Style) === */
+/* === БАЗОВЫЙ CSS === */
 * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
 body { margin: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; background: #eef1f5; color: #222; }
 button, input { font: inherit; outline: none; border: none; }
@@ -64,12 +64,15 @@ button { cursor: pointer; background: transparent; }
 .plus-btn { right: 14px; font-size: 26px; }
 .send-button { position: absolute; right: 14px; bottom: calc(max(10px, env(safe-area-inset-bottom)) + 4px); width: 40px; height: 40px; background: #66cc00; color: #fff; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(102, 204, 0, 0.4); }
 
-/* Нижнее меню */
-.bottom-nav { display: flex; justify-content: space-around; background: #fff; border-top: 1px solid #eee; padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
-.nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; font-size: 22px; color: #777; padding: 8px; border-radius: 12px; flex: 1; transition: 0.2s; }
+/* Нижнее меню (Круглая кнопка + и кнопки статистики) */
+.bottom-nav { display: flex; justify-content: space-around; align-items: center; background: #fff; border-top: 1px solid #eee; padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
+.nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; font-size: 22px; color: #777; padding: 8px; border-radius: 12px; transition: 0.2s; }
 .nav-button small { font-size: 10px; font-weight: 600; }
 .nav-button.active { color: #66cc00; background: #f0f5eb; }
 .nav-button.active small { color: #66cc00; }
+
+.main-add-btn { background: #66cc00; color: #000; width: 56px; height: 56px; font-size: 28px; font-weight: 300; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(102, 204, 0, 0.4); margin-top: -15px; }
+.stats-btn { font-size: 12px; font-weight: 700; color: #66cc00; background: #f0f5eb; border-radius: 20px; padding: 10px 14px; }
 
 /* Профиль и настройки */
 .profile-content { padding: 24px 18px; overflow-y: auto; flex: 1; }
@@ -140,7 +143,7 @@ button { cursor: pointer; background: transparent; }
 .fdesc { color: #555; margin: 2px 0 6px; line-height: 1.4; overflow-wrap: anywhere; font-size: 14px; }
 
 /* === СТИЛИ ДЛЯ ИСТОРИЙ (КАК НА РИСУНКЕ) === */
-.stories-grid {
+.story-grid {
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 12px;
@@ -149,8 +152,8 @@ button { cursor: pointer; background: transparent; }
 .story-tile {
   aspect-ratio: 1 / 1.1;
   border-radius: 16px;
-  background: #e0e5d8;
-  border: 2px solid #ccc;
+  background: #fff;
+  border: 2px solid #ddd;
   position: relative;
   overflow: hidden;
   display: flex;
@@ -173,11 +176,9 @@ button { cursor: pointer; background: transparent; }
 .story-tile .tile-text {
   position: relative;
   z-index: 2;
-  text-shadow: 0 1px 3px rgba(255,255,255,0.8);
-  font-size: 14px;
+  font-size: 15px;
   padding: 10px;
-  background: rgba(255,255,255,0.6);
-  border-radius: 8px;
+  line-height: 1.2;
 }
 .story-tile .badge {
   position: absolute;
@@ -210,6 +211,8 @@ button { cursor: pointer; background: transparent; }
   background: #fff;
   border-top: 1px solid #eee;
   border-bottom: 1px solid #eee;
+  margin: 0 16px;
+  border-radius: 12px 12px 0 0;
 }
 .contact-title strong { font-size: 18px; color: #111; }
 .contact-title .arrows { color: #66cc00; font-size: 20px; font-weight: bold; }
@@ -365,31 +368,34 @@ button { cursor: pointer; background: transparent; }
   <section class="view" id="statusView">
     <div style="flex: 1; overflow-y: auto; background: #f7f9f2;">
       
-      <!-- Верхний ряд (Две карточки) -->
-      <div class="stories-grid">
-        <div class="story-tile" id="topTile1">
-          <span class="tile-text">Фото и видео</span>
-        </div>
-        <div class="story-tile" id="topTile2">
-          <span class="tile-text">Фото и видео</span>
-        </div>
-      </div>
-
-      <!-- Заголовок Мерика -->
-      <div class="contact-title">
-        <strong>Мерика</strong>
-        <span class="arrows">↔</span>
-      </div>
-
-      <!-- Нижний ряд (Просмотры и Добавление) -->
-      <div class="stories-grid" style="padding-top: 0;">
-        <div class="story-tile" id="myStoryTile" style="cursor:default;">
-          <span class="badge">👁 14</span>
-          <span class="tile-text">Моя история</span>
-        </div>
+      <!-- Верхний ряд (Мои истории) -->
+      <div class="story-grid">
         <div class="story-tile add-tile" id="addStoryBtn">
           <span class="plus-icon">+</span>
           <span>Фото и видео</span>
+        </div>
+        <div class="story-tile" id="myStoryTile" style="cursor:default;">
+          <span class="badge">👁 0</span>
+          <span class="tile-text">Просмотры</span>
+        </div>
+      </div>
+
+      <!-- Заголовок Мерика (Первый контакт) -->
+      <div class="contact-title">
+        <div style="display:flex; align-items:center; gap:8px;">
+          <div class="avatar" style="width:32px; height:32px; border:2px solid #66cc00; font-size:16px;" id="contactAvatarSmall">👤</div>
+          <strong id="contactNameTitle">Мерика</strong>
+        </div>
+        <span class="arrows">↔</span>
+      </div>
+
+      <!-- Нижний ряд (Истории друзей) -->
+      <div class="story-grid" style="padding-top: 0;">
+        <div class="story-tile" id="friendStoryTile1">
+          <span class="tile-text">Нет фото</span>
+        </div>
+        <div class="story-tile" id="friendStoryTile2">
+          <span class="tile-text">Нет видео</span>
         </div>
       </div>
 
@@ -418,9 +424,9 @@ button { cursor: pointer; background: transparent; }
   <nav class="bottom-nav">
     <button class="nav-button active" data-view="chatsView" aria-label="Чат">✉️<small>Чат</small></button>
     <button class="nav-button" data-view="contactsView" aria-label="Контакты">👥<small>Контакты</small></button>
-    <button class="nav-button" data-view="statusView" aria-label="Истории">➕<small>Истории</small></button>
+    <button class="main-add-btn" data-view="statusView" aria-label="Добавить">+</button>
     <button class="nav-button" data-view="albumView" aria-label="Альбом">📷<small>Альбом</small></button>
-    <button class="nav-button" data-view="moreView" aria-label="Игры">🎮<small>Игры</small></button>
+    <button class="stats-btn" data-view="moreView">🎮</button>
   </nav>
 
   <!-- МОДАЛКИ (ОСТАЛЬНОЙ ФУНКЦИОНАЛ) -->
@@ -725,7 +731,7 @@ function showView(viewId) {
   document.querySelector(".bottom-nav").style.display = (viewId === "cpView" || viewId === "chatView") ? "none" : "";
 
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === viewId));
-  document.querySelectorAll(".nav-button[data-view]").forEach(b => b.classList.toggle("active", b.dataset.view === viewId));
+  document.querySelectorAll(".nav-button[data-view], .main-add-btn[data-view], .stats-btn[data-view]").forEach(b => b.classList.toggle("active", b.dataset.view === viewId));
 
   $("headerStatus").textContent = state.profile.phone ? "+" + state.profile.phone : "";
 
@@ -1049,7 +1055,7 @@ $("menuBlock").addEventListener("click", () => {
   renderContacts();
 });
 
-document.querySelectorAll(".nav-button[data-view]").forEach(button => {
+document.querySelectorAll(".nav-button[data-view], .main-add-btn[data-view], .stats-btn[data-view]").forEach(button => {
   button.addEventListener("click", function () {
     state.activeContact = null;
     showView(this.dataset.view);
@@ -1222,57 +1228,73 @@ $("albumInput").addEventListener("change", function () {
   });
 });
 
-// ---------- ИСТОРИИ (Сетка как на рисунке) ----------
+// ---------- ИСТОРИИ (Логика под твой рисунок) ----------
 async function loadStatuses() {
   if (!db) return;
   
-  // Загружаем свою историю
+  // 1. Моя история
   const myStory = await get(ref(db, "statuses/" + myKey())).then(sn => sn.val()).catch(() => null);
-  const tile = $("myStoryTile");
+  const myTile = $("myStoryTile");
   
   if (myStory && (Date.now() - (myStory.ts || 0) < 864e5)) {
-    // Если есть история, показываем её
-    const views = myStory.views ? Object.keys(myStory.views).length : 14; // 14 для примера, как на рисунке
-    tile.innerHTML = `
+    const views = myStory.views ? Object.keys(myStory.views).length : 14;
+    myTile.innerHTML = `
       <span class="badge">👁 ${views}</span>
       ${myStory.photo && myStory.photo.startsWith('data:image') ? `<img src="${myStory.photo}">` : ''}
       ${myStory.photo && myStory.photo.startsWith('data:video') ? `<video src="${myStory.photo}" muted autoplay loop playsinline></video>` : ''}
-      <span class="tile-text" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.5);color:#fff;">Моя история</span>
+      <span class="tile-text" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.5);color:#fff;padding:4px 8px;border-radius:8px;">Моя история</span>
     `;
-    tile.onclick = () => viewStory(myKey(), myStory);
+    myTile.onclick = () => viewStory(myKey(), myStory);
   } else {
-    // Если истории нет, показываем заглушку
-    tile.innerHTML = `<span class="tile-text">Нет истории</span>`;
-    tile.onclick = null;
+    myTile.innerHTML = `<span class="badge">👁 0</span><span class="tile-text">Просмотры</span>`;
+    myTile.onclick = null;
   }
 
-  // Загружаем историю контакта (Мерика)
-  const firstContact = state.contacts[0]; // Берем первого контакта
+  // 2. История друга (Мерика)
+  const firstContact = state.contacts[0];
+  const titleEl = $("contactNameTitle");
+  const avatarEl = $("contactAvatarSmall");
+  
   if (firstContact) {
-    const contactStory = await get(ref(db, "statuses/" + firstContact.id)).then(sn => sn.val()).catch(() => null);
-    
-    // Заполняем верхние две карточки
-    if (contactStory && (Date.now() - (contactStory.ts || 0) < 864e5)) {
-      $("topTile1").innerHTML = `
-        ${contactStory.photo && contactStory.photo.startsWith('data:image') ? `<img src="${contactStory.photo}">` : ''}
-        ${contactStory.photo && contactStory.photo.startsWith('data:video') ? `<video src="${contactStory.photo}" muted autoplay loop playsinline></video>` : ''}
-        <span class="tile-text" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.5);color:#fff;">${firstContact.name}</span>
-      `;
-      $("topTile1").onclick = () => viewStory(firstContact.id, contactStory);
-      
-      // Вторую карточку делаем дубликатом (или пустой)
-      $("topTile2").innerHTML = `
-        <span class="tile-text">Фото и видео</span>
-      `;
-      $("topTile2").onclick = () => viewStory(firstContact.id, contactStory);
+    titleEl.textContent = firstContact.name;
+    if (firstContact.photo) {
+      avatarEl.innerHTML = `<img src="${firstContact.photo}" style="width:100%;height:100%;object-fit:cover;border-radius:50%;">`;
     } else {
-      $("topTile1").innerHTML = `<span class="tile-text">Нет фото</span>`;
-      $("topTile2").innerHTML = `<span class="tile-text">Нет видео</span>`;
+      avatarEl.textContent = firstContact.name.charAt(0).toUpperCase();
     }
+    
+    const friendStory = await get(ref(db, "statuses/" + firstContact.id)).then(sn => sn.val()).catch(() => null);
+    
+    if (friendStory && (Date.now() - (friendStory.ts || 0) < 864e5)) {
+      // Показываем фото друга
+      $("friendStoryTile1").innerHTML = `
+        ${friendStory.photo && friendStory.photo.startsWith('data:image') ? `<img src="${friendStory.photo}">` : ''}
+        ${friendStory.photo && friendStory.photo.startsWith('data:video') ? `<video src="${friendStory.photo}" muted autoplay loop playsinline></video>` : ''}
+        <span class="tile-text" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.5);color:#fff;padding:4px 8px;border-radius:8px;">Фото</span>
+      `;
+      $("friendStoryTile1").onclick = () => viewStory(firstContact.id, friendStory);
+      
+      $("friendStoryTile2").innerHTML = `
+        ${friendStory.photo && friendStory.photo.startsWith('data:image') ? `<img src="${friendStory.photo}">` : ''}
+        ${friendStory.photo && friendStory.photo.startsWith('data:video') ? `<video src="${friendStory.photo}" muted autoplay loop playsinline></video>` : ''}
+        <span class="tile-text" style="position:absolute;bottom:10px;left:10px;background:rgba(0,0,0,0.5);color:#fff;padding:4px 8px;border-radius:8px;">Видео</span>
+      `;
+      $("friendStoryTile2").onclick = () => viewStory(firstContact.id, friendStory);
+    } else {
+      $("friendStoryTile1").innerHTML = `<span class="tile-text">Нет фото</span>`;
+      $("friendStoryTile1").onclick = null;
+      $("friendStoryTile2").innerHTML = `<span class="tile-text">Нет видео</span>`;
+      $("friendStoryTile2").onclick = null;
+    }
+  } else {
+    titleEl.textContent = "Нет друзей";
+    avatarEl.textContent = "👤";
+    $("friendStoryTile1").innerHTML = `<span class="tile-text">Нет фото</span>`;
+    $("friendStoryTile2").innerHTML = `<span class="tile-text">Нет видео</span>`;
   }
 }
 
-// Добавление истории
+// Добавление своей истории
 $("addStoryBtn").addEventListener("click", () => {
   if (!db) { alert("Нет подключения."); return; }
   $("storyMediaInput").click();
@@ -1296,7 +1318,7 @@ $("storyMediaInput").addEventListener("change", function() {
       await set(r, {
         photo: dataUrl,
         ts: Date.now(),
-        views: {} // Сбрасываем просмотры при новой загрузке
+        views: {} // Сбрасываем просмотры
       });
       loadStatuses();
     } catch(e) {
@@ -1306,26 +1328,22 @@ $("storyMediaInput").addEventListener("change", function() {
   reader.readAsDataURL(file);
 });
 
-// Просмотр истории
+// Просмотр истории (упрощенный)
 function viewStory(ownerId, story) {
   if (!story) return;
-  const img = document.createElement("img");
-  const vid = document.createElement("video");
-  
   if (story.photo && story.photo.startsWith('data:image')) {
+    const img = document.createElement("img");
     img.src = story.photo;
-    img.className = "story-viewer-img";
-    document.body.appendChild(img); // Временный просмотр
-    alert("Просмотр фото (демо)");
-    img.remove();
+    img.style.cssText = "position:fixed;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:2000;";
+    img.onclick = () => img.remove();
+    document.body.appendChild(img);
   } else if (story.photo && story.photo.startsWith('data:video')) {
+    const vid = document.createElement("video");
     vid.src = story.photo;
-    vid.className = "story-viewer-video";
-    vid.controls = true;
-    vid.autoplay = true;
+    vid.controls = true; vid.autoplay = true;
+    vid.style.cssText = "position:fixed;inset:0;width:100%;height:100%;object-fit:contain;background:#000;z-index:2000;";
+    vid.onclick = () => vid.remove();
     document.body.appendChild(vid);
-    alert("Просмотр видео (демо)");
-    vid.remove();
   }
 }
 
