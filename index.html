@@ -30,7 +30,7 @@ button { cursor: pointer; background: transparent; }
 .contact-list { overflow-y: auto; flex: 1; padding: 8px 0; }
 .contact { width: 100%; display: flex; align-items: center; gap: 14px; padding: 12px 16px; background: transparent; border-bottom: 1px solid #f0f0f0; text-align: left; transition: background 0.2s; }
 .contact:hover, .contact:active { background: #f0f5eb; }
-.contact .avatar { width: 52px; height: 52px; border-radius: 50%; background: #e1e1e1; display: flex; justify-content: center; align-items: center; font-size: 22px; flex-shrink: 0; overflow: hidden; }
+.contact .avatar { width: 52px; height: 52px; border-radius: 50%; background: #e1e1e1; display: flex; justify-content: center; align-items: center; font-size: 22px; flex-shrink: 0; overflow: hidden; border: none; }
 .contact .avatar img { width: 100%; height: 100%; object-fit: cover; }
 .contact-info strong { display: block; font-size: 16px; font-weight: 600; color: #111; }
 .contact-info small { display: block; margin-top: 4px; color: #777; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px; }
@@ -64,7 +64,7 @@ button { cursor: pointer; background: transparent; }
 .plus-btn { right: 14px; font-size: 26px; }
 .send-button { position: absolute; right: 14px; bottom: calc(max(10px, env(safe-area-inset-bottom)) + 4px); width: 40px; height: 40px; background: #66cc00; color: #fff; border-radius: 50%; font-size: 18px; display: flex; align-items: center; justify-content: center; box-shadow: 0 2px 8px rgba(102, 204, 0, 0.4); }
 
-/* Нижнее меню (Круглая кнопка + и кнопки статистики) */
+/* Нижнее меню */
 .bottom-nav { display: flex; justify-content: space-around; align-items: center; background: #fff; border-top: 1px solid #eee; padding: 8px 0; padding-bottom: max(8px, env(safe-area-inset-bottom)); }
 .nav-button { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; background: transparent; font-size: 22px; color: #777; padding: 8px; border-radius: 12px; transition: 0.2s; }
 .nav-button small { font-size: 10px; font-weight: 600; }
@@ -98,9 +98,9 @@ button { cursor: pointer; background: transparent; }
 .row input, .row select { flex: 1; min-width: 0; padding: 13px; border: 1px solid #ddd; border-radius: 12px; background: #fff; font-size: 15px; }
 #profilePhone { background: #f4f4f4; color: #555; }
 
-.primary-button { width: 100%; padding: 14px; border-radius: 12px; background: #66cc00; color: #fff; font-weight: 600; margin-top: 12px; transition: 0.2s; }
+.primary-button { width: 100%; padding: 14px; border-radius: 12px; background: #66cc00; color: #fff; font-weight: 600; margin-top: 12px; transition: 0.2s; border: none; display: flex; justify-content: center; align-items: center; gap: 8px; font-size: 16px; }
 .primary-button:active { background: #55aa00; }
-.secondary-button { padding: 12px 16px; border-radius: 12px; background: #f0f0f0; color: #333; font-weight: 600; }
+.secondary-button { padding: 12px 16px; border-radius: 12px; background: #f0f0f0; color: #333; font-weight: 600; border: none; }
 
 /* Модалки */
 .modal { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; backdrop-filter: blur(2px); }
@@ -119,7 +119,7 @@ button { cursor: pointer; background: transparent; }
 .cp-tabs button.on small { color: #66cc00; }
 
 .atabs { display: flex; justify-content: space-around; border-bottom: 1px solid #ddd; padding: 6px 0; background: #fff;}
-.atabs button { background: #fff; font-size: 24px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 30px; border-radius: 10px; color: #555; }
+.atabs button { background: #fff; font-size: 24px; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 6px 30px; border-radius: 10px; color: #555; border: none;}
 .atabs button small { font-size: 11px; color: #555; }
 .atabs button.on { background: #f0f5eb; color: #66cc00; }
 
@@ -131,7 +131,7 @@ button { cursor: pointer; background: transparent; }
 
 #recBar { display: none; align-items: center; gap: 10px; padding: 10px; background: #fff; border-top: 1px solid #eee; padding-bottom: max(10px, env(safe-area-inset-bottom)); }
 #recBar .rt { flex: 1; font-size: 18px; color: #d33; font-weight: bold; }
-#recBar button { width: 48px; height: 48px; border-radius: 50%; font-size: 22px; color: #fff; display: flex; align-items: center; justify-content: center; }
+#recBar button { width: 48px; height: 48px; border-radius: 50%; font-size: 22px; color: #fff; display: flex; align-items: center; justify-content: center; border: none;}
 
 /* Медиа */
 .vbtn { background: transparent; font-size: 16px; padding: 4px 2px; color: #111; }
@@ -144,17 +144,23 @@ button { cursor: pointer; background: transparent; }
 .fact button.on { background: #d9fdd3; color: #111; }
 .fview { margin-left: auto; color: #777; font-size: 13px; }
 
-/* Прочее */
-.modal#callModal { padding: 0; align-items: stretch; }
-.cbtn { width: 64px; height: 64px; border-radius: 50%; color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; }
-.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
-.grid img { width: 100%; aspect-ratio: 1; object-fit: cover; border-radius: 8px; }
-.fcard { margin: 0 0 22px; background: #fff; padding: 12px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); }
-.fown { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-weight: bold; }
-.fown .avatar { width: 34px; height: 34px; font-size: 16px; border: none; }
-.fimg { width: 100%; border-radius: 12px; display: block; background: #eee; }
-.ftitle { font-weight: bold; margin: 10px 0 4px; font-size: 16px; }
+/* --- ИСПРАВЛЕННЫЙ АЛЬБОМ --- */
+.atabs { display: flex; gap: 12px; padding: 16px; background: #fff; border-bottom: 1px solid #eee; justify-content: flex-start; }
+.atabs button { background: #f7f9f2; border-radius: 12px; padding: 10px 24px; display: flex; flex-direction: column; align-items: center; gap: 4px; color: #555; font-size: 24px; transition: 0.2s; border: none; }
+.atabs button small { font-size: 13px; font-weight: 600; color: #777; }
+.atabs button.on { background: #f0f5eb; color: #66cc00; }
+.atabs button.on small { color: #66cc00; }
+
+.fcard { margin: 0 16px 22px; background: #fff; padding: 12px; border-radius: 16px; box-shadow: 0 2px 10px rgba(0,0,0,0.03); display: flex; flex-direction: column; }
+.fown { display: flex; align-items: center; gap: 8px; margin-bottom: 10px; font-weight: bold; font-size: 15px; }
+.fown .avatar { width: 32px !important; height: 32px !important; font-size: 14px; border: none !important; flex-shrink: 0; }
+.fimg { width: 100%; border-radius: 12px; display: block; background: #eee; margin-bottom: 8px; }
+.ftitle { font-weight: bold; margin: 4px 0; font-size: 16px; }
 .fdesc { color: #555; margin: 2px 0 6px; line-height: 1.4; overflow-wrap: anywhere; font-size: 14px; }
+
+/* Кнопка "Добавить фото" на весь экран снизу */
+.add-photo-bottom-btn { margin: 16px; background: #66cc00; color: #fff; font-size: 18px; font-weight: bold; border-radius: 16px; padding: 16px; display: flex; justify-content: center; align-items: center; gap: 10px; border: none; box-shadow: 0 4px 12px rgba(102, 204, 0, 0.3); width: calc(100% - 32px); }
+.add-photo-bottom-btn:active { background: #55aa00; }
 
 /* === СТИЛИ ДЛЯ ИСТОРИЙ (КАК НА РИСУНКЕ) === */
 .story-grid {
@@ -265,6 +271,11 @@ button { cursor: pointer; background: transparent; }
   position: absolute; bottom: 0; left: 0; right: 0; z-index: 10;
 }
 
+/* Прочее */
+.modal#callModal { padding: 0; align-items: stretch; }
+.cbtn { width: 64px; height: 64px; border-radius: 50%; color: #fff; font-size: 28px; display: flex; align-items: center; justify-content: center; border: none;}
+.grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+
 @media (min-width: 700px){
   body{padding:15px}
   .app{height:calc(100dvh - 30px);border-radius:20px;box-shadow:0 10px 40px rgba(0,0,0,0.1)}
@@ -276,6 +287,7 @@ button { cursor: pointer; background: transparent; }
   <!-- ШАПКА (ОБЩАЯ) -->
   <div class="header">
     <button class="icon-button" id="headerMenu" aria-label="Меню">☰</button>
+    <!-- Вернул твой логотип -->
     <img id="logo" src="data:image/jpeg;base64,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" alt="LimeChat" style="border-radius:8px">
     <div style="flex:1"></div>
     <div class="header-info" style="display:none"><strong id="headerName"></strong><small id="headerStatus"></small></div>
@@ -353,7 +365,7 @@ button { cursor: pointer; background: transparent; }
   <section class="view" id="profileView">
     <div class="section-title">Мой профиль</div>
     <div class="profile-content">
-      <!-- Исправленная аватарка -->
+      <!-- Аватарка -->
       <div class="profile-photo" id="profileAvatar">👤</div>
       
       <button class="secondary-button" id="choosePhotoButton" style="display:block;margin:0 auto 20px auto; padding: 10px 20px;">🖼️ Выбрать фотографию</button>
@@ -400,7 +412,7 @@ button { cursor: pointer; background: transparent; }
     <div class="contact-list" id="callList"></div>
   </section>
 
-  <!-- ВКЛАДКА 7: ИСТОРИИ (СЕТКА КАК НА РИСУНКЕ) -->
+  <!-- ВКЛАДКА 7: ИСТОРИИ (СЕТКА) -->
   <section class="view" id="statusView">
     <div style="flex: 1; overflow-y: auto; background: #f7f9f2;">
       
@@ -419,7 +431,7 @@ button { cursor: pointer; background: transparent; }
       <!-- Заголовок Мерика (Первый контакт) -->
       <div class="contact-title">
         <div style="display:flex; align-items:center; gap:8px;">
-          <div class="avatar" style="width:32px; height:32px; border:2px solid #66cc00; font-size:16px;" id="contactAvatarSmall">👤</div>
+          <div class="avatar" style="width:32px; height:32px; border:2px solid #66cc00; font-size:16px; overflow:hidden; display:flex; align-items:center; justify-content:center;" id="contactAvatarSmall">👤</div>
           <strong id="contactNameTitle">Мерика</strong>
         </div>
         <span class="arrows">↔</span>
@@ -438,14 +450,21 @@ button { cursor: pointer; background: transparent; }
     </div>
   </section>
 
-  <!-- ВКЛАДКА 8: АЛЬБОМ -->
+  <!-- ВКЛАДКА 8: АЛЬБОМ (ИСПРАВЛЕННЫЙ) -->
   <section class="view" id="albumView">
+    <!-- Вкладки Фото/Видео в виде кнопок -->
     <div class="atabs">
-      <button data-a="photo">📷<small>Фото</small></button>
+      <button data-a="photo" class="on">📷<small>Фото</small></button>
       <button data-a="video">🎬<small>Видео</small></button>
     </div>
-    <div class="profile-content" id="feedBox" style="flex:1;min-height:0"></div>
-    <div style="padding:10px"><button class="primary-button" id="albumAdd" style="margin-top:0">➕ Добавить фото</button></div>
+    
+    <!-- Лента фотографий -->
+    <div class="profile-content" id="feedBox" style="flex:1;min-height:0; padding-bottom: 0;"></div>
+    
+    <!-- Кнопка добавления на всю ширину -->
+    <button class="add-photo-bottom-btn" id="albumAdd">
+      <span>➕</span> Добавить фото
+    </button>
   </section>
 
   <!-- ВКЛАДКА 9: ИГРЫ -->
@@ -465,7 +484,7 @@ button { cursor: pointer; background: transparent; }
     <button class="stats-btn" data-view="moreView">🎮</button>
   </nav>
 
-  <!-- МОДАЛКИ (ОСТАЛЬНОЙ ФУНКЦИОНАЛ) -->
+  <!-- МОДАЛКИ -->
   <div class="modal" id="callModal" style="background:#000;padding:0;align-items:stretch">
     <div style="position:relative;width:100%;height:100%;display:flex;flex-direction:column;color:#fff">
       <video id="remoteVideo" autoplay playsinline style="flex:1;width:100%;min-height:0;object-fit:cover;background:#111"></video>
@@ -753,7 +772,6 @@ function updateHeader() {
   $("pBD").value = +bp[2] || "";
   $("profilePhone").value = state.profile.phone ? "+" + state.profile.phone : "";
   
-  // Обновляем аватарку в профиле
   const profileAvatar = $("profileAvatar");
   if (state.profile.photo) {
     profileAvatar.innerHTML = `<img src="${state.profile.photo}" alt="">`;
@@ -1268,11 +1286,10 @@ $("albumInput").addEventListener("change", function () {
   });
 });
 
-// ---------- ИСТОРИИ (Логика под твой рисунок) ----------
+// ---------- ИСТОРИИ ----------
 async function loadStatuses() {
   if (!db) return;
   
-  // 1. Моя история
   const myStory = await get(ref(db, "statuses/" + myKey())).then(sn => sn.val()).catch(() => null);
   const myTile = $("myStoryTile");
   
@@ -1290,7 +1307,6 @@ async function loadStatuses() {
     myTile.onclick = null;
   }
 
-  // 2. История друга (Мерика)
   const firstContact = state.contacts[0];
   const titleEl = $("contactNameTitle");
   const avatarEl = $("contactAvatarSmall");
@@ -1306,7 +1322,6 @@ async function loadStatuses() {
     const friendStory = await get(ref(db, "statuses/" + firstContact.id)).then(sn => sn.val()).catch(() => null);
     
     if (friendStory && (Date.now() - (friendStory.ts || 0) < 864e5)) {
-      // Показываем фото друга
       $("friendStoryTile1").innerHTML = `
         ${friendStory.photo && friendStory.photo.startsWith('data:image') ? `<img src="${friendStory.photo}">` : ''}
         ${friendStory.photo && friendStory.photo.startsWith('data:video') ? `<video src="${friendStory.photo}" muted autoplay loop playsinline></video>` : ''}
@@ -1334,7 +1349,6 @@ async function loadStatuses() {
   }
 }
 
-// Добавление своей истории
 $("addStoryBtn").addEventListener("click", () => {
   if (!db) { alert("Нет подключения."); return; }
   $("storyMediaInput").click();
@@ -1358,7 +1372,7 @@ $("storyMediaInput").addEventListener("change", function() {
       await set(r, {
         photo: dataUrl,
         ts: Date.now(),
-        views: {} // Сбрасываем просмотры
+        views: {}
       });
       loadStatuses();
     } catch(e) {
@@ -1368,7 +1382,6 @@ $("storyMediaInput").addEventListener("change", function() {
   reader.readAsDataURL(file);
 });
 
-// Просмотр истории (упрощенный)
 function viewStory(ownerId, story) {
   if (!story) return;
   if (story.photo && story.photo.startsWith('data:image')) {
@@ -1424,6 +1437,7 @@ function makeCard(k, v) {
   if (me && !views[me] && !v.plain) { views[me] = true; set(ref(db, "feed/" + k + "/views/" + me), true).catch(() => {}); }
   const card = document.createElement("div");
   card.className = "fcard";
+  
   const c = state.contacts.find(x => x.id === v.owner);
   const own = document.createElement("div");
   own.className = "fown";
@@ -1431,16 +1445,20 @@ function makeCard(k, v) {
   const nm = document.createElement("span");
   nm.textContent = v.owner === me ? "Я" : (c ? c.name : (v.ownerName || "+" + v.owner));
   own.appendChild(nm);
+  
   const img = document.createElement("img");
   img.className = "fimg";
   img.src = v.d;
   img.alt = "";
+  
   const tt = document.createElement("div");
   tt.className = "ftitle";
   tt.textContent = v.title || "";
+  
   const ds = document.createElement("div");
   ds.className = "fdesc";
   ds.textContent = v.desc || "";
+  
   const act = document.createElement("div");
   act.className = "fact";
   const bl = document.createElement("button"), bd = document.createElement("button"), vw = document.createElement("span");
