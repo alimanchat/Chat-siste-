@@ -74,19 +74,33 @@ button { cursor: pointer; background: transparent; }
 .main-add-btn { background: #66cc00; color: #000; width: 56px; height: 56px; font-size: 28px; font-weight: 300; border-radius: 50%; display: flex; align-items: center; justify-content: center; box-shadow: 0 4px 12px rgba(102, 204, 0, 0.4); margin-top: -15px; }
 .stats-btn { font-size: 12px; font-weight: 700; color: #66cc00; background: #f0f5eb; border-radius: 20px; padding: 10px 14px; }
 
-/* Профиль и настройки */
+/* --- ИСПРАВЛЕННЫЙ ПРОФИЛЬ --- */
 .profile-content { padding: 24px 18px; overflow-y: auto; flex: 1; }
-.profile-photo { width: 110px; height: 110px; margin: 0 auto 18px; font-size: 55px; border: 3px solid #66cc00; }
+.profile-photo { 
+  width: 110px; 
+  height: 110px; 
+  margin: 0 auto 18px; 
+  font-size: 55px; 
+  border: 3px solid #66cc00; 
+  border-radius: 50%; 
+  overflow: hidden; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center; 
+  background: #e1e1e1;
+}
+.profile-photo img { width: 100%; height: 100%; object-fit: cover; }
+
 .field { margin: 18px 0; }
-.field label { display: block; color: #666; margin-bottom: 8px; font-size: 14px; }
-.field input, .field select { width: 100%; padding: 13px; border: 1px solid #ddd; border-radius: 12px; background: #fff; }
+.field input { width: 100%; padding: 13px; border: 1px solid #ddd; border-radius: 12px; background: #fff; font-size: 16px; }
+.row { display: flex; gap: 8px; align-items: center; margin: 14px 0; }
+.row i { font-style: normal; font-size: 24px; width: 34px; text-align: center; flex-shrink: 0; }
+.row input, .row select { flex: 1; min-width: 0; padding: 13px; border: 1px solid #ddd; border-radius: 12px; background: #fff; font-size: 15px; }
+#profilePhone { background: #f4f4f4; color: #555; }
+
 .primary-button { width: 100%; padding: 14px; border-radius: 12px; background: #66cc00; color: #fff; font-weight: 600; margin-top: 12px; transition: 0.2s; }
 .primary-button:active { background: #55aa00; }
 .secondary-button { padding: 12px 16px; border-radius: 12px; background: #f0f0f0; color: #333; font-weight: 600; }
-.row { display: flex; gap: 8px; align-items: center; margin: 14px 0; }
-.row i { font-style: normal; font-size: 24px; width: 34px; text-align: center; flex-shrink: 0; }
-.row input, .row select { flex: 1; min-width: 0; padding: 13px; border: 1px solid #ddd; border-radius: 12px; background: #fff; }
-#profilePhone { background: #f4f4f4; color: #555; }
 
 /* Модалки */
 .modal { position: absolute; inset: 0; background: rgba(0,0,0,0.5); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 100; backdrop-filter: blur(2px); }
@@ -339,21 +353,43 @@ button { cursor: pointer; background: transparent; }
   <section class="view" id="profileView">
     <div class="section-title">Мой профиль</div>
     <div class="profile-content">
-      <div class="avatar profile-photo" id="profileAvatar">👤</div>
-      <button class="secondary-button" id="choosePhotoButton" style="display:block;margin:auto">🖼️ Выбрать фотографию</button>
+      <!-- Исправленная аватарка -->
+      <div class="profile-photo" id="profileAvatar">👤</div>
+      
+      <button class="secondary-button" id="choosePhotoButton" style="display:block;margin:0 auto 20px auto; padding: 10px 20px;">🖼️ Выбрать фотографию</button>
       <input type="file" id="photoInput" accept="image/*" style="display:none">
+      
       <div class="field"><input id="profileName" maxlength="40" placeholder="Имя Фамилия"></div>
       <div class="field"><input id="profilePhone" readonly placeholder="Тел. номер"></div>
-      <div class="row"><i>🎂</i><input id="pBY" type="tel" inputmode="numeric" maxlength="4" placeholder="Год"><input id="pBD" type="tel" inputmode="numeric" maxlength="2" placeholder="День"><select id="pBM"><option value="">Месяц</option><option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option><option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option><option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option><option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option></select></div>
-      <div class="row"><i>🏙️</i><input id="pCity" maxlength="40" placeholder="Город"><input id="pVillage" maxlength="40" placeholder="Село"></div>
+      
+      <div class="row">
+        <i>🎂</i>
+        <input id="pBY" type="tel" inputmode="numeric" maxlength="4" placeholder="Год">
+        <input id="pBD" type="tel" inputmode="numeric" maxlength="2" placeholder="День">
+        <select id="pBM"><option value="">Месяц</option><option value="1">Январь</option><option value="2">Февраль</option><option value="3">Март</option><option value="4">Апрель</option><option value="5">Май</option><option value="6">Июнь</option><option value="7">Июль</option><option value="8">Август</option><option value="9">Сентябрь</option><option value="10">Октябрь</option><option value="11">Ноябрь</option><option value="12">Декабрь</option></select>
+      </div>
+      
+      <div class="row">
+        <i>🏙️</i>
+        <input id="pCity" maxlength="40" placeholder="Город">
+        <input id="pVillage" maxlength="40" placeholder="Село">
+      </div>
+      
       <div class="row"><i>🎓</i><input id="pEdu" maxlength="60" placeholder="Образование"></div>
       <div class="row"><i>💼</i><input id="pWork" maxlength="60" placeholder="Работа"></div>
       <div class="row"><i>🎯</i><input id="pHobby" maxlength="60" placeholder="Хобби"></div>
-      <div class="row"><i>👤</i><select id="pGender"><option value="">Пол</option><option>Мужской</option><option>Женский</option></select></div>
+      
+      <div class="row">
+        <i>👤</i>
+        <select id="pGender"><option value="">Пол</option><option>Мужской</option><option>Женский</option></select>
+      </div>
+      
       <div class="row"><i>💍</i><input id="pFamily" maxlength="40" placeholder="Семейное положение"></div>
       <div class="row"><i>➕</i><input id="pStatus" maxlength="100" placeholder="Статус"></div>
+      
       <button class="secondary-button" id="addAlbumPhoto" style="display:block;margin:12px auto">📷 Добавить фото в альбом</button>
       <input type="file" id="albumInput" accept="image/*" style="display:none">
+      
       <button class="primary-button" id="saveProfileButton">Сохранить профиль</button>
     </div>
   </section>
@@ -716,10 +752,14 @@ function updateHeader() {
   $("pBM").value = +bp[1] || "";
   $("pBD").value = +bp[2] || "";
   $("profilePhone").value = state.profile.phone ? "+" + state.profile.phone : "";
-  const profileAvatar = makeAvatar(state.profile.photo, state.profile.name);
-  profileAvatar.classList.add("profile-photo");
-  profileAvatar.id = "profileAvatar";
-  $("profileAvatar").replaceWith(profileAvatar);
+  
+  // Обновляем аватарку в профиле
+  const profileAvatar = $("profileAvatar");
+  if (state.profile.photo) {
+    profileAvatar.innerHTML = `<img src="${state.profile.photo}" alt="">`;
+  } else {
+    profileAvatar.textContent = state.profile.name ? state.profile.name.trim().charAt(0).toUpperCase() : "👤";
+  }
 }
 
 function showView(viewId) {
