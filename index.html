@@ -69,7 +69,8 @@ button{cursor:pointer;border:none}
 .mrow .message{align-self:auto;max-width:100%}
 .mcol{display:flex;flex-direction:column;align-items:flex-end;max-width:72%}
 .mt{font-size:11px;color:#888;white-space:nowrap}
-.tick{color:#4a90e2;font-size:12px;margin-top:2px}
+.tick{color:#999;font-size:12px;margin-top:2px}
+.tick.read{color:#4a90e2}
 #chatView .header{padding:8px 10px;gap:6px}
 #chatView .header .avatar{width:44px;height:44px;font-size:22px}
 #chatView .header-info strong{display:block;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
@@ -134,6 +135,11 @@ button{cursor:pointer;border:none}
 .pill.new{background:#5BB60F;color:#10200a;font-weight:bold;font-size:13px}
 .sbar{flex:1;height:3px;border-radius:2px;background:#ffffff55}
 .sbar.on{background:#fff}
+#gName{background:#eee;border-radius:10px;padding:10px;font-size:20px;margin:0 8px!important}
+.gtabs{display:flex;justify-content:space-around;margin:16px 0;padding-bottom:10px;border-bottom:1px solid #ddd}
+.gtabs button{background:#fff;font-size:26px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 6px;border-radius:10px}
+.gtabs button small{font-size:11px;color:#555}
+.gtabs button.on{background:#ededed}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -167,6 +173,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div class="contact-list" id="allContacts"></div>
     <div style="padding:12px">
       <button class="primary-button" id="addContactButton">➕ Добавить контакт</button>
+      <button class="primary-button" id="groupCreateBtn" style="margin-top:8px">👥 Создать группу</button>
     </div>
   </section>
 
@@ -219,6 +226,27 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
   </section>
 
+  <section class="view" id="groupView">
+    <button class="icon-button" id="gBack" aria-label="Назад" style="position:absolute;top:8px;left:8px;z-index:2;background:#ffffffcc">←</button>
+    <div class="profile-content" style="text-align:center;flex:1;min-height:0">
+      <div style="position:relative;width:110px;margin:0 auto 18px">
+        <div class="avatar profile-photo" id="gAvatar" style="margin:0">👥</div>
+        <button id="gPhotoBtn" aria-label="Фото группы" style="position:absolute;right:-6px;bottom:-6px;width:36px;height:36px;border-radius:50%;background:#5BB60F;color:#fff;font-size:24px;display:none">+</button>
+      </div>
+      <input type="file" id="gPhotoInput" accept="image/*" style="display:none">
+      <h2 id="gName" style="margin:0"></h2>
+      <div class="gtabs">
+        <button data-g="members">👥<small>Участники</small></button>
+        <button data-g="admin">👤<small>Админ</small></button>
+        <button data-g="photo">📷<small>Фото</small></button>
+        <button data-g="video">🎬<small>Видео</small></button>
+        <button data-g="sms">✉️<small>SMS</small></button>
+      </div>
+      <div id="gContent" style="text-align:left"></div>
+    </div>
+    <div style="padding:10px"><button class="primary-button" id="gAddMember" style="margin-top:0;display:none">+ Добавить контакт</button></div>
+  </section>
+
   <section class="view" id="profileView">
     <div class="section-title">Профиль</div>
     <div class="profile-content">
@@ -254,9 +282,6 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <div class="shead"><b>Мои истории</b><span>исчезают через 24 ч</span></div>
       <div class="srow" id="myStories"></div>
       <div id="otherStories"></div>
-      <div class="shead" style="margin-top:22px"><b>Статус на 24 часа</b></div>
-      <div class="row"><input id="stText" maxlength="100" placeholder="Мой статус на 24 часа"><button class="secondary-button" id="stPost">Опубликовать</button></div>
-      <div id="stList"></div>
     </div>
   </section>
 
@@ -294,7 +319,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <button class="cbtn" id="callEnd" style="background:#d33">✖</button>
       </div>
     </div>
-  </div>
+    </div>
 
   <div class="modal" id="loginModal">
     <div class="modal-card" style="text-align:center">
@@ -328,6 +353,27 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <button class="secondary-button" id="cancelContact">Отмена</button>
         <button class="primary-button" id="saveContact" style="margin-top:0">Добавить</button>
       </div>
+    </div>
+  </div>
+
+  <div class="modal" id="gCreateModal">
+    <div class="modal-card">
+      <h3>Новая группа</h3>
+      <input id="gNewName" maxlength="40" placeholder="Название группы">
+      <div style="margin:8px 0;color:#666">Выбери участников:</div>
+      <div id="gNewList" style="max-height:40vh;overflow-y:auto"></div>
+      <div class="modal-actions">
+        <button class="secondary-button" id="gCreateCancel">Отмена</button>
+        <button class="primary-button" id="gCreateOk" style="margin-top:0">Создать</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="modal" id="gAddModal">
+    <div class="modal-card">
+      <h3>Добавить в группу</h3>
+      <div id="gAddList" style="max-height:50vh;overflow-y:auto"></div>
+      <button class="secondary-button" id="gAddClose" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
   </div>
 
@@ -434,10 +480,16 @@ const $ = id => document.getElementById(id);
 const STORAGE_KEY = "my_chat_app_v2";
 const UID_KEY = "my_chat_uid";
 
-let state = { profile: { name: "", photo: "", phone: "", birth: "", city: "", village: "", edu: "", work: "", hobby: "", gender: "", family: "", status: "" }, contacts: [], calls: [], blocked: [], hidden: {}, messages: {}, activeContact: null };
+let state = { profile: { name: "", photo: "", phone: "", birth: "", city: "", village: "", edu: "", work: "", hobby: "", gender: "", family: "", status: "" }, contacts: [], calls: [], blocked: [], hidden: {}, groups: [], messages: {}, activeContact: null };
 let currentView = "chatsView";
 const listening = {};
 const presence = {};
+const readAt = {};
+function isRead(item, id) { return !!item.ts && (readAt[id] || 0) >= item.ts; }
+function markRead(id) {
+  if (!db || !myKey() || !id) return;
+  set(ref(db, "reads/" + chatIdWith(id) + "/" + myKey()), serverTimestamp()).catch(() => {});
+}
 function isBlocked(id) { return state.blocked.indexOf(id) !== -1; }
 
 // ---------- Firebase ----------
@@ -505,8 +557,14 @@ function listenChat(contact) {
     if (!m || typeof m.text !== "string" || isBlocked(contact.id)) return;
     const list = state.messages[contact.id] || (state.messages[contact.id] = []);
     if (state.hidden[snap.key] || list.some(x => x.key === snap.key)) return;
-    list.push({ key: snap.key, text: m.text, mine: m.from === myKey(), time: fmtTime(m.ts), type: m.type, mid: m.mid, dur: m.dur, th: m.th, ct: m.ct });
+    list.push({ key: snap.key, text: m.text, mine: m.from === myKey(), time: fmtTime(m.ts), ts: m.ts, type: m.type, mid: m.mid, dur: m.dur, th: m.th, ct: m.ct });
+    if (m.from !== myKey() && currentView === "chatView" && state.activeContact === contact.id && !document.hidden) markRead(contact.id);
     refreshAfterMessage(contact.id);
+  });
+  onValue(ref(db, "reads/" + chatIdWith(contact.id) + "/" + contact.id), sn => {
+    readAt[contact.id] = sn.val() || 0;
+    if (currentView === "chatView" && state.activeContact === contact.id) renderMessages();
+    if (currentView === "chatsView") renderChats();
   });
 }
 
@@ -594,8 +652,8 @@ function showView(viewId) {
   closeAttach();
   if (viewId !== "chatView") { stopVoice(false); closeVid(); }
   currentView = viewId;
-  document.querySelector(".app > .header").style.display = (viewId === "cpView" || viewId === "profileView" || viewId === "chatView") ? "none" : "";
-  document.querySelector(".bottom-nav").style.display = (viewId === "cpView" || viewId === "chatView") ? "none" : "";
+  document.querySelector(".app > .header").style.display = (viewId === "cpView" || viewId === "profileView" || viewId === "chatView" || viewId === "groupView") ? "none" : "";
+  document.querySelector(".bottom-nav").style.display = (viewId === "cpView" || viewId === "chatView" || viewId === "groupView") ? "none" : "";
 
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === viewId));
   document.querySelectorAll(".nav-button[data-view]").forEach(b => b.classList.toggle("active", b.dataset.view === viewId));
@@ -605,7 +663,7 @@ function showView(viewId) {
   if (viewId === "chatsView") renderChats();
   if (viewId === "contactsView") renderContacts();
   if (viewId === "profileView") updateHeader();
-  if (viewId === "statusView") { loadStatuses(); loadStories(); }
+  if (viewId === "statusView") loadStories();
   if (viewId === "albumView") loadAlbum();
   if (viewId === "callsView") renderCalls();
 }
@@ -614,6 +672,7 @@ function openContact(contactId) {
   const contact = state.contacts.find(c => c.id === contactId);
   if (!contact) return;
   state.activeContact = contactId;
+  markRead(contactId);
   $("chatName").textContent = contact.name;
   const avatar = makeAvatar(contact.photo, contact.name);
   avatar.id = "chatAvatar";
@@ -647,8 +706,9 @@ function makeContactButton(contact, showLastMessage) {
     side.className = "cside";
     if (messages.length && messages[messages.length - 1].mine) {
       const tk = document.createElement("small");
-      tk.className = "tick";
-      tk.textContent = "✓";
+      const rd2 = isRead(messages[messages.length - 1], contact.id);
+      tk.className = "tick" + (rd2 ? " read" : "");
+      tk.textContent = rd2 ? "✓✓" : "✓";
       side.appendChild(tk);
     }
     const dots = document.createElement("span");
@@ -680,8 +740,37 @@ function renderList(listId, emptyText, showLast) {
   state.contacts.forEach(c => list.appendChild(makeContactButton(c, showLast)));
 }
 
+function makeGroupButton(g) {
+  const b = document.createElement("button");
+  b.className = "contact";
+  const av = makeAvatar(g.photo, "");
+  if (!g.photo) av.textContent = "👥";
+  b.appendChild(av);
+  const info = document.createElement("div");
+  info.className = "contact-info";
+  const n = document.createElement("strong");
+  n.textContent = g.name;
+  const sm = document.createElement("small");
+  const msgs = state.messages[g.id] || [];
+  sm.textContent = msgs.length ? msgs[msgs.length - 1].text : "Группа · участников: " + (g.members ? g.members.length : 0);
+  info.append(n, sm);
+  b.appendChild(info);
+  b.addEventListener("click", () => openGroup(g.id));
+  return b;
+}
+
 function renderChats() {
-  renderList("contactList", "Пока нет контактов. Нажмите ➕, чтобы добавить первый контакт.", true);
+  const list = $("contactList");
+  list.replaceChildren();
+  if (!state.groups.length && !state.contacts.length) {
+    const empty = document.createElement("div");
+    empty.className = "empty";
+    empty.textContent = "Пока нет контактов. Нажмите ➕, чтобы добавить первый контакт.";
+    list.appendChild(empty);
+    return;
+  }
+  state.groups.forEach(g => list.appendChild(makeGroupButton(g)));
+  state.contacts.forEach(c => list.appendChild(makeContactButton(c, true)));
 }
 
 function renderContacts() {
@@ -713,8 +802,9 @@ function renderMessages() {
     col.appendChild(message);
     if (item.mine) {
       const tick = document.createElement("small");
-      tick.className = "tick";
-      tick.textContent = "✓";
+      const rd = isRead(item, state.activeContact);
+      tick.className = "tick" + (rd ? " read" : "");
+      tick.textContent = rd ? "✓✓" : "✓";
       col.appendChild(tick);
     }
     const time = document.createElement("span");
@@ -924,7 +1014,7 @@ document.querySelectorAll(".nav-button[data-view]").forEach(button => {
     state.activeContact = null;
     showView(this.dataset.view);
   });
-});
+  });
 
 ["contactModal", "menuModal", "sideMenu", "delModal", "cpMenu", "chatMenuModal", "pickModal"].forEach(id => {
   $(id).addEventListener("click", function (event) {
@@ -1091,48 +1181,6 @@ $("albumInput").addEventListener("change", function () {
       .then(() => { feedTab = "photo"; if (currentView === "albumView") loadAlbum(); })
       .catch(() => alert("Не удалось добавить фото."));
   });
-  });
-
-async function loadStatuses() {
-  const list = $("stList");
-  list.replaceChildren();
-  if (!db || !state.profile.phone) return;
-  const ids = [state.profile.phone, ...state.contacts.map(c => c.id)];
-  const res = await Promise.all(ids.map(id => get(ref(db, "statuses/" + id)).then(sn => [id, sn.val()]).catch(() => [id, null])));
-  let n = 0;
-  res.forEach(([id, v]) => {
-    if (!v || !v.text || Date.now() - (v.ts || 0) > 864e5) return;
-    n++;
-    const c = state.contacts.find(x => x.id === id);
-    const d = document.createElement("div");
-    d.className = "ro";
-    d.style.margin = "8px 0";
-    const b = document.createElement("b");
-    b.textContent = (id === state.profile.phone ? "Я" : (c ? c.name : "+" + id)) + " · " + fmtTime(v.ts);
-    const t = document.createElement("div");
-    t.textContent = v.text;
-    d.append(b, t);
-    list.appendChild(d);
-  });
-  if (!n) {
-    const e = document.createElement("div");
-    e.className = "empty";
-    e.textContent = "Пока нет статусов.";
-    list.appendChild(e);
-  }
-}
-
-$("stPost").addEventListener("click", async () => {
-  if (!db) { alert("Нет подключения."); return; }
-  const text = $("stText").value.trim();
-  const r = ref(db, "statuses/" + state.profile.phone);
-  try {
-    if (text) await set(r, { text: text, ts: serverTimestamp() }); else await remove(r);
-    $("stText").value = "";
-    loadStatuses();
-  } catch (e) {
-    alert("Не удалось опубликовать.");
-  }
 });
 
 let feedTab = "photo";
@@ -1391,7 +1439,7 @@ function renderCalls() {
     e.textContent = "Звонков пока не было.";
     list.appendChild(e);
     return;
-  }
+    }
   state.calls.forEach(c => {
     const ct = state.contacts.find(x => x.id === c.peer);
     const b = document.createElement("button");
@@ -1843,6 +1891,318 @@ $("storyInput").addEventListener("change", function () {
   });
 });
 
+// ---------- Группы ----------
+const gListening = {}, gNames = {};
+let gcur = null, gtab = "members", pendingOpen = null;
+const gById = id => state.groups.find(g => g.id === id);
+const personName = p => p === myKey() ? (state.profile.name || "Я") + " (я)" : ((state.contacts.find(c => c.id === p) || {}).name || gNames[p] || "+" + p);
+
+function listenGroups() {
+  onChildAdded(ref(db, "usergroups/" + myKey()), snap => listenGroup(snap.key));
+}
+
+function listenGroup(gid) {
+  if (gListening[gid]) return;
+  gListening[gid] = true;
+  onValue(ref(db, "groups/" + gid), sn => {
+    const v = sn.val(), me = myKey();
+    let g = gById(gid);
+    if (!v || !v.members || !v.members[me]) {
+      if (g) state.groups = state.groups.filter(x => x.id !== gid);
+      if (currentView === "groupView" && gcur === gid) { gcur = null; showView("chatsView"); }
+      else if (currentView === "chatsView") renderChats();
+      return;
+    }
+    if (!g) { g = { id: gid }; state.groups.push(g); }
+    g.name = v.name || "Группа";
+    g.photo = typeof v.photo === "string" && /^data:image\//.test(v.photo) ? v.photo : "";
+    g.admin = v.admin;
+    g.members = Object.keys(v.members);
+    if (pendingOpen === gid) { pendingOpen = null; openGroup(gid); return; }
+    if (currentView === "chatsView") renderChats();
+    if (currentView === "groupView" && gcur === gid) { renderGroupHead(); renderGroupTab(); }
+  });
+  onChildAdded(query(ref(db, "gchats/" + gid + "/messages"), limitToLast(200)), snap => {
+    const m = snap.val();
+    if (!m || typeof m.text !== "string" || state.hidden[snap.key]) return;
+    const list = state.messages[gid] || (state.messages[gid] = []);
+    if (list.some(x => x.key === snap.key)) return;
+    list.push({ key: snap.key, text: m.text, from: m.from, n: m.n, mine: m.from === myKey(), time: fmtTime(m.ts) });
+    if (currentView === "chatsView") renderChats();
+    if (currentView === "groupView" && gcur === gid && gtab === "sms") renderGroupMsgs();
+  });
+}
+
+function openGroup(gid) {
+  if (!gById(gid)) return;
+  gcur = gid;
+  gtab = "members";
+  state.activeContact = null;
+  showView("groupView");
+  renderGroupHead();
+  renderGroupTab();
+  document.querySelector("#groupView .profile-content").scrollTop = 0;
+}
+
+function renderGroupHead() {
+  const g = gById(gcur);
+  if (!g) return;
+  $("gName").textContent = g.name;
+  const av = makeAvatar(g.photo, "");
+  if (!g.photo) av.textContent = "👥";
+  av.id = "gAvatar";
+  av.classList.add("profile-photo");
+  av.style.margin = "0";
+  $("gAvatar").replaceWith(av);
+  $("gPhotoBtn").style.display = g.admin === myKey() ? "" : "none";
+}
+
+function memberRow(g, p, noAction) {
+  const c = state.contacts.find(x => x.id === p);
+  const row = document.createElement("div");
+  row.className = "contact";
+  row.appendChild(makeAvatar(c ? c.photo : "", c ? c.name : (gNames[p] || "")));
+  const info = document.createElement("div");
+  info.className = "contact-info";
+  const n = document.createElement("strong");
+  n.textContent = personName(p);
+  const sm = document.createElement("small");
+  sm.textContent = (p === g.admin ? "админ · " : "") + "+" + p;
+  info.append(n, sm);
+  row.appendChild(info);
+  if (!c && p !== myKey() && !gNames[p]) {
+    get(ref(db, "users/" + p)).then(sn => { const v = sn.val(); if (v && v.name) { gNames[p] = v.name; n.textContent = v.name; } }).catch(() => {});
+  }
+  if (!noAction && g.admin === myKey() && p !== myKey()) {
+    row.style.cursor = "pointer";
+    row.addEventListener("click", async () => {
+      if (!confirm("Удалить «" + n.textContent + "» из группы?")) return;
+      try {
+        await remove(ref(db, "groups/" + g.id + "/members/" + p));
+        await remove(ref(db, "usergroups/" + p + "/" + g.id));
+      } catch (e) { alert("Не удалось удалить участника."); }
+    });
+  }
+  return row;
+}
+
+function renderGroupTab() {
+  const g = gById(gcur);
+  if (!g) return;
+  document.querySelectorAll(".gtabs button").forEach(b => b.classList.toggle("on", b.dataset.g === gtab));
+  $("gAddMember").style.display = (g.admin === myKey() && gtab === "members") ? "" : "none";
+  const box = $("gContent");
+  box.replaceChildren();
+  const say = t => { const d = document.createElement("div"); d.className = "empty"; d.textContent = t; box.appendChild(d); };
+  const act = (txt, bg, fn) => {
+    const b = document.createElement("button");
+    b.className = "primary-button";
+    if (bg) b.style.background = bg;
+    b.textContent = txt;
+    b.addEventListener("click", fn);
+    box.appendChild(b);
+  };
+  if (gtab === "members") {
+    g.members.slice().sort((a, b) => (b === g.admin) - (a === g.admin)).forEach(p => box.appendChild(memberRow(g, p)));
+  } else if (gtab === "admin") {
+    box.appendChild(memberRow(g, g.admin, true));
+    if (g.admin === myKey()) {
+      act("✏️ Переименовать группу", "", renameGroup);
+      act("🗑 Удалить группу", "#a33", deleteGroup);
+    } else act("🚪 Выйти из группы", "#a33", leaveGroup);
+  } else if (gtab === "photo") {
+    if (g.photo) { const grid = document.createElement("div"); grid.className = "grid"; const im = document.createElement("img"); im.src = g.photo; im.alt = ""; grid.appendChild(im); box.appendChild(grid); }
+    else say("Пока нет фото группы.");
+  } else if (gtab === "video") {
+    say("Видео скоро появится.");
+  } else {
+    const msgs = document.createElement("div");
+    msgs.id = "gMsgs";
+    msgs.className = "messages";
+    msgs.style.cssText = "height:calc(100dvh - 430px);min-height:200px;border-radius:12px";
+    const form = document.createElement("form");
+    form.className = "row";
+    const inp = document.createElement("input");
+    inp.id = "gInput";
+    inp.placeholder = "Начать SMS";
+    inp.maxLength = 2000;
+    inp.autocomplete = "off";
+    const btn = document.createElement("button");
+    btn.type = "submit";
+    btn.className = "secondary-button";
+    btn.textContent = "↑";
+    form.append(inp, btn);
+    form.addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
+    box.append(msgs, form);
+    renderGroupMsgs();
+  }
+}
+
+function renderGroupMsgs() {
+  const list = $("gMsgs");
+  if (!list) return;
+  list.replaceChildren();
+  const arr = (state.messages[gcur] || []).filter(m => !isBlocked(m.from));
+  if (!arr.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "Начните общение в группе ❤️";
+    list.appendChild(e);
+    return;
+  }
+  arr.forEach(m => {
+    const row = document.createElement("div");
+    row.className = "mrow" + (m.mine ? " mine" : "");
+    const col = document.createElement("div");
+    col.className = "mcol";
+    col.style.alignItems = m.mine ? "flex-end" : "flex-start";
+    if (!m.mine) {
+      const nm = document.createElement("small");
+      nm.style.cssText = "color:#3E8A06;font-weight:bold;margin-bottom:2px";
+      nm.textContent = (state.contacts.find(c => c.id === m.from) || {}).name || m.n || "+" + m.from;
+      col.appendChild(nm);
+    }
+    const bubble = document.createElement("div");
+    bubble.className = "message" + (m.mine ? " mine" : "");
+    bubble.textContent = m.text;
+    bubble.addEventListener("click", () => {
+      if (!confirm("Удалить это сообщение?")) return;
+      state.hidden[m.key] = 1;
+      state.messages[gcur] = (state.messages[gcur] || []).filter(x => x.key !== m.key);
+      saveState();
+      renderGroupMsgs();
+    });
+    col.appendChild(bubble);
+    const time = document.createElement("span");
+    time.className = "mt";
+    time.textContent = m.time || "";
+    if (m.mine) row.append(time, col); else row.append(col, time);
+    list.appendChild(row);
+  });
+  list.scrollTop = list.scrollHeight;
+}
+
+function sendGroupMsg() {
+  const inp = $("gInput");
+  if (!inp || !gcur) return;
+  const text = inp.value.trim();
+  if (!text) return;
+  if (!db) { alert("Нет подключения."); return; }
+  inp.value = "";
+  push(ref(db, "gchats/" + gcur + "/messages"), { from: myKey(), n: state.profile.name || "", text: text, ts: serverTimestamp() })
+    .catch(() => alert("Не удалось отправить сообщение."));
+}
+
+function renameGroup() {
+  const g = gById(gcur);
+  if (!g) return;
+  const n = (prompt("Новое название группы:", g.name) || "").trim().slice(0, 40);
+  if (!n) return;
+  set(ref(db, "groups/" + g.id + "/name"), n).catch(() => alert("Не удалось переименовать."));
+}
+
+async function deleteGroup() {
+  const g = gById(gcur);
+  if (!g || !confirm("Удалить группу «" + g.name + "» для всех участников?")) return;
+  try {
+    await Promise.all(g.members.map(p => remove(ref(db, "usergroups/" + p + "/" + g.id))));
+    await remove(ref(db, "gchats/" + g.id));
+    await remove(ref(db, "groups/" + g.id));
+  } catch (e) { alert("Не удалось удалить группу."); }
+}
+
+async function leaveGroup() {
+  const g = gById(gcur);
+  if (!g || !confirm("Выйти из группы «" + g.name + "»?")) return;
+  try {
+    await remove(ref(db, "groups/" + g.id + "/members/" + myKey()));
+    await remove(ref(db, "usergroups/" + myKey() + "/" + g.id));
+  } catch (e) { alert("Не удалось выйти из группы."); }
+}
+
+$("gBack").addEventListener("click", () => { gcur = null; showView("chatsView"); });
+document.querySelectorAll(".gtabs button").forEach(b => b.addEventListener("click", () => { gtab = b.dataset.g; renderGroupTab(); }));
+$("gPhotoBtn").addEventListener("click", () => $("gPhotoInput").click());
+$("gPhotoInput").addEventListener("change", function () {
+  const f = this.files && this.files[0];
+  this.value = "";
+  if (!f || !f.type.startsWith("image/") || !gcur || !db) return;
+  const gid = gcur;
+  compress(f, 256, url => set(ref(db, "groups/" + gid + "/photo"), url).catch(() => alert("Не удалось сохранить фото.")));
+});
+
+$("groupCreateBtn").addEventListener("click", () => {
+  if (!state.contacts.length) { alert("Сначала добавь контакты."); return; }
+  $("gNewName").value = "";
+  const list = $("gNewList");
+  list.replaceChildren();
+  state.contacts.forEach(c => {
+    const lab = document.createElement("label");
+    lab.style.cssText = "display:flex;align-items:center;gap:10px;padding:8px 0;font-size:17px";
+    const cb = document.createElement("input");
+    cb.type = "checkbox";
+    cb.value = c.id;
+    cb.style.cssText = "width:22px;height:22px;margin:0;padding:0;flex-shrink:0";
+    lab.append(cb, document.createTextNode(c.name));
+    list.appendChild(lab);
+  });
+    $("gCreateModal").classList.add("show");
+});
+$("gCreateCancel").addEventListener("click", () => $("gCreateModal").classList.remove("show"));
+$("gCreateOk").addEventListener("click", async () => {
+  const name = $("gNewName").value.trim();
+  const ids = Array.from($("gNewList").querySelectorAll("input:checked")).map(x => x.value);
+  if (!name) { alert("Введи название группы."); return; }
+  if (!ids.length) { alert("Выбери хотя бы одного участника."); return; }
+  if (!db) { alert("Нет подключения."); return; }
+  const me = myKey(), all = [me].concat(ids), members = {};
+  all.forEach(p => { members[p] = true; });
+  try {
+    const gr = push(ref(db, "groups"), { name: name, admin: me, photo: "", members: members, ts: serverTimestamp() });
+    await gr;
+    const gid = gr.key;
+    pendingOpen = gid;
+    await Promise.all(all.map(p => set(ref(db, "usergroups/" + p + "/" + gid), true)));
+    $("gCreateModal").classList.remove("show");
+  } catch (e) {
+    pendingOpen = null;
+    alert("Не удалось создать группу.");
+  }
+});
+
+$("gAddMember").addEventListener("click", () => {
+  const g = gById(gcur);
+  if (!g) return;
+  const list = $("gAddList");
+  list.replaceChildren();
+  const others = state.contacts.filter(c => g.members.indexOf(c.id) === -1);
+  if (!others.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "Все твои контакты уже в группе.";
+    list.appendChild(e);
+  }
+  others.forEach(c => {
+    const b = document.createElement("button");
+    b.className = "primary-button";
+    b.textContent = "👤 " + c.name;
+    b.addEventListener("click", async () => {
+      $("gAddModal").classList.remove("show");
+      try {
+        await set(ref(db, "groups/" + g.id + "/members/" + c.id), true);
+        await set(ref(db, "usergroups/" + c.id + "/" + g.id), true);
+      } catch (e) { alert("Не удалось добавить участника."); }
+    });
+    list.appendChild(b);
+  });
+  $("gAddModal").classList.add("show");
+});
+$("gAddClose").addEventListener("click", () => $("gAddModal").classList.remove("show"));
+
+document.addEventListener("visibilitychange", () => {
+  if (!document.hidden && currentView === "chatView" && state.activeContact) markRead(state.activeContact);
+});
+
 // ---------- Запуск ----------
 loadState();
 updateHeader();
@@ -1865,6 +2225,7 @@ function startOnline() {
   }).then(() => {
     listenInbox();
     listenCalls();
+    listenGroups();
     state.contacts.forEach(listenChat);
     onValue(ref(db, ".info/connected"), sn => {
       if (sn.val() !== true) return;
