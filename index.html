@@ -319,7 +319,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <button class="cbtn" id="callEnd" style="background:#d33">✖</button>
       </div>
     </div>
-    </div>
+  </div>
 
   <div class="modal" id="loginModal">
     <div class="modal-card" style="text-align:center">
@@ -456,7 +456,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   window.addEventListener("unhandledrejection", function (e) {
     show("Ошибка: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
   });
-})();
+  })();
 </script>
 <script type="module">
 let initializeApp, getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp;
@@ -1014,7 +1014,7 @@ document.querySelectorAll(".nav-button[data-view]").forEach(button => {
     state.activeContact = null;
     showView(this.dataset.view);
   });
-  });
+});
 
 ["contactModal", "menuModal", "sideMenu", "delModal", "cpMenu", "chatMenuModal", "pickModal"].forEach(id => {
   $(id).addEventListener("click", function (event) {
@@ -1148,7 +1148,7 @@ $("cpDelete").addEventListener("click", () => {
   state.activeContact = cpId;
   deleteCurrentContact();
 });
-$("cpBlock").addEventListener("click", () => {
+  $("cpBlock").addEventListener("click", () => {
   $("cpMenu").classList.remove("show");
   const c = state.contacts.find(x => x.id === cpId);
   if (!c) return;
@@ -1439,7 +1439,7 @@ function renderCalls() {
     e.textContent = "Звонков пока не было.";
     list.appendChild(e);
     return;
-    }
+  }
   state.calls.forEach(c => {
     const ct = state.contacts.find(x => x.id === c.peer);
     const b = document.createElement("button");
@@ -2021,15 +2021,20 @@ function renderGroupTab() {
     msgs.className = "messages";
     msgs.style.cssText = "height:calc(100dvh - 430px);min-height:200px;border-radius:12px";
     const form = document.createElement("form");
-    form.className = "row";
+    form.className = "composer";
+    form.style.cssText = "border-top:none;background:transparent;padding-left:0;padding-right:0";
     const inp = document.createElement("input");
     inp.id = "gInput";
     inp.placeholder = "Начать SMS";
     inp.maxLength = 2000;
     inp.autocomplete = "off";
+    inp.style.setProperty("padding-right", "58px", "important");
     const btn = document.createElement("button");
     btn.type = "submit";
-    btn.className = "secondary-button";
+    btn.className = "send-button";
+    btn.style.right = "8px";
+    btn.style.bottom = "14px";
+    btn.setAttribute("aria-label", "Отправить");
     btn.textContent = "↑";
     form.append(inp, btn);
     form.addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
@@ -2146,7 +2151,7 @@ $("groupCreateBtn").addEventListener("click", () => {
     lab.append(cb, document.createTextNode(c.name));
     list.appendChild(lab);
   });
-    $("gCreateModal").classList.add("show");
+  $("gCreateModal").classList.add("show");
 });
 $("gCreateCancel").addEventListener("click", () => $("gCreateModal").classList.remove("show"));
 $("gCreateOk").addEventListener("click", async () => {
