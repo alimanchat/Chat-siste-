@@ -303,6 +303,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div class="profile-content" style="flex:1;min-height:0;padding-top:14px">
       <button class="dashed" id="storyAdd">+ Добавить историю</button>
       <input type="file" id="storyInput" accept="image/*" style="display:none">
+      <input type="file" id="storyVidInput" accept="video/*" style="display:none">
       <div class="shead"><b>Мои истории</b><span>исчезают через 24 ч</span></div>
       <div class="srow" id="myStories"></div>
       <div id="otherStories"></div>
@@ -390,13 +391,24 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <button class="secondary-button" id="gCreateCancel">Отмена</button>
         <button class="primary-button" id="gCreateOk" style="margin-top:0">Создать</button>
       </div>
-       </div>
+    </div>
+  </div>
 
   <div class="modal" id="gAddModal">
     <div class="modal-card">
       <h3>Добавить в группу</h3>
       <div id="gAddList" style="max-height:50vh;overflow-y:auto"></div>
       <button class="secondary-button" id="gAddClose" style="width:100%;margin-top:12px">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal" id="storyChoose">
+    <div class="modal-card">
+      <h3>Новая история</h3>
+      <button class="primary-button" id="scPhoto">🖼️ Фото из галереи</button>
+      <button class="primary-button" id="scVideo">🎞️ Видео из галереи</button>
+      <button class="primary-button" id="scCam">🎥 Снять видео (до 30 сек)</button>
+      <button class="secondary-button" id="scClose" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
   </div>
 
@@ -410,6 +422,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
     <div id="sStage" style="flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center">
       <img id="sImg" alt="" style="max-width:100%;max-height:100%;object-fit:contain">
+      <video id="sVid" playsinline autoplay style="max-width:100%;max-height:100%;display:none"></video>
       <div id="sCap" style="position:absolute;left:0;right:0;bottom:0;padding:18px;background:linear-gradient(transparent,#000c);text-align:center;font-size:17px;overflow-wrap:anywhere"></div>
     </div>
   </div>
@@ -606,7 +619,7 @@ function listenInbox() {
     }
     listenChat(contact);
   });
-}
+  }
 
 // ---------- Хранение (локально: профиль и контакты) ----------
 function loadState() {
@@ -1113,7 +1126,7 @@ async function loadCpStories(id) {
     const live = [];
     sn.forEach(ch => {
       const v = ch.val();
-      if (v && okData(v.d, "image") && Date.now() - (v.ts || Date.now()) < DAY) live.push(Object.assign({ key: ch.key, owner: id }, v));
+      if (v && (okData(v.d, "image") || v.t === "video") && Date.now() - (v.ts || Date.now()) < DAY) live.push(Object.assign({ key: ch.key, owner: id }, v));
     });
     live.sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
     box.replaceChildren();
@@ -1186,7 +1199,7 @@ async function cpTab(t) {
     box.replaceChildren();
     say("Не удалось загрузить.");
   }
-}
+  }
 
 $("cpMenuBtn").addEventListener("click", () => {
   $("cpBlock").textContent = isBlocked(cpId) ? "✅ Разблокировать" : "🚫 Заблокировать";
@@ -1212,7 +1225,8 @@ $("cpBlock").addEventListener("click", () => {
   $("cpName").textContent = c.name + (isBlocked(cpId) ? " 🚫" : "");
 });
 $("cpBack").addEventListener("click", () => {
-  if (cpFrom === "groupView" && gcur) { showView("groupView"); renderGroupHead(); renderGroupTab(); }
+  if (cpFrom === "statusView") showView("statusView");
+  else if (cpFrom === "groupView" && gcur) { showView("groupView"); renderGroupHead(); renderGroupTab(); }
   else showView("chatView");
 });
 document.querySelectorAll(".cp-tabs button").forEach(b => b.addEventListener("click", () => cpTab(b.dataset.t)));
@@ -1456,7 +1470,7 @@ async function acceptCall() {
     alert("Не удалось принять звонок.");
     endCall(true);
   }
-  }
+}
 
 function listenCalls() {
   onValue(ref(db, "calls/" + myKey()), sn => {
@@ -1696,17 +1710,18 @@ async function startVoice() {
 
 // --- кружок (видео до 1 минуты)
 let wrec = null;
-async function openVid() {
-  const id = state.activeContact;
+async function openVid(mode) {
+  const story = mode === "story";
+  const id = story ? myKey() : state.activeContact;
   if (!id || wrec) return;
   if (!db) { alert("Нет подключения."); return; }
-  if (isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
+  if (!story && isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
   closeAttach();
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 360 }, height: { ideal: 360 } }, audio: true }); } catch (e) { alert("Нет доступа к камере или микрофону."); return; }
-  wrec = { stream: stream, id: id, mr: null, timer: null, t0: 0, send: false };
+  wrec = { stream: stream, id: id, mr: null, timer: null, t0: 0, send: false, story: story };
   $("vidPrev").srcObject = stream;
-  $("vidTime").textContent = "0:00 / 1:00";
+  $("vidTime").textContent = story ? "0:00 / 0:30" : "0:00 / 1:00";
   $("vidGo").textContent = "⏺";
   $("vidModal").classList.add("show");
 }
@@ -1744,15 +1759,19 @@ $("vidGo").addEventListener("click", () => {
     if (!send || dur < 1 || !chunks.length) return;
     const type = (mr.mimeType || chunks[0].type || "video/webm").split(";")[0];
     const data = await blobToData(new Blob(chunks, { type: type }));
-    sendRich(r.id, { type: "video", text: "⭕ Видеосообщение", dur: Math.round(dur) }, data);
+    if (r.story) {
+      const th = await videoThumb(URL.createObjectURL(new Blob(chunks, { type: type })));
+      publishStory("video", data, th);
+    } else sendRich(r.id, { type: "video", text: "⭕ Видеосообщение", dur: Math.round(dur) }, data);
   };
   r.t0 = Date.now();
   mr.start();
   $("vidGo").textContent = "⏹";
   r.timer = setInterval(() => {
     const sec = (Date.now() - r.t0) / 1000;
-    $("vidTime").textContent = fmtDur(sec) + " / 1:00";
-    if (sec >= 60) finishVid();
+    const lim = r.story ? 30 : 60;
+    $("vidTime").textContent = fmtDur(sec) + " / " + fmtDur(lim);
+    if (sec >= lim) finishVid();
   }, 250);
 });
 $("vidCancel").addEventListener("click", closeVid);
@@ -1762,7 +1781,7 @@ $("micBtn").addEventListener("click", startVoice);
 $("recCancel").addEventListener("click", () => stopVoice(false));
 $("recSend").addEventListener("click", () => stopVoice(true));
 $("plusBtn").addEventListener("click", () => $("attachPanel").classList.toggle("show"));
-$("attCam").addEventListener("click", openVid);
+$("attCam").addEventListener("click", () => openVid());
 $("attPhoto").addEventListener("click", () => { closeAttach(); $("galInput").click(); });
 $("galInput").addEventListener("change", function () {
   const f = this.files && this.files[0];
@@ -1805,9 +1824,18 @@ function leftHours(ts) { return Math.max(1, Math.ceil((DAY - (Date.now() - (ts |
 
 function storyCard(s, list, i, own) {
   const me = state.profile.phone, views = s.views || {};
+  const isV = s.t === "video";
   const card = document.createElement("div");
   card.className = "scard" + (!own && !views[me] ? " fresh" : "");
-  card.style.backgroundImage = 'url("' + s.d + '")';
+  const pic = isV ? s.th : s.d;
+  if (okData(pic, "image")) card.style.backgroundImage = 'url("' + pic + '")';
+  else card.style.backgroundImage = "linear-gradient(160deg,#2f4f2f,#8fbf4f)";
+  if (isV) {
+    const pl = document.createElement("span");
+    pl.textContent = "▶";
+    pl.style.cssText = "position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);font-size:34px;color:#fff;text-shadow:0 0 8px #000";
+    card.appendChild(pl);
+  }
   if (own) {
     const p = document.createElement("span");
     p.className = "pill";
@@ -1839,13 +1867,13 @@ async function loadStories() {
   const ids = [me].concat(state.contacts.filter(c => !isBlocked(c.id)).map(c => c.id));
   const res = await Promise.all(ids.map(id => get(ref(db, "stories/" + id)).then(sn => {
     const a = [];
-    sn.forEach(ch => { const v = ch.val(); if (v && okData(v.d, "image")) a.push(Object.assign({ key: ch.key, owner: id }, v)); });
+    sn.forEach(ch => { const v = ch.val(); if (v && (okData(v.d, "image") || v.t === "video")) a.push(Object.assign({ key: ch.key, owner: id }, v)); });
     return [id, a];
   }).catch(() => [id, []])));
   const blocks = [];
   res.forEach(([id, arr]) => {
     const live = arr.filter(x => Date.now() - (x.ts || Date.now()) < DAY).sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
-    if (id === me) arr.filter(x => live.indexOf(x) === -1).forEach(x => remove(ref(db, "stories/" + me + "/" + x.key)).catch(() => {}));
+    if (id === me) arr.filter(x => live.indexOf(x) === -1).forEach(x => { remove(ref(db, "stories/" + me + "/" + x.key)).catch(() => {}); if (x.t === "video") remove(ref(db, "storyvid/" + me + "/" + x.key)).catch(() => {}); });
     if (!live.length) return;
     if (id === me) { live.forEach((x, i) => mine.appendChild(storyCard(x, live, i, true))); return; }
     blocks.push([id, live, live.some(x => !(x.views || {})[me])]);
@@ -1862,11 +1890,13 @@ async function loadStories() {
     const c = state.contacts.find(x => x.id === id);
     const head = document.createElement("div");
     head.className = "shead2";
+    head.style.cursor = "pointer";
+    head.addEventListener("click", () => openCP(id, "statusView"));
     head.appendChild(makeAvatar(c ? c.photo : "", c ? c.name : ""));
     const nm = document.createElement("span");
     nm.textContent = c ? c.name : "+" + id;
     const hint = document.createElement("small");
-    hint.textContent = live.length > 1 ? "листайте →" : "";
+    hint.textContent = live.length > 1 ? "листайте →" : "профиль →";
     head.append(nm, hint);
     const row = document.createElement("div");
     row.className = "srow";
@@ -1887,10 +1917,31 @@ function openStory(list, i) {
   showStory();
 }
 
+async function playStoryVideo(st) {
+  const sv0 = $("sVid");
+  sv0.poster = okData(st.th, "image") ? st.th : "";
+  sv0.removeAttribute("src");
+  if (!st.dv) {
+    try {
+      const sn = await get(ref(db, "storyvid/" + st.owner + "/" + st.key));
+      const v = sn.val();
+      st.dv = v && okData(v.d, "video") ? v.d : "";
+    } catch (e) { st.dv = ""; }
+  }
+  if (!sv || sv.list[sv.i] !== st) return;
+  if (!st.dv) { $("sCap").textContent = "Видео не загрузилось"; $("sCap").style.display = "block"; return; }
+  sv0.src = st.dv;
+  sv0.play().catch(() => {});
+}
+
 function showStory() {
   const s = sv.list[sv.i], me = state.profile.phone, own = s.owner === me;
   const views = s.views || (s.views = {});
-  $("sImg").src = s.d;
+  const isV = s.t === "video";
+  $("sImg").style.display = isV ? "none" : "";
+  $("sVid").style.display = isV ? "" : "none";
+  if (isV) { $("sImg").removeAttribute("src"); playStoryVideo(s); }
+  else { $("sVid").pause(); $("sVid").removeAttribute("src"); $("sImg").src = s.d; }
   $("sCap").textContent = s.cap || "";
   $("sCap").style.display = s.cap ? "block" : "none";
   const c = state.contacts.find(x => x.id === s.owner);
@@ -1906,10 +1957,17 @@ function showStory() {
 function closeStory() {
   sv = null;
   $("storyModal").classList.remove("show");
-  $("sImg").src = "";
+  $("sImg").removeAttribute("src");
+  try { $("sVid").pause(); } catch (e) {}
+  $("sVid").removeAttribute("src");
   if (currentView === "statusView") loadStories();
   else if (currentView === "cpView" && cpId) loadCpStories(cpId);
 }
+
+$("sVid").addEventListener("ended", () => {
+  if (!sv) return;
+  if (sv.i + 1 < sv.list.length) { sv.i++; showStory(); } else closeStory();
+});
 
 $("sClose").addEventListener("click", closeStory);
 $("sStage").addEventListener("click", e => {
@@ -1923,26 +1981,77 @@ $("sDel").addEventListener("click", () => {
   if (!sv || !confirm("Удалить эту историю?")) return;
   const s = sv.list[sv.i];
   remove(ref(db, "stories/" + s.owner + "/" + s.key)).catch(() => {});
+  if (s.t === "video") remove(ref(db, "storyvid/" + s.owner + "/" + s.key)).catch(() => {});
   sv.list.splice(sv.i, 1);
   if (!sv.list.length) { closeStory(); return; }
   if (sv.i >= sv.list.length) sv.i = sv.list.length - 1;
   showStory();
 });
 
+function videoThumb(src) {
+  return new Promise(res => {
+    const v = document.createElement("video");
+    let fin = false;
+    const done = u => { if (fin) return; fin = true; v.removeAttribute("src"); res(u); };
+    v.muted = true;
+    v.playsInline = true;
+    v.preload = "auto";
+    v.addEventListener("loadeddata", () => {
+      try {
+        const w = 240, h = Math.round(240 * (v.videoHeight || 4) / (v.videoWidth || 3));
+        const c = document.createElement("canvas");
+        c.width = w; c.height = h;
+        c.getContext("2d").drawImage(v, 0, 0, w, h);
+        done(c.toDataURL("image/jpeg", 0.6));
+      } catch (e) { done(""); }
+    });
+    v.addEventListener("error", () => done(""));
+    setTimeout(() => done(""), 6000);
+    v.src = src;
+  });
+}
+
+async function publishStory(kind, data, th) {
+  const me = state.profile.phone;
+  const cap = (prompt("Подпись к истории (можно пропустить):", "") || "").trim().slice(0, 100);
+  try {
+    if (kind === "video") {
+      const k = push(ref(db, "stories/" + me)).key;
+      await set(ref(db, "storyvid/" + me + "/" + k), { d: data });
+      await set(ref(db, "stories/" + me + "/" + k), { t: "video", th: th || "", cap: cap, ts: serverTimestamp() });
+    } else {
+      await push(ref(db, "stories/" + me), { d: data, cap: cap, ts: serverTimestamp() });
+    }
+    loadStories();
+  } catch (e) {
+    alert("Не удалось добавить историю.");
+  }
+}
+
 $("storyAdd").addEventListener("click", () => {
   if (!db || !state.profile.phone) { alert("Нет подключения."); return; }
-  $("storyInput").click();
+  $("storyChoose").classList.add("show");
 });
+$("scClose").addEventListener("click", () => $("storyChoose").classList.remove("show"));
+$("scPhoto").addEventListener("click", () => { $("storyChoose").classList.remove("show"); $("storyInput").click(); });
+$("scVideo").addEventListener("click", () => { $("storyChoose").classList.remove("show"); $("storyVidInput").click(); });
+$("scCam").addEventListener("click", () => { $("storyChoose").classList.remove("show"); openVid("story"); });
 $("storyInput").addEventListener("change", function () {
   const f = this.files && this.files[0];
   this.value = "";
   if (!f || !f.type.startsWith("image/")) return;
-  compress(f, 720, url => {
-    const cap = (prompt("Подпись к истории (можно пропустить):", "") || "").trim().slice(0, 100);
-    push(ref(db, "stories/" + state.profile.phone), { d: url, cap: cap, ts: serverTimestamp() })
-      .then(() => loadStories())
-      .catch(() => alert("Не удалось добавить историю."));
-  });
+  compress(f, 720, url => publishStory("photo", url));
+});
+$("storyVidInput").addEventListener("change", async function () {
+  const f = this.files && this.files[0];
+  this.value = "";
+  if (!f || !f.type.startsWith("video/")) return;
+  if (f.size > 8 * 1024 * 1024) { alert("Видео больше 8 МБ. Выбери короче или сними камерой (до 30 сек)."); return; }
+  try {
+    const data = await blobToData(f);
+    const th = await videoThumb(URL.createObjectURL(f));
+    publishStory("video", data, th);
+  } catch (e) { alert("Не удалось прочитать видео."); }
 });
 
 // ---------- Группы ----------
@@ -1986,7 +2095,7 @@ function listenGroup(gid) {
     if (currentView === "chatsView") renderChats();
     if (currentView === "gChatView" && gcur === gid) renderGroupMsgs();
   });
-}
+  }
 
 function openGroup(gid) {
   if (!gById(gid)) return;
