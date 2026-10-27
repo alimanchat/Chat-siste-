@@ -226,7 +226,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <h2 id="cpName" style="margin:0"></h2>
       <div class="cp-tabs">
         <button data-t="bio">👤<small>Профиль</small></button>
-        <button data-t="status">➕<small>Статус</small></button>
+        <button data-t="status">➕<small>Истории</small></button>
         <button data-t="photo">📷<small>Фото</small></button>
         <button data-t="video">🎬<small>Видео</small></button>
         <button data-t="sms">✉️<small>Сообщения</small></button>
@@ -477,7 +477,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
-  (function () {
+(function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -720,7 +720,7 @@ function openContact(contactId) {
   updateChatStatus();
   showView("chatView");
   renderMessages();
-}
+  }
 
 function makeContactButton(contact, showLastMessage) {
   const button = document.createElement("button");
@@ -1065,7 +1065,7 @@ function updateChatStatus() {
 }
 
 // ---------- Страница контакта ----------
-let cpId = null, cpFrom = null;
+let cpId = null, cpFrom = null, cpHas = false, cpLoaded = false, cpTabNow = "bio";
 const MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 
 const MN = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
@@ -1117,11 +1117,25 @@ function openCP(id, from) {
   loadCpStories(id);
 }
 
+function syncCpStories() {
+  const on = cpTabNow === "status";
+  $("cpStWrap").style.display = on && cpHas ? "" : "none";
+  if (!on || !cpLoaded || cpHas) return;
+  const box = $("cpContent");
+  box.replaceChildren();
+  const d = document.createElement("div");
+  d.className = "empty";
+  d.textContent = "Историй пока нет.";
+  box.appendChild(d);
+}
+
 async function loadCpStories(id) {
   const box = $("cpStories");
   box.replaceChildren();
-  $("cpStWrap").style.display = "none";
-  if (!db || isBlocked(id)) return;
+  cpHas = false;
+  cpLoaded = false;
+  syncCpStories();
+  if (!db || isBlocked(id)) { cpLoaded = true; syncCpStories(); return; }
   try {
     const sn = await get(ref(db, "stories/" + id));
     if (cpId !== id) return;
@@ -1133,8 +1147,9 @@ async function loadCpStories(id) {
     live.sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
     box.replaceChildren();
     live.forEach((x, i) => box.appendChild(storyCard(x, live, i, false)));
-    $("cpStWrap").style.display = live.length ? "" : "none";
+    cpHas = live.length > 0;
   } catch (e) {}
+  if (cpId === id) { cpLoaded = true; syncCpStories(); }
 }
 
 async function cpTab(t) {
@@ -1152,6 +1167,9 @@ async function cpTab(t) {
     if (cpId !== myKey() && confirm("Добавить +" + cpId + " в контакты, чтобы написать?")) { $("newContactName").value = cpId; addContact(); }
     return;
   }
+  cpTabNow = t;
+  syncCpStories();
+  if (t === "status") return;
   if (t === "video") { say("Видео-альбом пока недоступен: для хранения видео нужен платный тариф Firebase."); return; }
   if (!db) { say("Нет подключения."); return; }
   say("Загрузка...");
@@ -1183,12 +1201,6 @@ async function cpTab(t) {
       boxes.forEach(x => r.appendChild(x));
       box.appendChild(r);
     };
-    if (t === "status") {
-      const st = (await get(ref(db, "statuses/" + id))).val();
-      const live = st && st.text && Date.now() - (st.ts || 0) < 864e5;
-      row("➕", mk(live ? st.text : v.status, "Статуса пока нет"));
-      return;
-    }
     const bp = (v.birth || "").split("-");
     row("📞", mk("+" + id, ""));
     row("🎂", mk(+bp[0] || "", "Год"), mk(+bp[2] || "", "День"), mk(MN[+bp[1] - 1] || "", "Месяц"));
@@ -1202,7 +1214,7 @@ async function cpTab(t) {
     box.replaceChildren();
     say("Не удалось загрузить.");
   }
-  }
+}
 
 $("cpMenuBtn").addEventListener("click", () => {
   $("cpBlock").textContent = isBlocked(cpId) ? "✅ Разблокировать" : "🚫 Заблокировать";
