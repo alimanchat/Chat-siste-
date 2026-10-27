@@ -140,6 +140,14 @@ button{cursor:pointer;border:none}
 .gtabs button{background:#fff;font-size:26px;display:flex;flex-direction:column;align-items:center;gap:4px;padding:6px 6px;border-radius:10px}
 .gtabs button small{font-size:11px;color:#555}
 .gtabs button.on{background:#ededed}
+#gChatView .header{padding:8px 10px;gap:6px}
+#gChatView .header .avatar{width:44px;height:44px;font-size:22px}
+#gChatView .header-info strong{display:block;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gChatView .header-info small{display:block;margin:2px 0 0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#gForm input{padding-right:58px!important}
+#cpStories{padding:0 2px}
+#cpStories .scard{flex:0 0 84px;height:130px;border-radius:16px;border-width:2px}
+#cpStories .pill{font-size:10px;padding:3px 6px}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -201,7 +209,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <button type="button" id="recSend" style="background:#2a9d4a" aria-label="Отправить">➤</button>
     </div>
     <form class="composer" id="messageForm">
-      <input id="messageInput" type="text" placeholder="Начать SMS" autocomplete="off" maxlength="2000">
+      <input id="messageInput" type="text" placeholder="Написать сообщение" autocomplete="off" maxlength="2000">
       <button class="mic-btn" type="button" id="micBtn" aria-label="Голосовое сообщение">🎤</button>
       <button class="plus-btn" type="button" id="plusBtn" aria-label="Прикрепить">+</button>
       <button class="send-button" type="submit" aria-label="Отправить">↑</button>
@@ -215,12 +223,13 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div class="profile-content" style="text-align:center">
       <div class="avatar profile-photo" id="cpAvatar">👤</div>
       <h2 id="cpName" style="margin:0"></h2>
+      <div class="srow" id="cpStories" style="margin-top:10px"></div>
       <div class="cp-tabs">
         <button data-t="bio">👤<small>Профиль</small></button>
         <button data-t="status">➕<small>Статус</small></button>
         <button data-t="photo">📷<small>Фото</small></button>
         <button data-t="video">🎬<small>Видео</small></button>
-        <button data-t="sms">✉️<small>SMS</small></button>
+        <button data-t="sms">✉️<small>Сообщения</small></button>
       </div>
       <div id="cpContent" style="text-align:left"></div>
     </div>
@@ -240,11 +249,27 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <button data-g="admin">👤<small>Админ</small></button>
         <button data-g="photo">📷<small>Фото</small></button>
         <button data-g="video">🎬<small>Видео</small></button>
-        <button data-g="sms">✉️<small>SMS</small></button>
+        <button data-g="sms">✉️<small>Сообщения</small></button>
       </div>
       <div id="gContent" style="text-align:left"></div>
     </div>
     <div style="padding:10px"><button class="primary-button" id="gAddMember" style="margin-top:0;display:none">+ Добавить контакт</button></div>
+  </section>
+
+  <section class="view" id="gChatView">
+    <div class="header">
+      <button class="icon-button" id="gcBack" aria-label="Назад">←</button>
+      <div class="avatar" id="gcAvatar">👥</div>
+      <div class="header-info">
+        <strong id="gcName"></strong>
+        <small id="gcSub"></small>
+      </div>
+    </div>
+    <div class="messages" id="gMsgs"></div>
+    <form class="composer" id="gForm">
+      <input id="gInput" type="text" placeholder="Написать сообщение" autocomplete="off" maxlength="2000">
+      <button class="send-button" type="submit" aria-label="Отправить">↑</button>
+    </form>
   </section>
 
   <section class="view" id="profileView">
@@ -275,8 +300,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   </section>
 
   <section class="view" id="statusView">
-    <div class="section-title">Истории</div>
-    <div class="profile-content" style="flex:1;min-height:0">
+    <div class="profile-content" style="flex:1;min-height:0;padding-top:14px">
       <button class="dashed" id="storyAdd">+ Добавить историю</button>
       <input type="file" id="storyInput" accept="image/*" style="display:none">
       <div class="shead"><b>Мои истории</b><span>исчезают через 24 ч</span></div>
@@ -302,7 +326,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   </section>
 
   <nav class="bottom-nav">
-    <button class="nav-button active" data-view="chatsView" aria-label="Чат">✉️<small>Чат</small></button>
+    <button class="nav-button active" data-view="chatsView" aria-label="Чат">✉️<small>Сообщения</small></button>
     <button class="nav-button" data-view="contactsView" aria-label="Контакты">👥<small>Контакты</small></button>
     <button class="nav-button" data-view="statusView" aria-label="Истории">➕<small>Истории</small></button>
     <button class="nav-button" data-view="albumView" aria-label="Альбом">📷<small>Альбом</small></button>
@@ -366,8 +390,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <button class="secondary-button" id="gCreateCancel">Отмена</button>
         <button class="primary-button" id="gCreateOk" style="margin-top:0">Создать</button>
       </div>
-    </div>
-  </div>
+       </div>
 
   <div class="modal" id="gAddModal">
     <div class="modal-card">
@@ -413,7 +436,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   <div class="modal" id="chatMenuModal">
     <div class="modal-card">
       <h3>Чат</h3>
-      <button class="primary-button" id="chatClear" style="background:#a33">🗑 Удалить все SMS</button>
+      <button class="primary-button" id="chatClear" style="background:#a33">🗑 Удалить все сообщения</button>
       <p style="color:#777;font-size:13px;margin:10px 0 0">Чтобы удалить одно сообщение, нажми на него.</p>
       <button class="secondary-button" id="closeChatMenu" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
@@ -456,7 +479,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   window.addEventListener("unhandledrejection", function (e) {
     show("Ошибка: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
   });
-  })();
+})();
 </script>
 <script type="module">
 let initializeApp, getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp;
@@ -652,8 +675,8 @@ function showView(viewId) {
   closeAttach();
   if (viewId !== "chatView") { stopVoice(false); closeVid(); }
   currentView = viewId;
-  document.querySelector(".app > .header").style.display = (viewId === "cpView" || viewId === "profileView" || viewId === "chatView" || viewId === "groupView") ? "none" : "";
-  document.querySelector(".bottom-nav").style.display = (viewId === "cpView" || viewId === "chatView" || viewId === "groupView") ? "none" : "";
+  document.querySelector(".app > .header").style.display = (viewId === "cpView" || viewId === "profileView" || viewId === "chatView" || viewId === "groupView" || viewId === "gChatView") ? "none" : "";
+  document.querySelector(".bottom-nav").style.display = (viewId === "cpView" || viewId === "chatView" || viewId === "groupView" || viewId === "gChatView") ? "none" : "";
 
   document.querySelectorAll(".view").forEach(v => v.classList.toggle("active", v.id === viewId));
   document.querySelectorAll(".nav-button[data-view]").forEach(b => b.classList.toggle("active", b.dataset.view === viewId));
@@ -949,7 +972,7 @@ $("chatClear").addEventListener("click", () => {
   $("chatMenuModal").classList.remove("show");
   const id = state.activeContact;
   if (!id) return;
-  if (!confirm("Удалить все SMS в этом чате? Контакт останется.")) return;
+  if (!confirm("Удалить все сообщения в этом чате? Контакт останется.")) return;
   (state.messages[id] || []).forEach(m => { state.hidden[m.key] = 1; });
   state.messages[id] = [];
   saveState();
@@ -1028,7 +1051,7 @@ function updateChatStatus() {
 }
 
 // ---------- Страница контакта ----------
-let cpId = null;
+let cpId = null, cpFrom = null;
 const MONTHS = ["января","февраля","марта","апреля","мая","июня","июля","августа","сентября","октября","ноября","декабря"];
 
 const MN = ["Январь","Февраль","Март","Апрель","Май","Июнь","Июль","Август","Сентябрь","Октябрь","Ноябрь","Декабрь"];
@@ -1054,10 +1077,12 @@ function compress(file, max, cb) {
   img.src = URL.createObjectURL(file);
 }
 
-function openCP(id) {
-  const c = state.contacts.find(x => x.id === id);
-  if (!c) return;
+function openCP(id, from) {
+  const known = state.contacts.find(x => x.id === id);
+  const c = known || { id: id, name: (typeof gNames !== "undefined" && gNames[id]) || "+" + id, photo: "" };
   cpId = id;
+  cpFrom = from || null;
+  $("cpMenuBtn").style.display = known ? "" : "none";
   $("cpName").textContent = c.name + (isBlocked(id) ? " 🚫" : "");
   const setAv = photo => {
     const av = makeAvatar(photo, c.name);
@@ -1068,11 +1093,32 @@ function openCP(id) {
   setAv(c.photo);
   if (db) get(ref(db, "users/" + id)).then(sn => {
     const v = sn.val();
-    if (v && v.photo && cpId === id) setAv(v.photo);
+    if (!v || cpId !== id) return;
+    if (v.photo) setAv(v.photo);
+    if (!known && v.name) { gNames[id] = v.name; $("cpName").textContent = v.name; }
   }).catch(() => {});
   showView("cpView");
   document.querySelector("#cpView .profile-content").scrollTop = 0;
   cpTab("bio");
+  loadCpStories(id);
+}
+
+async function loadCpStories(id) {
+  const box = $("cpStories");
+  box.replaceChildren();
+  if (!db || isBlocked(id)) return;
+  try {
+    const sn = await get(ref(db, "stories/" + id));
+    if (cpId !== id) return;
+    const live = [];
+    sn.forEach(ch => {
+      const v = ch.val();
+      if (v && okData(v.d, "image") && Date.now() - (v.ts || Date.now()) < DAY) live.push(Object.assign({ key: ch.key, owner: id }, v));
+    });
+    live.sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
+    box.replaceChildren();
+    live.forEach((x, i) => box.appendChild(storyCard(x, live, i, false)));
+  } catch (e) {}
 }
 
 async function cpTab(t) {
@@ -1085,7 +1131,11 @@ async function cpTab(t) {
     d.textContent = txt;
     box.appendChild(d);
   };
-  if (t === "sms") { openContact(cpId); return; }
+  if (t === "sms") {
+    if (state.contacts.some(c => c.id === cpId)) { openContact(cpId); return; }
+    if (cpId !== myKey() && confirm("Добавить +" + cpId + " в контакты, чтобы написать?")) { $("newContactName").value = cpId; addContact(); }
+    return;
+  }
   if (t === "video") { say("Видео-альбом пока недоступен: для хранения видео нужен платный тариф Firebase."); return; }
   if (!db) { say("Нет подключения."); return; }
   say("Загрузка...");
@@ -1148,7 +1198,7 @@ $("cpDelete").addEventListener("click", () => {
   state.activeContact = cpId;
   deleteCurrentContact();
 });
-  $("cpBlock").addEventListener("click", () => {
+$("cpBlock").addEventListener("click", () => {
   $("cpMenu").classList.remove("show");
   const c = state.contacts.find(x => x.id === cpId);
   if (!c) return;
@@ -1161,7 +1211,10 @@ $("cpDelete").addEventListener("click", () => {
   saveState();
   $("cpName").textContent = c.name + (isBlocked(cpId) ? " 🚫" : "");
 });
-$("cpBack").addEventListener("click", () => showView("chatView"));
+$("cpBack").addEventListener("click", () => {
+  if (cpFrom === "groupView" && gcur) { showView("groupView"); renderGroupHead(); renderGroupTab(); }
+  else showView("chatView");
+});
 document.querySelectorAll(".cp-tabs button").forEach(b => b.addEventListener("click", () => cpTab(b.dataset.t)));
 $("chatName").parentElement.style.cursor = "pointer";
 $("chatName").parentElement.addEventListener("click", () => { if (state.activeContact) openCP(state.activeContact); });
@@ -1403,7 +1456,7 @@ async function acceptCall() {
     alert("Не удалось принять звонок.");
     endCall(true);
   }
-}
+  }
 
 function listenCalls() {
   onValue(ref(db, "calls/" + myKey()), sn => {
@@ -1855,6 +1908,7 @@ function closeStory() {
   $("storyModal").classList.remove("show");
   $("sImg").src = "";
   if (currentView === "statusView") loadStories();
+  else if (currentView === "cpView" && cpId) loadCpStories(cpId);
 }
 
 $("sClose").addEventListener("click", closeStory);
@@ -1909,7 +1963,7 @@ function listenGroup(gid) {
     let g = gById(gid);
     if (!v || !v.members || !v.members[me]) {
       if (g) state.groups = state.groups.filter(x => x.id !== gid);
-      if (currentView === "groupView" && gcur === gid) { gcur = null; showView("chatsView"); }
+      if ((currentView === "groupView" || currentView === "gChatView") && gcur === gid) { gcur = null; showView("chatsView"); }
       else if (currentView === "chatsView") renderChats();
       return;
     }
@@ -1921,6 +1975,7 @@ function listenGroup(gid) {
     if (pendingOpen === gid) { pendingOpen = null; openGroup(gid); return; }
     if (currentView === "chatsView") renderChats();
     if (currentView === "groupView" && gcur === gid) { renderGroupHead(); renderGroupTab(); }
+    if (currentView === "gChatView" && gcur === gid) fillGroupChatHead();
   });
   onChildAdded(query(ref(db, "gchats/" + gid + "/messages"), limitToLast(200)), snap => {
     const m = snap.val();
@@ -1929,7 +1984,7 @@ function listenGroup(gid) {
     if (list.some(x => x.key === snap.key)) return;
     list.push({ key: snap.key, text: m.text, from: m.from, n: m.n, mine: m.from === myKey(), time: fmtTime(m.ts) });
     if (currentView === "chatsView") renderChats();
-    if (currentView === "groupView" && gcur === gid && gtab === "sms") renderGroupMsgs();
+    if (currentView === "gChatView" && gcur === gid) renderGroupMsgs();
   });
 }
 
@@ -1958,10 +2013,12 @@ function renderGroupHead() {
 }
 
 function memberRow(g, p, noAction) {
-  const c = state.contacts.find(x => x.id === p);
+  const me = myKey(), c = state.contacts.find(x => x.id === p);
   const row = document.createElement("div");
   row.className = "contact";
-  row.appendChild(makeAvatar(c ? c.photo : "", c ? c.name : (gNames[p] || "")));
+  row.style.cursor = "pointer";
+  const av = makeAvatar(p === me ? state.profile.photo : (c ? c.photo : ""), p === me ? state.profile.name : (c ? c.name : (gNames[p] || "")));
+  row.appendChild(av);
   const info = document.createElement("div");
   info.className = "contact-info";
   const n = document.createElement("strong");
@@ -1970,19 +2027,33 @@ function memberRow(g, p, noAction) {
   sm.textContent = (p === g.admin ? "админ · " : "") + "+" + p;
   info.append(n, sm);
   row.appendChild(info);
-  if (!c && p !== myKey() && !gNames[p]) {
-    get(ref(db, "users/" + p)).then(sn => { const v = sn.val(); if (v && v.name) { gNames[p] = v.name; n.textContent = v.name; } }).catch(() => {});
+  if (!c && p !== me) {
+    get(ref(db, "users/" + p)).then(sn => {
+      const v = sn.val();
+      if (!v) return;
+      if (v.name) { gNames[p] = v.name; n.textContent = v.name; }
+      if (v.photo && /^data:image\//.test(v.photo)) av.replaceWith(makeAvatar(v.photo, ""));
+    }).catch(() => {});
   }
-  if (!noAction && g.admin === myKey() && p !== myKey()) {
-    row.style.cursor = "pointer";
-    row.addEventListener("click", async () => {
+  if (!noAction && g.admin === me && p !== me) {
+    const x = document.createElement("button");
+    x.textContent = "✖";
+    x.setAttribute("aria-label", "Удалить из группы");
+    x.style.cssText = "background:#eee;border-radius:50%;width:36px;height:36px;color:#a33;flex-shrink:0";
+    x.addEventListener("click", async e => {
+      e.stopPropagation();
       if (!confirm("Удалить «" + n.textContent + "» из группы?")) return;
       try {
         await remove(ref(db, "groups/" + g.id + "/members/" + p));
         await remove(ref(db, "usergroups/" + p + "/" + g.id));
-      } catch (e) { alert("Не удалось удалить участника."); }
+      } catch (err) { alert("Не удалось удалить участника."); }
     });
+    row.appendChild(x);
   }
+  row.addEventListener("click", () => {
+    if (p === me) { showView("profileView"); return; }
+    openCP(p, "groupView");
+  });
   return row;
 }
 
@@ -2015,31 +2086,6 @@ function renderGroupTab() {
     else say("Пока нет фото группы.");
   } else if (gtab === "video") {
     say("Видео скоро появится.");
-  } else {
-    const msgs = document.createElement("div");
-    msgs.id = "gMsgs";
-    msgs.className = "messages";
-    msgs.style.cssText = "height:calc(100dvh - 430px);min-height:200px;border-radius:12px";
-    const form = document.createElement("form");
-    form.className = "composer";
-    form.style.cssText = "border-top:none;background:transparent;padding-left:0;padding-right:0";
-    const inp = document.createElement("input");
-    inp.id = "gInput";
-    inp.placeholder = "Начать SMS";
-    inp.maxLength = 2000;
-    inp.autocomplete = "off";
-    inp.style.setProperty("padding-right", "58px", "important");
-    const btn = document.createElement("button");
-    btn.type = "submit";
-    btn.className = "send-button";
-    btn.style.right = "8px";
-    btn.style.bottom = "14px";
-    btn.setAttribute("aria-label", "Отправить");
-    btn.textContent = "↑";
-    form.append(inp, btn);
-    form.addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
-    box.append(msgs, form);
-    renderGroupMsgs();
   }
 }
 
@@ -2126,7 +2172,36 @@ async function leaveGroup() {
 }
 
 $("gBack").addEventListener("click", () => { gcur = null; showView("chatsView"); });
-document.querySelectorAll(".gtabs button").forEach(b => b.addEventListener("click", () => { gtab = b.dataset.g; renderGroupTab(); }));
+document.querySelectorAll(".gtabs button").forEach(b => b.addEventListener("click", () => {
+  if (b.dataset.g === "sms") { openGroupChat(); return; }
+  gtab = b.dataset.g;
+  renderGroupTab();
+}));
+
+function fillGroupChatHead() {
+  const g = gById(gcur);
+  if (!g) return;
+  $("gcName").textContent = g.name;
+  $("gcSub").textContent = "участников: " + g.members.length;
+  const av = makeAvatar(g.photo, "");
+  if (!g.photo) av.textContent = "👥";
+  av.id = "gcAvatar";
+  $("gcAvatar").replaceWith(av);
+}
+
+function openGroupChat() {
+  if (!gById(gcur)) return;
+  showView("gChatView");
+  fillGroupChatHead();
+  renderGroupMsgs();
+}
+
+$("gcBack").addEventListener("click", () => {
+  showView("groupView");
+  renderGroupHead();
+  renderGroupTab();
+});
+$("gForm").addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
 $("gPhotoBtn").addEventListener("click", () => $("gPhotoInput").click());
 $("gPhotoInput").addEventListener("change", function () {
   const f = this.files && this.files[0];
