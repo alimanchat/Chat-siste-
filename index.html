@@ -146,8 +146,9 @@ button{cursor:pointer;border:none}
 #gChatView .header-info small{display:block;margin:2px 0 0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #gForm input{padding-right:58px!important}
 #cpStories{padding:0 2px}
-#cpStories .scard{flex:0 0 84px;height:130px;border-radius:16px;border-width:2px}
-#cpStories .pill{font-size:10px;padding:3px 6px}
+#cpStories .scard{flex:0 0 130px;height:200px;border-radius:20px}
+#cpStories .pill{font-size:11px;padding:4px 8px;white-space:nowrap}
+.pill{white-space:nowrap}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -223,7 +224,6 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div class="profile-content" style="text-align:center">
       <div class="avatar profile-photo" id="cpAvatar">👤</div>
       <h2 id="cpName" style="margin:0"></h2>
-      <div class="srow" id="cpStories" style="margin-top:10px"></div>
       <div class="cp-tabs">
         <button data-t="bio">👤<small>Профиль</small></button>
         <button data-t="status">➕<small>Статус</small></button>
@@ -232,6 +232,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <button data-t="sms">✉️<small>Сообщения</small></button>
       </div>
       <div id="cpContent" style="text-align:left"></div>
+      <div id="cpStWrap" style="text-align:left;display:none"><div class="shead"><b>Истории</b></div><div class="srow" id="cpStories"></div></div>
     </div>
   </section>
 
@@ -476,7 +477,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
-(function () {
+  (function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -619,7 +620,7 @@ function listenInbox() {
     }
     listenChat(contact);
   });
-  }
+}
 
 // ---------- Хранение (локально: профиль и контакты) ----------
 function loadState() {
@@ -1119,6 +1120,7 @@ function openCP(id, from) {
 async function loadCpStories(id) {
   const box = $("cpStories");
   box.replaceChildren();
+  $("cpStWrap").style.display = "none";
   if (!db || isBlocked(id)) return;
   try {
     const sn = await get(ref(db, "stories/" + id));
@@ -1131,6 +1133,7 @@ async function loadCpStories(id) {
     live.sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
     box.replaceChildren();
     live.forEach((x, i) => box.appendChild(storyCard(x, live, i, false)));
+    $("cpStWrap").style.display = live.length ? "" : "none";
   } catch (e) {}
 }
 
@@ -2095,7 +2098,7 @@ function listenGroup(gid) {
     if (currentView === "chatsView") renderChats();
     if (currentView === "gChatView" && gcur === gid) renderGroupMsgs();
   });
-  }
+}
 
 function openGroup(gid) {
   if (!gById(gid)) return;
