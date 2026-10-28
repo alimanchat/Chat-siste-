@@ -628,7 +628,7 @@ const normPhone = (v, c) => {
   if (d.length === c.len) d = c.code + d;
   return isKey(d) ? d : "";
 };
-  const FLAGS = {
+const FLAGS = {
   kg: '<rect width="30" height="20" fill="#E8112D"/><circle cx="15" cy="10" r="5" fill="#FFD400"/><circle cx="15" cy="10" r="2.6" fill="#E8112D"/><circle cx="15" cy="10" r="6.4" fill="none" stroke="#FFD400" stroke-width="1.6" stroke-dasharray="1 1"/>',
   ru: '<rect width="30" height="6.7" fill="#fff"/><rect y="6.7" width="30" height="6.7" fill="#0039A6"/><rect y="13.4" width="30" height="6.6" fill="#D52B1E"/>',
   uz: '<rect width="30" height="6.2" fill="#0099B5"/><rect y="6.2" width="30" height="0.8" fill="#CE1126"/><rect y="7" width="30" height="6" fill="#fff"/><rect y="13" width="30" height="0.8" fill="#CE1126"/><rect y="13.8" width="30" height="6.2" fill="#1EB53A"/><circle cx="5" cy="3.1" r="1.9" fill="#fff"/><circle cx="5.8" cy="3.1" r="1.7" fill="#0099B5"/><circle cx="9" cy="1.8" r="0.5" fill="#fff"/><circle cx="11" cy="3.2" r="0.5" fill="#fff"/><circle cx="9" cy="4.5" r="0.5" fill="#fff"/><circle cx="13" cy="1.8" r="0.5" fill="#fff"/>',
@@ -1345,7 +1345,7 @@ $("albumInput").addEventListener("change", function () {
       .then(() => { feedTab = "photo"; if (currentView === "albumView") loadAlbum(); })
       .catch(() => alert("Не удалось добавить фото."));
   });
-  });
+});
 
 let feedTab = "photo";
 async function loadAlbum() {
@@ -1441,14 +1441,7 @@ function closeMedia() {
   $("mImg").removeAttribute("src");
   $("mediaModal").classList.remove("show");
 }
-function mediaStep(d) {
-  if (!mv) return;
-  const n = mv.i + d;
-  if (n < 0 || n >= mv.list.length) return;
-  mv.i = n;
-  showMedia();
-}
-function showMedia() {
+  function showMedia() {
   const it = mv.list[mv.i], v = it.v, me = state.profile.phone, own = it.owner === me;
   stopMv();
   const img = $("mImg");
