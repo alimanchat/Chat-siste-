@@ -149,6 +149,17 @@ button{cursor:pointer;border:none}
 #cpStories .scard{flex:0 0 130px;height:200px;border-radius:20px}
 #cpStories .pill{font-size:11px;padding:4px 8px;white-space:nowrap}
 .pill{white-space:nowrap}
+.phonepill{display:flex;align-items:center;gap:10px;width:100%;max-width:380px;padding:8px 16px;border:2px solid #4CE05A;border-radius:30px;background:#04140a;box-shadow:0 0 18px #4ce05a44}
+.phonepill b{font-size:22px;color:#fff}
+.phonepill input{flex:1;min-width:0;width:auto;border:none;background:transparent;color:#fff;font-size:22px;outline:none;padding:10px 0;margin:0}
+.phonerow{display:flex;align-items:center;gap:8px}
+.phonerow b{font-size:18px}
+.phonerow input{flex:1;min-width:0}
+.flagbtn{background:transparent;padding:0;display:flex;align-items:center;flex-shrink:0}
+.flagbtn svg,.crow svg{width:42px;height:28px;border-radius:5px;display:block;box-shadow:0 0 0 1px #8884;flex-shrink:0}
+.crow{display:flex;align-items:center;gap:12px;width:100%;padding:12px 6px;background:#fff;border-bottom:1px solid #eee;font-size:18px;text-align:left}
+.crow span{flex:1}
+.crow b{color:#555}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -347,11 +358,24 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
   </div>
 
-  <div class="modal" id="loginModal">
-    <div class="modal-card" style="text-align:center">
-      <h3>Вход по номеру</h3>
-      <div style="display:flex;gap:8px;align-items:center"><b>+996</b><input id="loginPhone" type="tel" inputmode="numeric" maxlength="12" placeholder="000 000 000"></div>
-      <button class="primary-button" id="loginButton">Отправить</button>
+  <div class="modal" id="loginModal" style="background:radial-gradient(circle at 50% 0%,#0f5a1f 0%,#06220d 55%,#03120a 100%);padding:24px;flex-direction:column;color:#fff;text-align:center;z-index:20">
+    <img id="loginLogo" alt="LimeChat" style="width:150px;border-radius:12px;margin-bottom:18px">
+    <div style="font-size:30px;font-weight:bold;line-height:1.15">Добро пожаловать</div>
+    <div style="font-size:44px;font-weight:bold;margin:4px 0 22px"><span style="color:#6BE82A">Lime</span>Chat</div>
+    <div class="phonepill">
+      <button type="button" class="flagbtn" id="loginFlag" aria-label="Выбрать страну"></button>
+      <b id="loginCode">+996</b>
+      <input id="loginPhone" type="tel" inputmode="numeric" placeholder="000 000 000">
+    </div>
+    <button class="primary-button" id="loginButton" style="background:#4CC81A;color:#05220a;font-weight:bold;max-width:380px;margin-top:16px">Войти</button>
+    <div style="margin-top:12px;color:#9fd8a8;font-size:13px">Нажми на флаг, чтобы выбрать страну</div>
+  </div>
+
+  <div class="modal" id="countryModal" style="z-index:30">
+    <div class="modal-card">
+      <h3>Выбери страну</h3>
+      <div id="countryList"></div>
+      <button class="secondary-button" id="countryClose" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
   </div>
 
@@ -374,7 +398,11 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   <div class="modal" id="contactModal">
     <div class="modal-card">
       <h3>Новый контакт</h3>
-      <input id="newContactName" type="tel" inputmode="numeric" placeholder="Номер телефона (9 цифр)" maxlength="15">
+      <div class="phonerow">
+        <button type="button" class="flagbtn" id="addFlag" aria-label="Выбрать страну"></button>
+        <b id="addCode">+996</b>
+        <input id="newContactName" type="tel" inputmode="numeric" placeholder="000 000 000">
+      </div>
       <div class="modal-actions">
         <button class="secondary-button" id="cancelContact">Отмена</button>
         <button class="primary-button" id="saveContact" style="margin-top:0">Добавить</button>
@@ -477,7 +505,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
-(function () {
+ (function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -552,7 +580,32 @@ if (!myUid) {
   try { localStorage.setItem(UID_KEY, myUid); } catch (e) {}
 }
 
-const normPhone = v => { const d = String(v).replace(/\D/g, ""); if (d.length === 9) return "996" + d; return /^996\d{9}$/.test(d) ? d : ""; };
+const COUNTRIES = [
+  { id: "kg", name: "Кыргызстан", code: "996", len: 9 },
+  { id: "ru", name: "Россия", code: "7", len: 10 },
+  { id: "uz", name: "Узбекистан", code: "998", len: 9 },
+  { id: "kz", name: "Казахстан", code: "7", len: 10 },
+  { id: "tj", name: "Таджикистан", code: "992", len: 9 }
+];
+const isKey = k => /^(996|998|992)\d{9}$/.test(String(k)) || /^7\d{10}$/.test(String(k));
+const countryOf = k => String(k).indexOf("998") === 0 ? COUNTRIES[2] : String(k).indexOf("992") === 0 ? COUNTRIES[4] : String(k).charAt(0) === "7" ? COUNTRIES[1] : COUNTRIES[0];
+const normPhone = (v, c) => {
+  c = c || COUNTRIES[0];
+  let d = String(v).replace(/\D/g, "");
+  if (isKey(d)) return d;
+  if (c.code === "7" && d.length === 11 && d.charAt(0) === "8") d = d.slice(1);
+  if (d.length === c.len + 1 && d.charAt(0) === "0") d = d.slice(1);
+  if (d.length === c.len) d = c.code + d;
+  return isKey(d) ? d : "";
+};
+const FLAGS = {
+  kg: '<rect width="30" height="20" fill="#E8112D"/><circle cx="15" cy="10" r="5" fill="#FFD400"/><circle cx="15" cy="10" r="2.6" fill="#E8112D"/><circle cx="15" cy="10" r="6.4" fill="none" stroke="#FFD400" stroke-width="1.6" stroke-dasharray="1 1"/>',
+  ru: '<rect width="30" height="6.7" fill="#fff"/><rect y="6.7" width="30" height="6.7" fill="#0039A6"/><rect y="13.4" width="30" height="6.6" fill="#D52B1E"/>',
+  uz: '<rect width="30" height="6.2" fill="#0099B5"/><rect y="6.2" width="30" height="0.8" fill="#CE1126"/><rect y="7" width="30" height="6" fill="#fff"/><rect y="13" width="30" height="0.8" fill="#CE1126"/><rect y="13.8" width="30" height="6.2" fill="#1EB53A"/><circle cx="5" cy="3.1" r="1.9" fill="#fff"/><circle cx="5.8" cy="3.1" r="1.7" fill="#0099B5"/><circle cx="9" cy="1.8" r="0.5" fill="#fff"/><circle cx="11" cy="3.2" r="0.5" fill="#fff"/><circle cx="9" cy="4.5" r="0.5" fill="#fff"/><circle cx="13" cy="1.8" r="0.5" fill="#fff"/>',
+  kz: '<rect width="30" height="20" fill="#00AFCA"/><circle cx="15" cy="8" r="3.4" fill="#FEC50C"/><circle cx="15" cy="8" r="4.7" fill="none" stroke="#FEC50C" stroke-width="1.2" stroke-dasharray="1 1"/><path d="M8 15.4 Q15 12.4 22 15.4 Q15 17.4 8 15.4Z" fill="#FEC50C"/>',
+  tj: '<rect width="30" height="5.7" fill="#CC0000"/><rect y="5.7" width="30" height="8.6" fill="#fff"/><rect y="14.3" width="30" height="5.7" fill="#006600"/><path d="M12 11.4 L12.8 8.6 L14 10.2 L15 7.8 L16 10.2 L17.2 8.6 L18 11.4 Z" fill="#F8C300"/>'
+};
+const flagSvg = id => '<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + FLAGS[id] + '</svg>';
 const showName = (n, k) => n || "+" + k;
 const myKey = () => state.profile.phone;
 const chatIdWith = otherKey => [myKey(), otherKey].sort().join("__");
@@ -633,7 +686,7 @@ function loadState() {
         state.calls = Array.isArray(data.calls) ? data.calls : [];
         state.blocked = Array.isArray(data.blocked) ? data.blocked : [];
         state.hidden = data.hidden && typeof data.hidden === "object" ? data.hidden : {};
-        state.contacts = Array.isArray(data.contacts) ? data.contacts.filter(c => /^996\d{9}$/.test(c.id)) : [];
+        state.contacts = Array.isArray(data.contacts) ? data.contacts.filter(c => isKey(c.id)) : [];
       }
     }
   } catch (error) {
@@ -720,7 +773,7 @@ function openContact(contactId) {
   updateChatStatus();
   showView("chatView");
   renderMessages();
-  }
+}
 
 function makeContactButton(contact, showLastMessage) {
   const button = document.createElement("button");
@@ -860,8 +913,8 @@ function renderMessages() {
 
 // ---------- Действия ----------
 async function addContact() {
-  const key = normPhone($("newContactName").value);
-  if (!key) { alert("Введи номер: 9 цифр после +996."); return; }
+  const key = normPhone($("newContactName").value, addC);
+  if (!key) { alert("Введи номер полностью. Если номер из другой страны, выбери её флаг."); return; }
   if (!db) { alert("Firebase не настроен."); return; }
 
   if (key === myKey()) { alert("Это твой номер."); return; }
@@ -912,6 +965,8 @@ function sendMessage(event) {
 }
 
 function openAddContact() {
+  addC = countryOf(myKey());
+  paintCountry($("addFlag"), $("addCode"), $("newContactName"), addC);
   $("contactModal").classList.add("show");
   $("newContactName").focus();
 }
@@ -968,8 +1023,8 @@ $("saveProfileButton").addEventListener("click", async function () {
   try { if (db) await saveRemote(); } catch (e) { alert("Не удалось сохранить на сервере."); return; }
   updateHeader();
   alert("Профиль сохранён! ❤️");
-});
-$("addContactButton").addEventListener("click", openAddContact);
+}); 
+ $("addContactButton").addEventListener("click", openAddContact);
 $("backButton").addEventListener("click", function () {
   state.activeContact = null;
   showView("chatsView");
@@ -1657,7 +1712,7 @@ function buildBody(message, item, cid) {
     });
     message.appendChild(im);
     longPress(message, () => askDelete(item));
-  } else if (t === "contact" && item.ct && /^996\d{9}$/.test(String(item.ct.id))) {
+  } else if (t === "contact" && item.ct && isKey(item.ct.id)) {
     const id = String(item.ct.id);
     const box = document.createElement("button");
     box.className = "ctcard";
@@ -2407,6 +2462,40 @@ document.addEventListener("visibilitychange", () => {
   if (!document.hidden && currentView === "chatView" && state.activeContact) markRead(state.activeContact);
 });
 
+// ---------- Выбор страны ----------
+let loginC = COUNTRIES[0], addC = COUNTRIES[0], pickCb = null;
+function paintCountry(btn, codeEl, inp, c) {
+  btn.innerHTML = flagSvg(c.id);
+  codeEl.textContent = "+" + c.code;
+  inp.maxLength = c.len + 4;
+  inp.placeholder = c.len === 10 ? "000 000 0000" : "000 000 000";
+}
+function openCountryPicker(cb) {
+  pickCb = cb;
+  const list = $("countryList");
+  list.replaceChildren();
+  COUNTRIES.forEach(c => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "crow";
+    b.innerHTML = flagSvg(c.id);
+    const n = document.createElement("span");
+    n.textContent = c.name;
+    const k = document.createElement("b");
+    k.textContent = "+" + c.code;
+    b.append(n, k);
+    b.addEventListener("click", () => { $("countryModal").classList.remove("show"); if (pickCb) pickCb(c); });
+    list.appendChild(b);
+  });
+  $("countryModal").classList.add("show");
+}
+$("countryClose").addEventListener("click", () => $("countryModal").classList.remove("show"));
+$("loginFlag").addEventListener("click", () => openCountryPicker(c => { loginC = c; paintCountry($("loginFlag"), $("loginCode"), $("loginPhone"), c); }));
+$("addFlag").addEventListener("click", () => openCountryPicker(c => { addC = c; paintCountry($("addFlag"), $("addCode"), $("newContactName"), c); }));
+paintCountry($("loginFlag"), $("loginCode"), $("loginPhone"), loginC);
+paintCountry($("addFlag"), $("addCode"), $("newContactName"), addC);
+$("loginLogo").src = $("logo").src;
+
 // ---------- Запуск ----------
 loadState();
 updateHeader();
@@ -2440,8 +2529,8 @@ function startOnline() {
 }
 
 $("loginButton").addEventListener("click", function () {
-  const phone = normPhone($("loginPhone").value);
-  if (!phone) { alert("Введи номер: 9 цифр после +996."); return; }
+  const phone = normPhone($("loginPhone").value, loginC);
+  if (!phone) { alert("Введи номер полностью. Выбери свою страну по флагу."); return; }
   state.profile.phone = phone;
   saveState();
   $("loginModal").classList.remove("show");
