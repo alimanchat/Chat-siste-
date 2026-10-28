@@ -160,6 +160,15 @@ button{cursor:pointer;border:none}
 .crow{display:flex;align-items:center;gap:12px;width:100%;padding:12px 6px;background:#fff;border-bottom:1px solid #eee;font-size:18px;text-align:left}
 .crow span{flex:1}
 .crow b{color:#555}
+#feedBox{padding:3px!important}
+.mgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:3px}
+.mcell{position:relative;aspect-ratio:3/4;background:#dde3d8;overflow:hidden;cursor:pointer}
+.mcell img{width:100%;height:100%;object-fit:cover;display:block}
+.mcell .vb{position:absolute;right:6px;top:6px;background:#0008;color:#fff;border-radius:8px;padding:2px 7px;font-size:12px}
+.mact{display:flex;gap:10px;align-items:center}
+.mact button{background:#ffffff22;color:#fff;border-radius:18px;padding:7px 14px;font-size:16px}
+.mact button.on{background:#4CC81A66}
+.mact .fview{margin-left:auto;color:#bbb;font-size:13px}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -441,6 +450,27 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
   </div>
 
+  <div class="modal" id="mediaModal" style="background:#000;padding:0;flex-direction:column;align-items:stretch;justify-content:flex-start;color:#fff">
+    <div style="display:flex;align-items:center;gap:8px;padding:10px 12px">
+      <button id="mBack" aria-label="Назад" style="background:transparent;font-size:26px;color:#fff">←</button>
+      <b id="mOwner" style="flex:1;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b>
+      <span id="mCount" style="font-size:13px;color:#bbb"></span>
+      <button id="mSave" aria-label="Сохранить" style="background:transparent;font-size:22px;color:#fff">💾</button>
+      <button id="mDel" aria-label="Удалить" style="background:transparent;font-size:22px;color:#fff">🗑</button>
+    </div>
+    <div id="mStage" style="flex:1;min-height:0;position:relative;display:flex;align-items:center;justify-content:center">
+      <img id="mImg" alt="" style="max-width:100%;max-height:100%;object-fit:contain">
+      <video id="mVid" playsinline controls style="display:none;max-width:100%;max-height:100%"></video>
+      <button id="mPrev" aria-label="Назад" style="position:absolute;left:4px;top:50%;transform:translateY(-50%);width:40px;height:56px;background:#0005;color:#fff;font-size:30px;border-radius:12px">‹</button>
+      <button id="mNext" aria-label="Вперёд" style="position:absolute;right:4px;top:50%;transform:translateY(-50%);width:40px;height:56px;background:#0005;color:#fff;font-size:30px;border-radius:12px">›</button>
+    </div>
+    <div style="padding:12px 14px;padding-bottom:max(12px,env(safe-area-inset-bottom))">
+      <div id="mTitle" style="font-weight:bold;font-size:17px"></div>
+      <div id="mDesc" style="color:#ccc;margin:2px 0 8px;overflow-wrap:anywhere"></div>
+      <div class="mact" id="mAct"></div>
+    </div>
+  </div>
+
   <div class="modal" id="storyModal" style="background:#000;padding:0;flex-direction:column;align-items:stretch;justify-content:flex-start;color:#fff">
     <div id="sBars" style="display:flex;gap:4px;padding:12px 12px 0"></div>
     <div style="display:flex;align-items:center;gap:10px;padding:10px 12px">
@@ -505,7 +535,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
- (function () {
+(function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -1023,8 +1053,8 @@ $("saveProfileButton").addEventListener("click", async function () {
   try { if (db) await saveRemote(); } catch (e) { alert("Не удалось сохранить на сервере."); return; }
   updateHeader();
   alert("Профиль сохранён! ❤️");
-}); 
- $("addContactButton").addEventListener("click", openAddContact);
+});
+$("addContactButton").addEventListener("click", openAddContact);
 $("backButton").addEventListener("click", function () {
   state.activeContact = null;
   showView("chatsView");
@@ -1225,19 +1255,16 @@ async function cpTab(t) {
   cpTabNow = t;
   syncCpStories();
   if (t === "status") return;
-  if (t === "video") { say("Видео-альбом пока недоступен: для хранения видео нужен платный тариф Firebase."); return; }
+  if (t === "photo" || t === "video") {
+    if (!db) { say("Нет подключения."); return; }
+    const pid = cpId;
+    await fillMedia(box, pid, t, () => cpId !== pid || cpTabNow !== t);
+    return;
+  }
   if (!db) { say("Нет подключения."); return; }
   say("Загрузка...");
   const id = cpId;
   try {
-    if (t === "photo") {
-      const items = await getPhotos(id, () => cpId !== id);
-      if (cpId !== id) return;
-      box.replaceChildren();
-      if (!items.length) { say("Пока нет фото."); return; }
-      items.forEach(([k, v]) => box.appendChild(makeCard(k, v)));
-      return;
-    }
     const v = (await get(ref(db, "users/" + id))).val() || {};
     if (cpId !== id) return;
     box.replaceChildren();
@@ -1323,21 +1350,11 @@ $("albumInput").addEventListener("change", function () {
 let feedTab = "photo";
 async function loadAlbum() {
   const box = $("feedBox");
-  box.replaceChildren();
   document.querySelectorAll(".atabs button").forEach(b => b.classList.toggle("on", b.dataset.a === feedTab));
-  const say = t => { const d = document.createElement("div"); d.className = "empty"; d.textContent = t; box.appendChild(d); };
-  if (feedTab === "video") { say("Видео скоро появится."); return; }
-  if (!db) { say("Нет подключения."); return; }
-  say("Загрузка...");
-  try {
-    const items = await getPhotos(state.profile.phone, () => false);
-    box.replaceChildren();
-    if (!items.length) { say("Пока нет фото."); return; }
-    items.forEach(([k, v]) => box.appendChild(makeCard(k, v)));
-  } catch (e) {
-    box.replaceChildren();
-    say("Не удалось загрузить.");
-  }
+  $("albumAdd").textContent = feedTab === "video" ? "🎥 Добавить видео" : "➕ Добавить фото";
+  if (!db) { box.replaceChildren(); const d = document.createElement("div"); d.className = "empty"; d.textContent = "Нет подключения."; box.appendChild(d); return; }
+  const t = feedTab;
+  await fillMedia(box, state.profile.phone, t, () => feedTab !== t || currentView !== "albumView");
 }
 
 async function getPhotos(id, stale) {
@@ -1350,31 +1367,119 @@ async function getPhotos(id, stale) {
   return items.reverse();
 }
 
-function makeCard(k, v) {
-  const me = state.profile.phone;
+async function getMedia(owner, kind, stale) {
+  if (kind === "video") {
+    const sn = await get(query(ref(db, "albumvideo/" + owner), limitToLast(60)));
+    if (stale()) return [];
+    const a = [];
+    sn.forEach(ch => { const v = ch.val(); if (v) a.push({ k: ch.key, kind: "video", owner: owner, v: v }); });
+    return a.reverse();
+  }
+  const ph = await getPhotos(owner, stale);
+  return ph.map(([k, v]) => ({ k: k, kind: "photo", owner: owner, v: v }));
+}
+
+function buildGrid(items) {
+  const g = document.createElement("div");
+  g.className = "mgrid";
+  items.forEach((it, i) => {
+    const cell = document.createElement("div");
+    cell.className = "mcell";
+    const pic = it.kind === "video" ? it.v.th : it.v.d;
+    if (okData(pic, "image")) {
+      const im = document.createElement("img");
+      im.src = pic;
+      im.alt = "";
+      im.loading = "lazy";
+      cell.appendChild(im);
+    }
+    if (it.kind === "video") {
+      const vb = document.createElement("span");
+      vb.className = "vb";
+      vb.textContent = "▶ " + fmtDur(it.v.dur);
+      cell.appendChild(vb);
+    }
+    cell.addEventListener("click", () => openMedia(items, i));
+    g.appendChild(cell);
+  });
+  return g;
+}
+
+async function fillMedia(box, owner, kind, stale) {
+  const say = t => { const d = document.createElement("div"); d.className = "empty"; d.textContent = t; box.appendChild(d); };
+  box.replaceChildren();
+  say("Загрузка...");
+  try {
+    const items = await getMedia(owner, kind, stale);
+    if (stale()) return;
+    box.replaceChildren();
+    if (!items.length) { say(kind === "video" ? "Пока нет видео." : "Пока нет фото."); return; }
+    box.appendChild(buildGrid(items));
+  } catch (e) {
+    box.replaceChildren();
+    say("Не удалось загрузить.");
+  }
+}
+
+// --- полноэкранный просмотр фото и видео
+let mv = null;
+function stopMv() {
+  const v = $("mVid");
+  v.pause();
+  v.removeAttribute("src");
+  v.load();
+  v.style.display = "none";
+}
+function openMedia(list, i) {
+  mv = { list: list, i: i };
+  $("mediaModal").classList.add("show");
+  showMedia();
+}
+function closeMedia() {
+  mv = null;
+  stopMv();
+  $("mImg").removeAttribute("src");
+  $("mediaModal").classList.remove("show");
+}
+function mediaStep(d) {
+  if (!mv) return;
+  const n = mv.i + d;
+  if (n < 0 || n >= mv.list.length) return;
+  mv.i = n;
+  showMedia();
+}
+function showMedia() {
+  const it = mv.list[mv.i], v = it.v, me = state.profile.phone, own = it.owner === me;
+  stopMv();
+  const img = $("mImg");
+  img.style.display = "";
+  const pic = it.kind === "video" ? v.th : v.d;
+  if (okData(pic, "image")) img.src = pic; else img.removeAttribute("src");
+  if (it.kind === "video") {
+    get(ref(db, "albumvmedia/" + it.owner + "/" + it.k)).then(sn => {
+      const m = sn.val();
+      if (!mv || mv.list[mv.i] !== it || !m || !okData(m.d, "video")) return;
+      const vd = $("mVid");
+      vd.src = m.d;
+      vd.style.display = "block";
+      img.style.display = "none";
+      vd.play().catch(() => {});
+    }).catch(() => {});
+  }
+  const c = state.contacts.find(x => x.id === it.owner);
+  $("mOwner").textContent = own ? "Я" : (c ? c.name : (v.ownerName || "+" + it.owner));
+  $("mCount").textContent = (mv.i + 1) + " / " + mv.list.length;
+  $("mTitle").textContent = v.title || "";
+  $("mDesc").textContent = v.desc || "";
+  $("mDel").style.display = own ? "" : "none";
+  $("mPrev").style.display = mv.i > 0 ? "" : "none";
+  $("mNext").style.display = mv.i < mv.list.length - 1 ? "" : "none";
+  const act = $("mAct");
+  act.replaceChildren();
+  if (v.plain) return;
+  const base = it.kind === "video" ? "albumvideo/" + it.owner + "/" + it.k : "feed/" + it.k;
   const likes = v.likes || {}, dis = v.dislikes || {}, views = v.views || {};
-  if (me && !views[me] && !v.plain) { views[me] = true; set(ref(db, "feed/" + k + "/views/" + me), true).catch(() => {}); }
-  const card = document.createElement("div");
-  card.className = "fcard";
-  const c = state.contacts.find(x => x.id === v.owner);
-  const own = document.createElement("div");
-  own.className = "fown";
-  own.appendChild(makeAvatar(c ? c.photo : (v.owner === me ? state.profile.photo : ""), v.ownerName || (c && c.name) || ""));
-  const nm = document.createElement("span");
-  nm.textContent = v.owner === me ? "Я" : (c ? c.name : (v.ownerName || "+" + v.owner));
-  own.appendChild(nm);
-  const img = document.createElement("img");
-  img.className = "fimg";
-  img.src = v.d;
-  img.alt = "";
-  const tt = document.createElement("div");
-  tt.className = "ftitle";
-  tt.textContent = v.title || "";
-  const ds = document.createElement("div");
-  ds.className = "fdesc";
-  ds.textContent = v.desc || "";
-  const act = document.createElement("div");
-  act.className = "fact";
+  if (me && !views[me]) { views[me] = true; set(ref(db, base + "/views/" + me), true).catch(() => {}); }
   const bl = document.createElement("button"), bd = document.createElement("button"), vw = document.createElement("span");
   vw.className = "fview";
   const paint = () => {
@@ -1386,39 +1491,75 @@ function makeCard(k, v) {
   };
   const toggle = (mine, other, mName, oName) => {
     if (!me) return;
-    if (mine[me]) { delete mine[me]; remove(ref(db, "feed/" + k + "/" + mName + "/" + me)).catch(() => {}); }
+    if (mine[me]) { delete mine[me]; remove(ref(db, base + "/" + mName + "/" + me)).catch(() => {}); }
     else {
       mine[me] = true;
-      set(ref(db, "feed/" + k + "/" + mName + "/" + me), true).catch(() => {});
-      if (other[me]) { delete other[me]; remove(ref(db, "feed/" + k + "/" + oName + "/" + me)).catch(() => {}); }
+      set(ref(db, base + "/" + mName + "/" + me), true).catch(() => {});
+      if (other[me]) { delete other[me]; remove(ref(db, base + "/" + oName + "/" + me)).catch(() => {}); }
     }
     paint();
   };
   bl.addEventListener("click", () => toggle(likes, dis, "likes", "dislikes"));
   bd.addEventListener("click", () => toggle(dis, likes, "dislikes", "likes"));
-  const sv = document.createElement("button");
-  sv.textContent = "💾";
-  sv.setAttribute("aria-label", "Сохранить фото");
-  sv.addEventListener("click", () => {
-    const a = document.createElement("a");
-    a.href = v.d;
-    a.download = (v.title || "photo") + ".jpg";
-    document.body.appendChild(a);
-    a.click();
-    a.remove();
-  });
   paint();
-  if (v.plain) act.append(sv); else act.append(bl, bd, sv, vw);
-  card.append(own, img);
-  if (v.title) card.appendChild(tt);
-  if (v.desc) card.appendChild(ds);
-  card.appendChild(act);
-  return card;
+  act.append(bl, bd, vw);
+}
+$("mBack").addEventListener("click", closeMedia);
+$("mPrev").addEventListener("click", () => mediaStep(-1));
+$("mNext").addEventListener("click", () => mediaStep(1));
+let mvX = null;
+$("mStage").addEventListener("touchstart", e => { mvX = e.touches[0].clientX; }, { passive: true });
+$("mStage").addEventListener("touchend", e => {
+  if (mvX === null) return;
+  const dx = e.changedTouches[0].clientX - mvX;
+  mvX = null;
+  if (Math.abs(dx) > 60) mediaStep(dx < 0 ? 1 : -1);
+});
+$("mSave").addEventListener("click", () => {
+  if (!mv) return;
+  const it = mv.list[mv.i];
+  const src = it.kind === "video" ? $("mVid").getAttribute("src") : it.v.d;
+  if (!src) { alert("Подожди, видео ещё загружается."); return; }
+  const a = document.createElement("a");
+  a.href = src;
+  a.download = (it.v.title || (it.kind === "video" ? "video" : "photo")) + (it.kind === "video" ? ".webm" : ".jpg");
+  document.body.appendChild(a);
+  a.click();
+  a.remove();
+});
+$("mDel").addEventListener("click", async () => {
+  if (!mv) return;
+  const it = mv.list[mv.i];
+  if (it.owner !== state.profile.phone || !confirm("Удалить это " + (it.kind === "video" ? "видео" : "фото") + "?")) return;
+  try {
+    if (it.kind === "video") {
+      await remove(ref(db, "albumvideo/" + it.owner + "/" + it.k));
+      await remove(ref(db, "albumvmedia/" + it.owner + "/" + it.k));
+    } else {
+      await remove(ref(db, "feed/" + it.k));
+      await remove(ref(db, "albums/" + it.owner + "/" + it.k));
+    }
+  } catch (e) { alert("Не удалось удалить."); return; }
+  closeMedia();
+  if (currentView === "albumView") loadAlbum();
+});
+
+async function postAlbumVideo(data, th, dur) {
+  const me = state.profile.phone;
+  const title = (prompt("Название видео:", "") || "").trim().slice(0, 60);
+  const desc = (prompt("Описание видео:", "") || "").trim().slice(0, 300);
+  try {
+    const k = push(ref(db, "albumvideo/" + me)).key;
+    await set(ref(db, "albumvmedia/" + me + "/" + k), { d: data });
+    await set(ref(db, "albumvideo/" + me + "/" + k), { th: th || "", title: title, desc: desc, dur: Math.round(dur), owner: me, ownerName: state.profile.name || "", ts: serverTimestamp() });
+    feedTab = "video";
+    if (currentView === "albumView") loadAlbum();
+  } catch (e) { alert("Не удалось добавить видео."); }
 }
 
 document.querySelectorAll(".atabs button").forEach(b => b.addEventListener("click", () => { feedTab = b.dataset.a; loadAlbum(); }));
 
-$("albumAdd").addEventListener("click", () => $("albumInput").click());
+$("albumAdd").addEventListener("click", () => { if (feedTab === "video") openVid("album"); else $("albumInput").click(); });
 
 document.querySelector(".app > .header").addEventListener("click", e => {
   state.activeContact = null;
@@ -1554,7 +1695,7 @@ function listenCalls() {
     logCall(v.from, !!v.video, "in", false);
     showCall((v.name || "+" + v.from) + (v.video ? " — видеозвонок" : " — звонок"), true, false);
   });
-}
+  }
 
 $("callAudio").addEventListener("click", () => startCall(false));
 $("callVideo").addEventListener("click", () => startCall(true));
@@ -1782,14 +1923,15 @@ async function startVoice() {
 let wrec = null;
 async function openVid(mode) {
   const story = mode === "story";
-  const id = story ? myKey() : state.activeContact;
+  const album = mode === "album";
+  const id = (story || album) ? myKey() : state.activeContact;
   if (!id || wrec) return;
   if (!db) { alert("Нет подключения."); return; }
-  if (!story && isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
+  if (!story && !album && isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
   closeAttach();
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 360 }, height: { ideal: 360 } }, audio: true }); } catch (e) { alert("Нет доступа к камере или микрофону."); return; }
-  wrec = { stream: stream, id: id, mr: null, timer: null, t0: 0, send: false, story: story };
+  wrec = { stream: stream, id: id, mr: null, timer: null, t0: 0, send: false, story: story, album: album };
   $("vidPrev").srcObject = stream;
   $("vidTime").textContent = story ? "0:00 / 0:30" : "0:00 / 1:00";
   $("vidGo").textContent = "⏺";
@@ -1832,6 +1974,9 @@ $("vidGo").addEventListener("click", () => {
     if (r.story) {
       const th = await videoThumb(URL.createObjectURL(new Blob(chunks, { type: type })));
       publishStory("video", data, th);
+    } else if (r.album) {
+      const th = await videoThumb(URL.createObjectURL(new Blob(chunks, { type: type })));
+      postAlbumVideo(data, th, dur);
     } else sendRich(r.id, { type: "video", text: "⭕ Видеосообщение", dur: Math.round(dur) }, data);
   };
   r.t0 = Date.now();
@@ -2406,6 +2551,8 @@ $("groupCreateBtn").addEventListener("click", () => {
     list.appendChild(lab);
   });
   $("gCreateModal").classList.add("show");
+});
+    $("gCreateModal").classList.add("show");
 });
 $("gCreateCancel").addEventListener("click", () => $("gCreateModal").classList.remove("show"));
 $("gCreateOk").addEventListener("click", async () => {
