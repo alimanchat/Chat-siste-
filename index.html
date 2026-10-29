@@ -1499,6 +1499,13 @@ function closeMedia() {
   paint();
   act.append(bl, bd, vw);
 }
+ function mediaStep(step) {
+if (!mv) return;
+const next = mv.i + step;
+if (next < 0 || next >= mv.list.length) return;
+mv.i = next;
+showMedia();
+}
 $("mBack").addEventListener("click", closeMedia);
 $("mPrev").addEventListener("click", () => mediaStep(-1));
 $("mNext").addEventListener("click", () => mediaStep(1));
