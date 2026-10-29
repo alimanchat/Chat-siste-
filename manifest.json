@@ -1,11 +1,19 @@
 {
-"id": "/Chat-siste-/",
-"name": "LimeChat",
-"short_name": "LimeChat",
-"description": "LimeChat is a messaging app that helps you connect with friends.",
-"start_url": "/Chat-siste-/",
-"scope": "/Chat-siste-/",
-"display": "standalone",
-"background_color": "#FFFFFF",
-"theme_color": "#00C853"
+  "id": "/Chat-siste-/",
+  "name": "LimeChat",
+  "short_name": "LimeChat",
+  "description": "LimeChat messaging app",
+  "start_url": "/Chat-siste-/",
+  "scope": "/Chat-siste-/",
+  "display": "standalone",
+  "background_color": "#FFFFFF",
+  "theme_color": "#00C853",
+  "icons": [
+    {
+      "src": "launchericon-512x512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
 }
