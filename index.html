@@ -183,6 +183,276 @@ button{cursor:pointer;border:none}
 body{padding:15px}
 .app{height:calc(100dvh - 30px);border-radius:15px;box-shadow:0 3px 20px #00000010}
 }
+ /* LIMECHAT DURAK GAME */
+
+.durak-launch {
+  background: linear-gradient(145deg,#063b20,#0d6b35);
+  color: #fff;
+  border-radius: 24px;
+  padding: 28px 20px;
+  text-align: center;
+  box-shadow: 0 12px 30px #073d2033;
+}
+
+.durak-mark {
+  font-size: 76px;
+}
+
+.durak-launch h2 {
+  font-size: 28px;
+  margin: 8px;
+}
+
+.durak-launch p {
+  color: #d6f5df;
+}
+
+.durak-launch .primary-button {
+  background: #b7f36b;
+  color: #17320d;
+  font-weight: bold;
+}
+
+.durak-launch small {
+  display: block;
+  margin-top: 14px;
+  color: #d6f5df;
+}
+
+.durak-game {
+  background: radial-gradient(
+    ellipse,#23834b,#07502c 70%,#04351e
+  );
+  color: white;
+  border-radius: 20px;
+  padding: 10px;
+  min-height: 570px;
+  overflow: hidden;
+}
+
+.durak-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 6px;
+  font-size: 13px;
+}
+
+.durak-top button,
+.durak-actions button,
+.durak-restart {
+  border: 0;
+  border-radius: 12px;
+  padding: 10px 12px;
+  background: #e5f4df;
+  color: #164326;
+  font-weight: bold;
+}
+
+.durak-top b {
+  font-size: 19px;
+  color: #eaffb6;
+}
+
+.durak-seat {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 7px;
+  font-size: 12px;
+}
+
+.durak-seat small {
+  opacity: .8;
+}
+
+.durak-avatar {
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: #e4f4df;
+  display: grid;
+  place-items: center;
+  font-size: 20px;
+}
+
+.seat-top {
+  margin: 12px auto;
+}
+
+.durak-middle {
+  display: grid;
+  grid-template-columns: 62px 1fr 62px;
+  align-items: center;
+  gap: 5px;
+  min-height: 190px;
+}
+
+.seat-left,
+.seat-right {
+  flex-direction: column;
+}
+
+.durak-table {
+  min-height: 180px;
+  border: 2px solid #a6d68a66;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: relative;
+  background: #ffffff0b;
+}
+
+.durak-deck {
+  position: absolute;
+  left: 8px;
+  top: 8px;
+  font-size: 30px;
+  text-align: center;
+}
+
+.durak-deck small {
+  display: block;
+  font-size: 9px;
+}
+
+.durak-pile {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 5px;
+  max-width: 180px;
+  min-height: 90px;
+  align-items: center;
+}
+
+.durak-status {
+  font-size: 12px;
+}
+
+.durak-pile span {
+  font-size: 12px;
+  opacity: .8;
+}
+
+.durak-card {
+  width: 47px;
+  height: 68px;
+  border-radius: 7px;
+  background: #fff;
+  color: #202020;
+  border: 1px solid #ddd;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  padding: 5px;
+  font-weight: bold;
+  box-shadow: 0 2px 5px #0005;
+  font-size: 17px;
+}
+
+.durak-card.red {
+  color: #d22;
+}
+
+.durak-card.back {
+  background: repeating-linear-gradient(
+    45deg,#e7f2df,#e7f2df 4px,
+    #2f8b48 4px,#2f8b48 8px
+  );
+  color: transparent;
+}
+
+.durak-pair {
+  position: relative;
+  width: 52px;
+  height: 76px;
+}
+
+.durak-pair .durak-card {
+  position: absolute;
+  top: 0;
+  left: 0;
+}
+
+.durak-pair .durak-card + .durak-card {
+  top: 7px;
+  left: 8px;
+}
+
+.seat-bottom {
+  margin: 10px;
+}
+
+.durak-hand {
+  display: flex;
+  justify-content: center;
+  gap: 3px;
+  min-height: 80px;
+  overflow-x: auto;
+  padding: 6px 1px;
+}
+
+.durak-hand .durak-card {
+  flex: 0 0 43px;
+  width: 43px;
+  height: 66px;
+  padding: 4px;
+  font-size: 15px;
+  cursor: pointer;
+}
+
+.durak-hand .durak-card.selected {
+  transform: translateY(-10px);
+  border: 2px solid #b7f36b;
+}
+
+.durak-actions {
+  display: flex;
+  gap: 7px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.durak-actions button {
+  min-width: 78px;
+}
+
+.durak-actions button:disabled {
+  opacity: .4;
+}
+
+.durak-restart {
+  display: block;
+  margin: 10px auto;
+  background: #b7f36b;
+}
+
+@media(max-width:380px) {
+  .durak-game {
+    padding: 7px;
+  }
+
+  .durak-middle {
+    grid-template-columns: 48px 1fr 48px;
+  }
+
+  .durak-avatar {
+    width: 29px;
+    height: 29px;
+  }
+
+  .durak-card {
+    width: 40px;
+    height: 61px;
+  }
+
+  .durak-hand .durak-card {
+    flex-basis: 38px;
+    width: 38px;
+  }
+} 
 </style>
 </head>
 <body>
