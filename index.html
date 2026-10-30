@@ -195,6 +195,33 @@ button{cursor:pointer;border:none}
 body{padding:15px}
 .app{height:calc(100dvh - 30px);border-radius:15px;box-shadow:0 3px 20px #00000010}
 }
+/* LimeChat Translation */
+.translation-result {
+  display: none;
+  margin-top: 9px;
+  padding: 9px 11px;
+  border-top: 1px solid #ccc;
+  color: #267a36;
+  font-size: 14px;
+  line-height: 1.5;
+  overflow-wrap: anywhere;
+}
+
+.translation-result.show {
+  display: block;
+}
+
+.translate-button {
+  display: block;
+  margin-top: 7px;
+  padding: 5px 10px;
+  border: none;
+  border-radius: 15px;
+  background: #e8f5e9;
+  color: #267a36;
+  font-size: 13px;
+  cursor: pointer;
+}  
 </style>
 </head>
 <body>
@@ -1932,7 +1959,61 @@ function makeRecorder(stream, kind) {
   return new MediaRecorder(stream, opts);
 }
 
-function buildBody(message, item, cid) {
+// ===== LimeChat: Перевод сообщений =====
+
+async function translateMessage(text, resultBox, button) {
+  const languages = {
+    "1": ["ru", "Русский"],
+    "2": ["ky", "Кыргызский"],
+    "3": ["en", "Английский"],
+    "4": ["tr", "Турецкий"],
+    "5": ["uz", "Узбекский"],
+    "6": ["zh-CN", "Китайский"]
+  };
+
+  const choice = prompt(
+    "Выбери язык перевода:\n" +
+    "1 — Русский 🇷🇺\n" +
+    "2 — Кыргызский 🇰🇬\n" +
+    "3 — Английский 🇺🇸\n" +
+    "4 — Турецкий 🇹🇷\n" +
+    "5 — Узбекский 🇺🇿\n" +
+    "6 — Китайский 🇨🇳"
+  );
+
+  if (!languages[choice]) return;
+
+  const [lang, name] = languages[choice];
+
+  button.textContent = "Перевожу...";
+
+  try {
+    const url =
+      "https://translate.googleapis.com/translate_a/single" +
+      "?client=gtx&sl=auto&tl=" + lang +
+      "&dt=t&q=" + encodeURIComponent(text);
+
+    const response = await fetch(url);
+
+    if (!response.ok) throw new Error("Ошибка сервера");
+
+    const data = await response.json();
+
+    const translated = data[0]
+      .map(part => part[0] || "")
+      .join("");
+
+    resultBox.textContent = "🌐 " + name + ": " + translated;
+    resultBox.classList.add("show");
+
+    button.textContent = "🌐 Перевести ещё";
+
+  } catch (error) {
+    alert("Не удалось перевести. Попробуй ещё раз.");
+    button.textContent = "🌐 Перевести";
+  }
+}
+  function buildBody(message, item, cid) {
   const t = item.type;
   if (t === "voice" && item.mid) {
     const b = document.createElement("button");
@@ -2002,6 +2083,23 @@ function buildBody(message, item, cid) {
     longPress(message, () => askDelete(item));
   } else {
     message.textContent = item.text;
+
+    const translateBtn = document.createElement("button");
+    translateBtn.className = "translate-button";
+    translateBtn.type = "button";
+    translateBtn.textContent = "🌐 Перевести";
+
+    const resultBox = document.createElement("div");
+    resultBox.className = "translation-result";
+
+    translateBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      translateMessage(item.text, resultBox, translateBtn);
+    });
+
+    message.appendChild(translateBtn);
+    message.appendChild(resultBox);
+
     message.addEventListener("click", () => askDelete(item));
   }
 }
