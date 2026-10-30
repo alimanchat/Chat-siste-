@@ -175,6 +175,12 @@ button{cursor:pointer;border:none}
 #callVideo,#micBtn{display:flex;align-items:center;justify-content:center;padding:0}
 #callVideo svg{width:32px;height:32px;display:block}
 #micBtn svg{width:32px;height:32px;display:block}
+.nav-button{color:#444;transition:background .15s,color .15s,box-shadow .15s}
+.nav-button .ni{width:30px;height:30px;display:block}
+.nav-button small{color:inherit}
+.nav-button.active{background:#e6f7d6;color:#2a9d0a;border-radius:14px;box-shadow:0 0 12px #5bd21a66}
+.nav-button.active small{font-weight:bold}
+.nav-button:active{background:#d2f2b4;color:#1f8a05;box-shadow:0 0 14px #5bd21a99}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -183,276 +189,6 @@ button{cursor:pointer;border:none}
 body{padding:15px}
 .app{height:calc(100dvh - 30px);border-radius:15px;box-shadow:0 3px 20px #00000010}
 }
- /* LIMECHAT DURAK GAME */
-
-.durak-launch {
-  background: linear-gradient(145deg,#063b20,#0d6b35);
-  color: #fff;
-  border-radius: 24px;
-  padding: 28px 20px;
-  text-align: center;
-  box-shadow: 0 12px 30px #073d2033;
-}
-
-.durak-mark {
-  font-size: 76px;
-}
-
-.durak-launch h2 {
-  font-size: 28px;
-  margin: 8px;
-}
-
-.durak-launch p {
-  color: #d6f5df;
-}
-
-.durak-launch .primary-button {
-  background: #b7f36b;
-  color: #17320d;
-  font-weight: bold;
-}
-
-.durak-launch small {
-  display: block;
-  margin-top: 14px;
-  color: #d6f5df;
-}
-
-.durak-game {
-  background: radial-gradient(
-    ellipse,#23834b,#07502c 70%,#04351e
-  );
-  color: white;
-  border-radius: 20px;
-  padding: 10px;
-  min-height: 570px;
-  overflow: hidden;
-}
-
-.durak-top {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 6px;
-  font-size: 13px;
-}
-
-.durak-top button,
-.durak-actions button,
-.durak-restart {
-  border: 0;
-  border-radius: 12px;
-  padding: 10px 12px;
-  background: #e5f4df;
-  color: #164326;
-  font-weight: bold;
-}
-
-.durak-top b {
-  font-size: 19px;
-  color: #eaffb6;
-}
-
-.durak-seat {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 7px;
-  font-size: 12px;
-}
-
-.durak-seat small {
-  opacity: .8;
-}
-
-.durak-avatar {
-  width: 34px;
-  height: 34px;
-  border-radius: 50%;
-  background: #e4f4df;
-  display: grid;
-  place-items: center;
-  font-size: 20px;
-}
-
-.seat-top {
-  margin: 12px auto;
-}
-
-.durak-middle {
-  display: grid;
-  grid-template-columns: 62px 1fr 62px;
-  align-items: center;
-  gap: 5px;
-  min-height: 190px;
-}
-
-.seat-left,
-.seat-right {
-  flex-direction: column;
-}
-
-.durak-table {
-  min-height: 180px;
-  border: 2px solid #a6d68a66;
-  border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  position: relative;
-  background: #ffffff0b;
-}
-
-.durak-deck {
-  position: absolute;
-  left: 8px;
-  top: 8px;
-  font-size: 30px;
-  text-align: center;
-}
-
-.durak-deck small {
-  display: block;
-  font-size: 9px;
-}
-
-.durak-pile {
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: 5px;
-  max-width: 180px;
-  min-height: 90px;
-  align-items: center;
-}
-
-.durak-status {
-  font-size: 12px;
-}
-
-.durak-pile span {
-  font-size: 12px;
-  opacity: .8;
-}
-
-.durak-card {
-  width: 47px;
-  height: 68px;
-  border-radius: 7px;
-  background: #fff;
-  color: #202020;
-  border: 1px solid #ddd;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  padding: 5px;
-  font-weight: bold;
-  box-shadow: 0 2px 5px #0005;
-  font-size: 17px;
-}
-
-.durak-card.red {
-  color: #d22;
-}
-
-.durak-card.back {
-  background: repeating-linear-gradient(
-    45deg,#e7f2df,#e7f2df 4px,
-    #2f8b48 4px,#2f8b48 8px
-  );
-  color: transparent;
-}
-
-.durak-pair {
-  position: relative;
-  width: 52px;
-  height: 76px;
-}
-
-.durak-pair .durak-card {
-  position: absolute;
-  top: 0;
-  left: 0;
-}
-
-.durak-pair .durak-card + .durak-card {
-  top: 7px;
-  left: 8px;
-}
-
-.seat-bottom {
-  margin: 10px;
-}
-
-.durak-hand {
-  display: flex;
-  justify-content: center;
-  gap: 3px;
-  min-height: 80px;
-  overflow-x: auto;
-  padding: 6px 1px;
-}
-
-.durak-hand .durak-card {
-  flex: 0 0 43px;
-  width: 43px;
-  height: 66px;
-  padding: 4px;
-  font-size: 15px;
-  cursor: pointer;
-}
-
-.durak-hand .durak-card.selected {
-  transform: translateY(-10px);
-  border: 2px solid #b7f36b;
-}
-
-.durak-actions {
-  display: flex;
-  gap: 7px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-
-.durak-actions button {
-  min-width: 78px;
-}
-
-.durak-actions button:disabled {
-  opacity: .4;
-}
-
-.durak-restart {
-  display: block;
-  margin: 10px auto;
-  background: #b7f36b;
-}
-
-@media(max-width:380px) {
-  .durak-game {
-    padding: 7px;
-  }
-
-  .durak-middle {
-    grid-template-columns: 48px 1fr 48px;
-  }
-
-  .durak-avatar {
-    width: 29px;
-    height: 29px;
-  }
-
-  .durak-card {
-    width: 40px;
-    height: 61px;
-  }
-
-  .durak-hand .durak-card {
-    flex-basis: 38px;
-    width: 38px;
-  }
-} 
 </style>
 </head>
 <body>
@@ -620,121 +356,19 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div style="padding:10px"><button class="primary-button" id="albumAdd" style="margin-top:0">➕ Добавить фото</button></div>
   </section>
 
-<section class="view" id="moreView">
-
-  <div class="section-title">🎮 LimeChat Games</div>
-
-  <div class="profile-content">
-
-    <div class="durak-launch">
-
-      <div class="durak-mark">🃏</div>
-
-      <h2>ДУРАК ОНЛАЙН</h2>
-
-      <p>Играй с друзьями в LimeChat!</p>
-
-      <button class="primary-button"
-        id="durakStart">
-        🎮 Начать игру
-      </button>
-
-      <small>👥 До 4 игроков</small>
-
+  <section class="view" id="moreView">
+    <div class="section-title">Онлайн игры</div>
+    <div class="profile-content">
+      <p class="empty">Онлайн-игры скоро появятся. Напиши, во что хочешь играть! 🎮</p>
     </div>
+  </section>
 
-    <div id="durakRoom" style="display:none">
-
-      <div class="durak-game">
-
-        <div class="durak-top">
-
-          <button id="durakBack">← Назад</button>
-
-          <b>🃏 ДУРАК</b>
-
-          <span id="durakCount">36 карт</span>
-
-        </div>
-
-        <div class="durak-seat seat-top">
-          <div class="durak-avatar">🤖</div>
-          <div>
-            <b>Игрок 2</b>
-            <small>Соперник</small>
-          </div>
-        </div>
-
-        <div class="durak-middle">
-
-          <div class="durak-seat seat-left">
-            <div class="durak-avatar">🤖</div>
-            <b>Игрок 3</b>
-          </div>
-
-          <div class="durak-table">
-
-            <div class="durak-deck">
-              🂠
-              <small>Колода</small>
-            </div>
-
-            <div class="durak-pile"
-              id="durakPile">
-              <span>Игровой стол</span>
-            </div>
-
-          </div>
-
-          <div class="durak-seat seat-right">
-            <div class="durak-avatar">🤖</div>
-            <b>Игрок 4</b>
-          </div>
-
-        </div>
-
-        <div class="durak-seat seat-bottom">
-          <div class="durak-avatar">👤</div>
-          <b>Ты</b>
-        </div>
-
-        <div class="durak-status"
-          id="durakStatus">
-          Твой ход!
-        </div>
-
-        <div class="durak-hand"
-          id="durakHand">
-        </div>
-
-        <div class="durak-actions">
-
-          <button id="durakTake">Взять</button>
-
-          <button id="durakPass">Бито</button>
-
-          <button id="durakThrow">Подкинуть</button>
-
-        </div>
-
-        <button class="durak-restart"
-          id="durakRestart">
-          🔄 Новая игра
-        </button>
-
-      </div>
-
-    </div>
-
-  </div>
-
-</section>
-    <nav class="bottom-nav">
-    <button class="nav-button active" data-view="chatsView" aria-label="Чат">✉️<small>Сообщения</small></button>
-    <button class="nav-button" data-view="contactsView" aria-label="Контакты">👥<small>Контакты</small></button>
-    <button class="nav-button" data-view="statusView" aria-label="Истории">➕<small>Истории</small></button>
-    <button class="nav-button" data-view="albumView" aria-label="Альбом">📷<small>Альбом</small></button>
-    <button class="nav-button" data-view="moreView" aria-label="Игры">🎮<small>Игры</small></button>
+  <nav class="bottom-nav">
+    <button class="nav-button active" data-view="chatsView" aria-label="Чат"><svg class="ni" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 5C13.5 5 5 12.6 5 22c0 3.9 1.5 7.5 4 10.3L6.8 41l8.9-2.2c2.5 1 5.3 1.5 8.3 1.5 10.5 0 19-7.6 19-17S34.5 5 24 5z"/><g fill="currentColor" stroke="none"><circle cx="15.5" cy="22.5" r="2.6"/><circle cx="24" cy="22.5" r="2.6"/><circle cx="32.5" cy="22.5" r="2.6"/></g></svg><small>Сообщения</small></button>
+    <button class="nav-button" data-view="contactsView" aria-label="Контакты"><svg class="ni" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="20.5"/><circle cx="24" cy="19" r="6.2"/><path d="M10.2 37.3C13 31.6 18.3 28.6 24 28.6s11 3 13.8 8.7"/></svg><small>Контакты</small></button>
+    <button class="nav-button" data-view="statusView" aria-label="Истории"><svg class="ni" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="20.5"/><circle cx="24" cy="24" r="11.5" stroke-dasharray="15 5 6 5 12 5"/><path d="M24 18v12M18 24h12"/></svg><small>Истории</small></button>
+    <button class="nav-button" data-view="albumView" aria-label="Альбом"><svg class="ni" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 15.5h8.5l2.3-4.5h10.4l2.3 4.5H40a3.5 3.5 0 0 1 3.5 3.5v18a3.5 3.5 0 0 1-3.5 3.5H8A3.5 3.5 0 0 1 4.5 37V19A3.5 3.5 0 0 1 8 15.5z"/><circle cx="24" cy="28" r="8.2"/><circle cx="24" cy="28" r="4.2" fill="currentColor" stroke="none"/><circle cx="10.5" cy="21.5" r="1.4" fill="currentColor" stroke="none"/></svg><small>Альбом</small></button>
+    <button class="nav-button" data-view="moreView" aria-label="Игры"><svg class="ni" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 10.5h18a7 7 0 0 1 6.6 4.6l4.4 12.7a6 6 0 0 1-10.4 5.6L30.3 29H17.7l-2.9 4.4A6 6 0 0 1 4.4 27.8l4.4-12.7A7 7 0 0 1 15 10.5z"/><path d="M19.5 10.5V16a2 2 0 0 0 2 2h5a2 2 0 0 0 2-2v-5.5"/><path d="M13 16.5v7M9.5 20h7"/><g fill="currentColor" stroke="none"><circle cx="35" cy="17" r="1.5"/><circle cx="31.8" cy="20.2" r="1.5"/><circle cx="38.2" cy="20.2" r="1.5"/><circle cx="35" cy="23.4" r="1.5"/></g><circle cx="19.5" cy="24.5" r="2.6"/><circle cx="28.5" cy="24.5" r="2.6"/></svg><small>Игры</small></button>
   </nav>
 
   <div class="modal" id="callModal" style="background:#000;padding:0;align-items:stretch">
@@ -922,7 +556,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
- (function () {
+(function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -1769,9 +1403,7 @@ $("albumInput").addEventListener("change", function () {
       .catch(() => alert("Не удалось добавить фото."));
   });
 });
-
 let feedTab = "photo";
- 
 async function loadAlbum() {
   const box = $("feedBox");
   document.querySelectorAll(".atabs button").forEach(b => b.classList.toggle("on", b.dataset.a === feedTab));
@@ -1854,7 +1486,7 @@ function stopMv() {
   v.load();
   v.style.display = "none";
 }
-let mvCmt = null;
+  let mvCmt = null;
 function setupComments(base, it) {
   const wrap = $("mCmtWrap"), list = $("mCmtList");
   list.replaceChildren();
@@ -2685,8 +2317,8 @@ $("sStage").addEventListener("click", e => {
   if (e.clientX < r.left + r.width / 3) { if (sv.i > 0) { sv.i--; showStory(); } }
   else if (sv.i + 1 < sv.list.length) { sv.i++; showStory(); }
   else closeStory();
-});
- $("sDel").addEventListener("click", () => {
+}); 
+$("sDel").addEventListener("click", () => {
   if (!sv || !confirm("Удалить эту историю?")) return;
   const s = sv.list[sv.i];
   remove(ref(db, "stories/" + s.owner + "/" + s.key)).catch(() => {});
@@ -3219,237 +2851,7 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
   } catch (e) {
     console.error(e);
   }
- // LIMECHAT DURAK GAME
-
-(() => {
-  const $ = id => document.getElementById(id);
-
-  let hands = [];
-  let deck = [];
-  let selected = -1;
-  let attacker = 0;
-  let defender = 1;
-  let trump = "";
-  let table = [];
-  let phase = "attack";
-  let finished = false;
-
-  const suits = ["♠", "♥", "♦", "♣"];
-  const ranks = [
-    "6","7","8","9","10","J","Q","K","A"
-  ];
-
-  function createDeck() {
-    deck = [];
-
-    suits.forEach(s =>
-      ranks.forEach((r,i) =>
-        deck.push({
-          suit:s,
-          rank:r,
-          value:i+6
-        })
-      )
-    );
-
-    deck.sort(() => Math.random() - 0.5);
-  }
-
-  function startGame() {
-    createDeck();
-
-    hands = [[],[],[],[]];
-    table = [];
-    selected = -1;
-    attacker = 0;
-    defender = 1;
-    phase = "attack";
-    finished = false;
-
-    for(let i=0;i<6;i++) {
-      hands.forEach(h => h.push(deck.pop()));
-    }
-
-    trump = deck[deck.length-1].suit;
-
-    $("durakRoom").style.display = "block";
-
-    render();
-
-    $("durakStatus").textContent =
-      "Игра началась! Выбери карту.";
-
-  }
-
-  function renderCard(card,index) {
-    const red =
-      card.suit === "♥" || card.suit === "♦";
-
-    return `
-      <div class="durak-card ${red ? "red" : ""}"
-        data-card="${index}">
-        <span>${card.rank}${card.suit}</span>
-        <span>${card.suit}</span>
-      </div>
-    `;
-  }
-
-  function render() {
-    $("durakHand").innerHTML =
-      hands[0].map(renderCard).join("");
-
-    $("durakCount").textContent =
-      deck.length + " карт";
-
-    $("durakPile").innerHTML =
-      table.length
-      ? table.map((p,i) => `
-        <div class="durak-pair">
-          ${renderCard(p.attack,i)}
-          ${p.defense ? renderCard(p.defense,i) : ""}
-        </div>
-      `).join("")
-      : "<span>Игровой стол</span>";
-
-    document.querySelectorAll(
-      "#durakHand .durak-card"
-    ).forEach(card => {
-      card.onclick = () => {
-        selected = Number(card.dataset.card);
-
-        document.querySelectorAll(
-          "#durakHand .durak-card"
-        ).forEach(c =>
-          c.classList.remove("selected")
-        );
-
-        card.classList.add("selected");
-      };
-    });
-
-    $("durakStatus").textContent =
-      "Козырь: " + trump +
-      " | " + (phase === "attack"
-      ? "Твой ход"
-      : "Защищайся");
-  }
-
-  function refill() {
-    [attacker,defender,2,3].forEach(i => {
-      while(hands[i].length < 6 && deck.length) {
-        hands[i].push(deck.pop());
-      }
-    });
-  }
-
-  function attack() {
-    if(selected < 0 || finished) return;
-
-    if(phase !== "attack") {
-      return;
-    }
-
-    const card = hands[0].splice(selected,1)[0];
-
-    table.push({
-      attack:card,
-      defense:null
-    });
-
-    selected = -1;
-    phase = "defense";
-
-    render();
-
-    $("durakStatus").textContent =
-      "Бей карту соперника!";
-  }
-
-  function defend() {
-    if(selected < 0 || finished) return;
-
-    if(phase !== "defense") return;
-
-    const card = hands[0][selected];
-    const pair = table[table.length-1];
-
-    if(!pair) return;
-
-    const a = pair.attack;
-
-    const beats =
-      (card.suit === a.suit &&
-       card.value > a.value) ||
-      (card.suit === trump &&
-       a.suit !== trump);
-
-    if(!beats) {
-      $("durakStatus").textContent =
-        "Эта карта не бьёт атакующую!";
-      return;
-    }
-
-    pair.defense = hands[0].splice(selected,1)[0];
-
-    selected = -1;
-    phase = "attack";
-
-    refill();
-
-    table = [];
-
-    render();
-
-    $("durakStatus").textContent =
-      "Карта отбита! Твой следующий ход.";
-  }
-
-  function takeCards() {
-    if(finished) return;
-
-    table.forEach(pair => {
-      hands[0].push(pair.attack);
-
-      if(pair.defense) {
-        hands[0].push(pair.defense);
-      }
-    });
-
-    table = [];
-    phase = "attack";
-
-    refill();
-    render();
-  }
-
-  function pass() {
-    if(table.some(p => !p.defense)) {
-      $("durakStatus").textContent =
-        "Сначала отбей все карты!";
-      return;
-    }
-
-    table = [];
-    refill();
-
-    render();
-
-    $("durakStatus").textContent =
-      "Раунд завершён!";
-  }
-
-  $("durakStart").onclick = startGame;
-  $("durakRestart").onclick = startGame;
-
-  $("durakBack").onclick = () => {
-    $("durakRoom").style.display = "none";
-  };
-
-  $("durakTake").onclick = takeCards;
-  $("durakPass").onclick = pass;
-  $("durakThrow").onclick = attack;
-
-})();
 </script>
 </body>
 </html>
+       
