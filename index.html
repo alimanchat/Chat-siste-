@@ -620,14 +620,116 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div style="padding:10px"><button class="primary-button" id="albumAdd" style="margin-top:0">➕ Добавить фото</button></div>
   </section>
 
-  <section class="view" id="moreView">
-    <div class="section-title">Онлайн игры</div>
-    <div class="profile-content">
-      <p class="empty">Онлайн-игры скоро появятся. Напиши, во что хочешь играть! 🎮</p>
-    </div>
-  </section>
+<section class="view" id="moreView">
 
-  <nav class="bottom-nav">
+  <div class="section-title">🎮 LimeChat Games</div>
+
+  <div class="profile-content">
+
+    <div class="durak-launch">
+
+      <div class="durak-mark">🃏</div>
+
+      <h2>ДУРАК ОНЛАЙН</h2>
+
+      <p>Играй с друзьями в LimeChat!</p>
+
+      <button class="primary-button"
+        id="durakStart">
+        🎮 Начать игру
+      </button>
+
+      <small>👥 До 4 игроков</small>
+
+    </div>
+
+    <div id="durakRoom" style="display:none">
+
+      <div class="durak-game">
+
+        <div class="durak-top">
+
+          <button id="durakBack">← Назад</button>
+
+          <b>🃏 ДУРАК</b>
+
+          <span id="durakCount">36 карт</span>
+
+        </div>
+
+        <div class="durak-seat seat-top">
+          <div class="durak-avatar">🤖</div>
+          <div>
+            <b>Игрок 2</b>
+            <small>Соперник</small>
+          </div>
+        </div>
+
+        <div class="durak-middle">
+
+          <div class="durak-seat seat-left">
+            <div class="durak-avatar">🤖</div>
+            <b>Игрок 3</b>
+          </div>
+
+          <div class="durak-table">
+
+            <div class="durak-deck">
+              🂠
+              <small>Колода</small>
+            </div>
+
+            <div class="durak-pile"
+              id="durakPile">
+              <span>Игровой стол</span>
+            </div>
+
+          </div>
+
+          <div class="durak-seat seat-right">
+            <div class="durak-avatar">🤖</div>
+            <b>Игрок 4</b>
+          </div>
+
+        </div>
+
+        <div class="durak-seat seat-bottom">
+          <div class="durak-avatar">👤</div>
+          <b>Ты</b>
+        </div>
+
+        <div class="durak-status"
+          id="durakStatus">
+          Твой ход!
+        </div>
+
+        <div class="durak-hand"
+          id="durakHand">
+        </div>
+
+        <div class="durak-actions">
+
+          <button id="durakTake">Взять</button>
+
+          <button id="durakPass">Бито</button>
+
+          <button id="durakThrow">Подкинуть</button>
+
+        </div>
+
+        <button class="durak-restart"
+          id="durakRestart">
+          🔄 Новая игра
+        </button>
+
+      </div>
+
+    </div>
+
+  </div>
+
+</section>
+    <nav class="bottom-nav">
     <button class="nav-button active" data-view="chatsView" aria-label="Чат">✉️<small>Сообщения</small></button>
     <button class="nav-button" data-view="contactsView" aria-label="Контакты">👥<small>Контакты</small></button>
     <button class="nav-button" data-view="statusView" aria-label="Истории">➕<small>Истории</small></button>
@@ -3117,6 +3219,237 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
   } catch (e) {
     console.error(e);
   }
+ // LIMECHAT DURAK GAME
+
+(() => {
+  const $ = id => document.getElementById(id);
+
+  let hands = [];
+  let deck = [];
+  let selected = -1;
+  let attacker = 0;
+  let defender = 1;
+  let trump = "";
+  let table = [];
+  let phase = "attack";
+  let finished = false;
+
+  const suits = ["♠", "♥", "♦", "♣"];
+  const ranks = [
+    "6","7","8","9","10","J","Q","K","A"
+  ];
+
+  function createDeck() {
+    deck = [];
+
+    suits.forEach(s =>
+      ranks.forEach((r,i) =>
+        deck.push({
+          suit:s,
+          rank:r,
+          value:i+6
+        })
+      )
+    );
+
+    deck.sort(() => Math.random() - 0.5);
+  }
+
+  function startGame() {
+    createDeck();
+
+    hands = [[],[],[],[]];
+    table = [];
+    selected = -1;
+    attacker = 0;
+    defender = 1;
+    phase = "attack";
+    finished = false;
+
+    for(let i=0;i<6;i++) {
+      hands.forEach(h => h.push(deck.pop()));
+    }
+
+    trump = deck[deck.length-1].suit;
+
+    $("durakRoom").style.display = "block";
+
+    render();
+
+    $("durakStatus").textContent =
+      "Игра началась! Выбери карту.";
+
+  }
+
+  function renderCard(card,index) {
+    const red =
+      card.suit === "♥" || card.suit === "♦";
+
+    return `
+      <div class="durak-card ${red ? "red" : ""}"
+        data-card="${index}">
+        <span>${card.rank}${card.suit}</span>
+        <span>${card.suit}</span>
+      </div>
+    `;
+  }
+
+  function render() {
+    $("durakHand").innerHTML =
+      hands[0].map(renderCard).join("");
+
+    $("durakCount").textContent =
+      deck.length + " карт";
+
+    $("durakPile").innerHTML =
+      table.length
+      ? table.map((p,i) => `
+        <div class="durak-pair">
+          ${renderCard(p.attack,i)}
+          ${p.defense ? renderCard(p.defense,i) : ""}
+        </div>
+      `).join("")
+      : "<span>Игровой стол</span>";
+
+    document.querySelectorAll(
+      "#durakHand .durak-card"
+    ).forEach(card => {
+      card.onclick = () => {
+        selected = Number(card.dataset.card);
+
+        document.querySelectorAll(
+          "#durakHand .durak-card"
+        ).forEach(c =>
+          c.classList.remove("selected")
+        );
+
+        card.classList.add("selected");
+      };
+    });
+
+    $("durakStatus").textContent =
+      "Козырь: " + trump +
+      " | " + (phase === "attack"
+      ? "Твой ход"
+      : "Защищайся");
+  }
+
+  function refill() {
+    [attacker,defender,2,3].forEach(i => {
+      while(hands[i].length < 6 && deck.length) {
+        hands[i].push(deck.pop());
+      }
+    });
+  }
+
+  function attack() {
+    if(selected < 0 || finished) return;
+
+    if(phase !== "attack") {
+      return;
+    }
+
+    const card = hands[0].splice(selected,1)[0];
+
+    table.push({
+      attack:card,
+      defense:null
+    });
+
+    selected = -1;
+    phase = "defense";
+
+    render();
+
+    $("durakStatus").textContent =
+      "Бей карту соперника!";
+  }
+
+  function defend() {
+    if(selected < 0 || finished) return;
+
+    if(phase !== "defense") return;
+
+    const card = hands[0][selected];
+    const pair = table[table.length-1];
+
+    if(!pair) return;
+
+    const a = pair.attack;
+
+    const beats =
+      (card.suit === a.suit &&
+       card.value > a.value) ||
+      (card.suit === trump &&
+       a.suit !== trump);
+
+    if(!beats) {
+      $("durakStatus").textContent =
+        "Эта карта не бьёт атакующую!";
+      return;
+    }
+
+    pair.defense = hands[0].splice(selected,1)[0];
+
+    selected = -1;
+    phase = "attack";
+
+    refill();
+
+    table = [];
+
+    render();
+
+    $("durakStatus").textContent =
+      "Карта отбита! Твой следующий ход.";
+  }
+
+  function takeCards() {
+    if(finished) return;
+
+    table.forEach(pair => {
+      hands[0].push(pair.attack);
+
+      if(pair.defense) {
+        hands[0].push(pair.defense);
+      }
+    });
+
+    table = [];
+    phase = "attack";
+
+    refill();
+    render();
+  }
+
+  function pass() {
+    if(table.some(p => !p.defense)) {
+      $("durakStatus").textContent =
+        "Сначала отбей все карты!";
+      return;
+    }
+
+    table = [];
+    refill();
+
+    render();
+
+    $("durakStatus").textContent =
+      "Раунд завершён!";
+  }
+
+  $("durakStart").onclick = startGame;
+  $("durakRestart").onclick = startGame;
+
+  $("durakBack").onclick = () => {
+    $("durakRoom").style.display = "none";
+  };
+
+  $("durakTake").onclick = takeCards;
+  $("durakPass").onclick = pass;
+  $("durakThrow").onclick = attack;
+
+})();
 </script>
 </body>
 </html>
