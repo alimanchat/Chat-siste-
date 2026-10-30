@@ -2,8 +2,6 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
- <link rel="manifest" href="/Chat-siste-/manifest.json">
-<meta name="theme-color" content="#00C853"> 
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LimeChat</title>
 <style>
@@ -171,6 +169,12 @@ button{cursor:pointer;border:none}
 .mact button{background:#ffffff22;color:#fff;border-radius:18px;padding:7px 14px;font-size:16px}
 .mact button.on{background:#4CC81A66}
 .mact .fview{margin-left:auto;color:#bbb;font-size:13px}
+#mCmtInput::placeholder{color:#aaa}
+.mcm{padding:4px 0;overflow-wrap:anywhere}
+.mcm b{color:#7fe04a;margin-right:6px}
+#callVideo,#micBtn{display:flex;align-items:center;justify-content:center;padding:0}
+#callVideo svg{width:32px;height:32px;display:block}
+#micBtn svg{width:32px;height:32px;display:block}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -217,7 +221,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
         <small id="chatStatus"></small>
       </div>
       <button class="icon-button" id="callAudio" aria-label="Аудиозвонок">📞</button>
-      <button class="icon-button" id="callVideo" aria-label="Видеозвонок">🎥</button>
+      <button class="icon-button" id="callVideo" aria-label="Видеозвонок"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="#2b2b2b" stroke-width="2.4"/><rect x="12" y="17" width="16" height="14" rx="2.6" fill="#2b2b2b"/><polygon points="30,23 36.5,18.5 36.5,29.5 30,25" fill="#2b2b2b"/></svg></button>
       <button class="icon-button" id="chatMenu" aria-label="Меню">⋮</button>
     </div>
     <div class="messages" id="messageList"></div>
@@ -233,7 +237,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
     <form class="composer" id="messageForm">
       <input id="messageInput" type="text" placeholder="Написать сообщение" autocomplete="off" maxlength="2000">
-      <button class="mic-btn" type="button" id="micBtn" aria-label="Голосовое сообщение">🎤</button>
+      <button class="mic-btn" type="button" id="micBtn" aria-label="Голосовое сообщение"><svg viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><circle cx="24" cy="24" r="21" fill="none" stroke="#2b2b2b" stroke-width="2.4"/><rect x="19.5" y="11" width="9" height="16" rx="4.5" fill="none" stroke="#2b2b2b" stroke-width="2.6"/><path d="M15 23.5a9 9 0 0 0 18 0" fill="none" stroke="#2b2b2b" stroke-width="2.6" stroke-linecap="round"/><path d="M24 32.5V37M19.5 37h9" fill="none" stroke="#2b2b2b" stroke-width="2.6" stroke-linecap="round"/></svg></button>
       <button class="plus-btn" type="button" id="plusBtn" aria-label="Прикрепить">+</button>
       <button class="send-button" type="submit" aria-label="Отправить">↑</button>
     </form>
@@ -298,8 +302,10 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   <section class="view" id="profileView">
     <div class="section-title">Профиль</div>
     <div class="profile-content">
-      <div class="avatar profile-photo" id="profileAvatar">👤</div>
-      <button class="secondary-button" id="choosePhotoButton" style="display:block;margin:auto">🖼️ Выбрать фотографию</button>
+      <div style="position:relative;width:110px;margin:0 auto 18px">
+        <div class="avatar profile-photo" id="profileAvatar" style="margin:0">👤</div>
+        <button id="choosePhotoButton" aria-label="Выбрать фото из галереи" style="position:absolute;right:-6px;bottom:-6px;width:38px;height:38px;border-radius:50%;background:#5BB60F;color:#fff;font-size:26px;line-height:1;border:3px solid #fff">+</button>
+      </div>
       <input type="file" id="photoInput" accept="image/*">
       <div class="field"><input id="profileName" maxlength="40" placeholder="Имя Фамилия"></div>
       <div class="field"><input id="profilePhone" readonly placeholder="Тел. номер"></div>
@@ -310,8 +316,10 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <div class="row"><i>🎯</i><input id="pHobby" maxlength="60" placeholder="Хобби"></div>
       <div class="row"><i>👤</i><select id="pGender"><option value="">Пол</option><option>Мужской</option><option>Женский</option></select></div>
       <div class="row"><i>💍</i><input id="pFamily" maxlength="40" placeholder="Семейное положение"></div>
-      <div class="row"><i>➕</i><input id="pStatus" maxlength="100" placeholder="Статус"></div>
-      <button class="secondary-button" id="addAlbumPhoto" style="display:block;margin:6px auto">📷 Добавить фото в альбом</button>
+      <div class="row"><i>📸</i><input id="pInsta" maxlength="100" placeholder="Instagram (@имя)" autocapitalize="none" autocomplete="off"></div>
+      <div class="row"><i>▶️</i><input id="pYoutube" maxlength="100" placeholder="YouTube (@канал)" autocapitalize="none" autocomplete="off"></div>
+      <div class="row"><i>🎵</i><input id="pTiktok" maxlength="100" placeholder="TikTok (@имя)" autocapitalize="none" autocomplete="off"></div>
+      <div class="row"><i>✈️</i><input id="pTelegram" maxlength="100" placeholder="Telegram (@имя)" autocapitalize="none" autocomplete="off"></div>
       <input type="file" id="albumInput" accept="image/*" style="display:none">
       <button class="primary-button" id="saveProfileButton">Сохранить профиль</button>
     </div>
@@ -470,6 +478,11 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <div id="mTitle" style="font-weight:bold;font-size:17px"></div>
       <div id="mDesc" style="color:#ccc;margin:2px 0 8px;overflow-wrap:anywhere"></div>
       <div class="mact" id="mAct"></div>
+      <div id="mCmtWrap" style="display:none;margin-top:8px"><div id="mCmtList" style="max-height:26vh;overflow-y:auto;font-size:14px"></div></div>
+      <form id="mCmtForm" style="display:flex;gap:8px;margin-top:10px">
+        <input id="mCmtInput" maxlength="300" placeholder="Написать комментарий..." autocomplete="off" style="flex:1;min-width:0;padding:11px 14px;border-radius:22px;border:none;background:#ffffff22;color:#fff;outline:none;font-size:15px">
+        <button type="submit" aria-label="Отправить комментарий" style="width:44px;height:44px;border-radius:50%;background:#4CC81A;color:#05220a;font-size:22px;font-weight:bold;flex-shrink:0">↑</button>
+      </form>
     </div>
   </div>
 
@@ -537,7 +550,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
-(function () {
+ (function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -577,7 +590,7 @@ const $ = id => document.getElementById(id);
 const STORAGE_KEY = "my_chat_app_v2";
 const UID_KEY = "my_chat_uid";
 
-let state = { profile: { name: "", photo: "", phone: "", birth: "", city: "", village: "", edu: "", work: "", hobby: "", gender: "", family: "", status: "" }, contacts: [], calls: [], blocked: [], hidden: {}, groups: [], messages: {}, activeContact: null };
+let state = { profile: { name: "", photo: "", phone: "", birth: "", city: "", village: "", edu: "", work: "", hobby: "", gender: "", family: "", instagram: "", youtube: "", tiktok: "", telegram: "" }, contacts: [], calls: [], blocked: [], hidden: {}, groups: [], messages: {}, activeContact: null };
 let currentView = "chatsView";
 const listening = {};
 const presence = {};
@@ -645,7 +658,7 @@ const fmtTime = ts => new Date(ts || Date.now()).toLocaleTimeString("ru-RU", { h
 
 function saveRemote() {
   const p = state.profile;
-  return set(ref(db, "users/" + p.phone), { uid: myUid, name: p.name || "", phone: p.phone, birth: p.birth, city: p.city, village: p.village, edu: p.edu, work: p.work, hobby: p.hobby, gender: p.gender, family: p.family, status: p.status, photo: p.photo });
+  return set(ref(db, "users/" + p.phone), { uid: myUid, name: p.name || "", phone: p.phone, birth: p.birth, city: p.city, village: p.village, edu: p.edu, work: p.work, hobby: p.hobby, gender: p.gender, family: p.family, instagram: p.instagram || "", youtube: p.youtube || "", tiktok: p.tiktok || "", telegram: p.telegram || "", photo: p.photo });
 }
 
 function refreshAfterMessage(id) {
@@ -757,7 +770,7 @@ function updateHeader() {
   $("headerAvatar").replaceWith(avatar);
 
   $("profileName").value = state.profile.name;
-  [["pCity","city"],["pVillage","village"],["pEdu","edu"],["pWork","work"],["pHobby","hobby"],["pGender","gender"],["pFamily","family"],["pStatus","status"]].forEach(([i, k]) => { $(i).value = state.profile[k] || ""; });
+  [["pCity","city"],["pVillage","village"],["pEdu","edu"],["pWork","work"],["pHobby","hobby"],["pGender","gender"],["pFamily","family"],["pInsta","instagram"],["pYoutube","youtube"],["pTiktok","tiktok"],["pTelegram","telegram"]].forEach(([i, k]) => { $(i).value = state.profile[k] || ""; });
   const bp = (state.profile.birth || "").split("-");
   $("pBY").value = +bp[0] || "";
   $("pBM").value = +bp[1] || "";
@@ -766,6 +779,7 @@ function updateHeader() {
   const profileAvatar = makeAvatar(state.profile.photo, state.profile.name);
   profileAvatar.classList.add("profile-photo");
   profileAvatar.id = "profileAvatar";
+  profileAvatar.style.margin = "0";
   $("profileAvatar").replaceWith(profileAvatar);
 }
 
@@ -1050,7 +1064,10 @@ $("saveProfileButton").addEventListener("click", async function () {
   p.hobby = $("pHobby").value.trim();
   p.gender = $("pGender").value;
   p.family = $("pFamily").value.trim();
-  p.status = $("pStatus").value.trim();
+  p.instagram = $("pInsta").value.trim();
+  p.youtube = $("pYoutube").value.trim();
+  p.tiktok = $("pTiktok").value.trim();
+  p.telegram = $("pTelegram").value.trim();
   saveState();
   try { if (db) await saveRemote(); } catch (e) { alert("Не удалось сохранить на сервере."); return; }
   updateHeader();
@@ -1239,6 +1256,25 @@ async function loadCpStories(id) {
   if (cpId === id) { cpLoaded = true; syncCpStories(); }
 }
 
+function socialUrl(kind, val) {
+  let h = String(val).trim();
+  const hosts = { instagram: "instagram.com", youtube: "youtube.com", tiktok: "tiktok.com", telegram: "t.me" };
+  if (/^https?:\/\//i.test(h)) {
+    try {
+      const u = new URL(h);
+      const host = u.hostname.replace(/^www\./, "").replace(/^m\./, "");
+      const ok = host === hosts[kind] || (kind === "youtube" && host === "youtu.be") || (kind === "telegram" && host === "telegram.me");
+      return ok && /^https?:$/.test(u.protocol) ? u.href : "";
+    } catch (e) { return ""; }
+  }
+  h = h.replace(/^@/, "");
+  if (!/^[A-Za-z0-9._-]{1,64}$/.test(h)) return "";
+  if (kind === "instagram") return "https://instagram.com/" + h;
+  if (kind === "youtube") return "https://youtube.com/@" + h;
+  if (kind === "tiktok") return "https://tiktok.com/@" + h;
+  return "https://t.me/" + h;
+}
+
 async function cpTab(t) {
   document.querySelectorAll(".cp-tabs button").forEach(b => b.classList.toggle("on", b.dataset.t === t));
   const box = $("cpContent");
@@ -1294,6 +1330,20 @@ async function cpTab(t) {
     row("🎯", mk(v.hobby, "Хобби"));
     row("👤", mk(v.gender, "Пол"));
     row("💍", mk(v.family, "Семейное положение"));
+    [["📸", "instagram", "Instagram"], ["▶️", "youtube", "YouTube"], ["🎵", "tiktok", "TikTok"], ["✈️", "telegram", "Telegram"]].forEach(([ic, k, label]) => {
+      const val = typeof v[k] === "string" ? v[k].trim() : "";
+      if (!val) return;
+      const url = socialUrl(k, val);
+      if (!url) { row(ic, mk(val, label)); return; }
+      const a = document.createElement("a");
+      a.className = "ro";
+      a.href = url;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.style.cssText = "color:#2a7d0a;text-decoration:none";
+      a.textContent = label + ": " + val;
+      row(ic, a);
+    });
   } catch (e) {
     box.replaceChildren();
     say("Не удалось загрузить.");
@@ -1332,7 +1382,6 @@ document.querySelectorAll(".cp-tabs button").forEach(b => b.addEventListener("cl
 $("chatName").parentElement.style.cursor = "pointer";
 $("chatName").parentElement.addEventListener("click", () => { if (state.activeContact) openCP(state.activeContact); });
 
-$("addAlbumPhoto").addEventListener("click", () => $("albumInput").click());
 $("albumInput").addEventListener("change", function () {
   const f = this.files && this.files[0];
   this.value = "";
@@ -1350,6 +1399,7 @@ $("albumInput").addEventListener("change", function () {
 });
 
 let feedTab = "photo";
+ 
 async function loadAlbum() {
   const box = $("feedBox");
   document.querySelectorAll(".atabs button").forEach(b => b.classList.toggle("on", b.dataset.a === feedTab));
@@ -1432,6 +1482,57 @@ function stopMv() {
   v.load();
   v.style.display = "none";
 }
+let mvCmt = null;
+function setupComments(base, it) {
+  const wrap = $("mCmtWrap"), list = $("mCmtList");
+  list.replaceChildren();
+  wrap.style.display = "none";
+  const btn = document.createElement("button");
+  btn.textContent = "💬 0";
+  btn.setAttribute("aria-label", "Комментарии");
+  let count = 0;
+  const addRow = c => {
+    const row = document.createElement("div");
+    row.className = "mcm";
+    const nm = document.createElement("b");
+    const mine = c.from === state.profile.phone;
+    nm.textContent = mine ? "Я" : ((state.contacts.find(x => x.id === c.from) || {}).name || c.n || "+" + c.from);
+    const tx = document.createElement("span");
+    tx.textContent = c.text;
+    row.append(nm, tx);
+    list.appendChild(row);
+    list.scrollTop = list.scrollHeight;
+  };
+  get(ref(db, base + "/comments")).then(sn => {
+    if (!mv || mv.list[mv.i] !== it) return;
+    const arr = [];
+    sn.forEach(ch => { const c = ch.val(); if (c && typeof c.text === "string" && !isBlocked(c.from)) arr.push(c); });
+    arr.sort((a, b) => (a.ts || 0) - (b.ts || 0));
+    list.replaceChildren();
+    arr.slice(-50).forEach(addRow);
+    count = arr.length;
+    btn.textContent = "💬 " + count;
+  }).catch(() => {});
+  btn.addEventListener("click", () => {
+    wrap.style.display = wrap.style.display === "none" ? "block" : "none";
+    list.scrollTop = list.scrollHeight;
+  });
+  mvCmt = { base: base, addRow: addRow, inc: () => { count++; btn.textContent = "💬 " + count; } };
+  return btn;
+}
+$("mCmtForm").addEventListener("submit", e => {
+  e.preventDefault();
+  const inp = $("mCmtInput");
+  const text = inp.value.trim().slice(0, 300);
+  if (!text || !mvCmt || !db || !state.profile.phone) return;
+  inp.value = "";
+  const c = { from: state.profile.phone, n: state.profile.name || "", text: text };
+  push(ref(db, mvCmt.base + "/comments"), Object.assign({ ts: serverTimestamp() }, c)).catch(() => alert("Не удалось отправить комментарий."));
+  mvCmt.addRow(c);
+  mvCmt.inc();
+  $("mCmtWrap").style.display = "block";
+});
+
 function openMedia(list, i) {
   mv = { list: list, i: i };
   $("mediaModal").classList.add("show");
@@ -1443,7 +1544,14 @@ function closeMedia() {
   $("mImg").removeAttribute("src");
   $("mediaModal").classList.remove("show");
 }
-  function showMedia() {
+function mediaStep(d) {
+  if (!mv) return;
+  const n = mv.i + d;
+  if (n < 0 || n >= mv.list.length) return;
+  mv.i = n;
+  showMedia();
+}
+function showMedia() {
   const it = mv.list[mv.i], v = it.v, me = state.profile.phone, own = it.owner === me;
   stopMv();
   const img = $("mImg");
@@ -1471,8 +1579,25 @@ function closeMedia() {
   $("mNext").style.display = mv.i < mv.list.length - 1 ? "" : "none";
   const act = $("mAct");
   act.replaceChildren();
-  if (v.plain) return;
   const base = it.kind === "video" ? "albumvideo/" + it.owner + "/" + it.k : "feed/" + it.k;
+  const cbtn = setupComments(base, it);
+  const mbtn = document.createElement("button");
+  mbtn.textContent = "✉️";
+  mbtn.setAttribute("aria-label", "Написать ему");
+  mbtn.addEventListener("click", () => {
+    const owner = it.owner;
+    if (owner === state.profile.phone) return;
+    if (!state.contacts.some(c => c.id === owner)) {
+      if (!confirm("Добавить +" + owner + " в контакты, чтобы написать?")) return;
+      closeMedia();
+      $("newContactName").value = owner;
+      addContact();
+      return;
+    }
+    closeMedia();
+    openContact(owner);
+  });
+  if (v.plain) { act.append(cbtn); if (it.owner !== me) act.append(mbtn); return; }
   const likes = v.likes || {}, dis = v.dislikes || {}, views = v.views || {};
   if (me && !views[me]) { views[me] = true; set(ref(db, base + "/views/" + me), true).catch(() => {}); }
   const bl = document.createElement("button"), bd = document.createElement("button"), vw = document.createElement("span");
@@ -1497,14 +1622,9 @@ function closeMedia() {
   bl.addEventListener("click", () => toggle(likes, dis, "likes", "dislikes"));
   bd.addEventListener("click", () => toggle(dis, likes, "dislikes", "likes"));
   paint();
-  act.append(bl, bd, vw);
-}
- function mediaStep(step) {
-if (!mv) return;
-const next = mv.i + step;
-if (next < 0 || next >= mv.list.length) return;
-mv.i = next;
-showMedia();
+  act.append(bl, bd, cbtn);
+  if (it.owner !== me) act.append(mbtn);
+  act.append(vw);
 }
 $("mBack").addEventListener("click", closeMedia);
 $("mPrev").addEventListener("click", () => mediaStep(-1));
@@ -2194,7 +2314,7 @@ $("sStage").addEventListener("click", e => {
   else if (sv.i + 1 < sv.list.length) { sv.i++; showStory(); }
   else closeStory();
 });
-  $("sDel").addEventListener("click", () => {
+ $("sDel").addEventListener("click", () => {
   if (!sv || !confirm("Удалить эту историю?")) return;
   const s = sv.list[sv.i];
   remove(ref(db, "stories/" + s.owner + "/" + s.key)).catch(() => {});
@@ -2657,7 +2777,7 @@ function startOnline() {
   get(ref(db, "users/" + state.profile.phone)).then(snap => {
     const v = snap.val();
     if (v) {
-      ["name", "birth", "city", "village", "edu", "work", "hobby", "gender", "family", "status", "photo"].forEach(k => { if (!state.profile[k] && v[k]) state.profile[k] = v[k]; });
+      ["name", "birth", "city", "village", "edu", "work", "hobby", "gender", "family", "instagram", "youtube", "tiktok", "telegram", "photo"].forEach(k => { if (!state.profile[k] && v[k]) state.profile[k] = v[k]; });
       saveState();
       updateHeader();
     }
