@@ -181,6 +181,12 @@ button{cursor:pointer;border:none}
 .nav-button.active{background:#e6f7d6;color:#2a9d0a;border-radius:14px;box-shadow:0 0 12px #5bd21a66}
 .nav-button.active small{font-weight:bold}
 .nav-button:active{background:#d2f2b4;color:#1f8a05;box-shadow:0 0 14px #5bd21a99}
+.cp-tabs button,.gtabs button,.atabs button{color:#444;transition:background .15s,color .15s,box-shadow .15s}
+.cp-tabs button small,.gtabs button small,.atabs button small{color:inherit}
+.ti{width:30px;height:30px;display:block}
+.cp-tabs button.on,.gtabs button.on,.atabs button.on{background:#e6f7d6;color:#2a9d0a;box-shadow:0 0 12px #5bd21a66}
+.cp-tabs button.on small,.gtabs button.on small,.atabs button.on small{font-weight:bold}
+.cp-tabs button:active,.gtabs button:active,.atabs button:active{background:#d2f2b4;color:#1f8a05}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -257,11 +263,11 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <div class="avatar profile-photo" id="cpAvatar">👤</div>
       <h2 id="cpName" style="margin:0"></h2>
       <div class="cp-tabs">
-        <button data-t="bio">👤<small>Профиль</small></button>
-        <button data-t="status">➕<small>Истории</small></button>
-        <button data-t="photo">📷<small>Фото</small></button>
-        <button data-t="video">🎬<small>Видео</small></button>
-        <button data-t="sms">✉️<small>Сообщения</small></button>
+        <button data-t="bio"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="20.5"/><circle cx="24" cy="19" r="6.2"/><path d="M10.2 37.3C13 31.6 18.3 28.6 24 28.6s11 3 13.8 8.7"/></svg><small>Профиль</small></button>
+        <button data-t="status"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="20.5"/><circle cx="24" cy="24" r="11.5" stroke-dasharray="15 5 6 5 12 5"/><path d="M24 18v12M18 24h12"/></svg><small>Истории</small></button>
+        <button data-t="photo"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 15.5h8.5l2.3-4.5h10.4l2.3 4.5H40a3.5 3.5 0 0 1 3.5 3.5v18a3.5 3.5 0 0 1-3.5 3.5H8A3.5 3.5 0 0 1 4.5 37V19A3.5 3.5 0 0 1 8 15.5z"/><circle cx="24" cy="28" r="8.2"/><circle cx="24" cy="28" r="4.2" fill="currentColor" stroke="none"/><circle cx="10.5" cy="21.5" r="1.4" fill="currentColor" stroke="none"/></svg><small>Фото</small></button>
+        <button data-t="video"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="9" width="40" height="30" rx="9"/><path d="M19.5 17v14l12-7z"/></svg><small>Видео</small></button>
+        <button data-t="sms"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 5C13.5 5 5 12.6 5 22c0 3.9 1.5 7.5 4 10.3L6.8 41l8.9-2.2c2.5 1 5.3 1.5 8.3 1.5 10.5 0 19-7.6 19-17S34.5 5 24 5z"/><g fill="currentColor" stroke="none"><circle cx="15.5" cy="22.5" r="2.6"/><circle cx="24" cy="22.5" r="2.6"/><circle cx="32.5" cy="22.5" r="2.6"/></g></svg><small>Сообщения</small></button>
       </div>
       <div id="cpContent" style="text-align:left"></div>
       <div id="cpStWrap" style="text-align:left;display:none"><div class="shead"><b>Истории</b></div><div class="srow" id="cpStories"></div></div>
@@ -278,11 +284,11 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <input type="file" id="gPhotoInput" accept="image/*" style="display:none">
       <h2 id="gName" style="margin:0"></h2>
       <div class="gtabs">
-        <button data-g="members">👥<small>Участники</small></button>
-        <button data-g="admin">👤<small>Админ</small></button>
-        <button data-g="photo">📷<small>Фото</small></button>
-        <button data-g="video">🎬<small>Видео</small></button>
-        <button data-g="sms">✉️<small>Сообщения</small></button>
+        <button data-g="members"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17.5" cy="16" r="6.3"/><path d="M5.5 38c.9-7.2 6-10.6 12-10.6s11.100 3.400 12 10.600"/><circle cx="33.5" cy="18" r="5"/><path d="M32 28.2c5.800-.3 10.200 2.800 11 9.300"/></svg><small>Участники</small></button>
+        <button data-g="admin"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="20.5"/><circle cx="24" cy="19" r="6.2"/><path d="M10.2 37.3C13 31.6 18.3 28.6 24 28.6s11 3 13.8 8.7"/></svg><small>Админ</small></button>
+        <button data-g="photo"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 15.5h8.5l2.3-4.5h10.4l2.3 4.5H40a3.5 3.5 0 0 1 3.5 3.5v18a3.5 3.5 0 0 1-3.5 3.5H8A3.5 3.5 0 0 1 4.5 37V19A3.5 3.5 0 0 1 8 15.5z"/><circle cx="24" cy="28" r="8.2"/><circle cx="24" cy="28" r="4.2" fill="currentColor" stroke="none"/><circle cx="10.5" cy="21.5" r="1.4" fill="currentColor" stroke="none"/></svg><small>Фото</small></button>
+        <button data-g="video"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="9" width="40" height="30" rx="9"/><path d="M19.5 17v14l12-7z"/></svg><small>Видео</small></button>
+        <button data-g="sms"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 5C13.5 5 5 12.6 5 22c0 3.9 1.5 7.5 4 10.3L6.8 41l8.9-2.2c2.5 1 5.3 1.5 8.3 1.5 10.5 0 19-7.6 19-17S34.5 5 24 5z"/><g fill="currentColor" stroke="none"><circle cx="15.5" cy="22.5" r="2.6"/><circle cx="24" cy="22.5" r="2.6"/><circle cx="32.5" cy="22.5" r="2.6"/></g></svg><small>Сообщения</small></button>
       </div>
       <div id="gContent" style="text-align:left"></div>
     </div>
@@ -349,8 +355,8 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 
   <section class="view" id="albumView">
     <div class="atabs">
-      <button data-a="photo">📷<small>Фото</small></button>
-      <button data-a="video">🎬<small>Видео</small></button>
+      <button data-a="photo"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 15.5h8.5l2.3-4.5h10.4l2.3 4.5H40a3.5 3.5 0 0 1 3.5 3.5v18a3.5 3.5 0 0 1-3.5 3.5H8A3.5 3.5 0 0 1 4.5 37V19A3.5 3.5 0 0 1 8 15.5z"/><circle cx="24" cy="28" r="8.2"/><circle cx="24" cy="28" r="4.2" fill="currentColor" stroke="none"/><circle cx="10.5" cy="21.5" r="1.4" fill="currentColor" stroke="none"/></svg><small>Фото</small></button>
+      <button data-a="video"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="9" width="40" height="30" rx="9"/><path d="M19.5 17v14l12-7z"/></svg><small>Видео</small></button>
     </div>
     <div class="profile-content" id="feedBox" style="flex:1;min-height:0"></div>
     <div style="padding:10px"><button class="primary-button" id="albumAdd" style="margin-top:0">➕ Добавить фото</button></div>
@@ -656,7 +662,7 @@ const FLAGS = {
   kz: '<rect width="30" height="20" fill="#00AFCA"/><circle cx="15" cy="8" r="3.4" fill="#FEC50C"/><circle cx="15" cy="8" r="4.7" fill="none" stroke="#FEC50C" stroke-width="1.2" stroke-dasharray="1 1"/><path d="M8 15.4 Q15 12.4 22 15.4 Q15 17.4 8 15.4Z" fill="#FEC50C"/>',
   tj: '<rect width="30" height="5.7" fill="#CC0000"/><rect y="5.7" width="30" height="8.6" fill="#fff"/><rect y="14.3" width="30" height="5.7" fill="#006600"/><path d="M12 11.4 L12.8 8.6 L14 10.2 L15 7.8 L16 10.2 L17.2 8.6 L18 11.4 Z" fill="#F8C300"/>'
 };
-const flagSvg = id => '<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + FLAGS[id] + '</svg>';
+  const flagSvg = id => '<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + FLAGS[id] + '</svg>';
 const showName = (n, k) => n || "+" + k;
 const myKey = () => state.profile.phone;
 const chatIdWith = otherKey => [myKey(), otherKey].sort().join("__");
@@ -1403,6 +1409,7 @@ $("albumInput").addEventListener("change", function () {
       .catch(() => alert("Не удалось добавить фото."));
   });
 });
+
 let feedTab = "photo";
 async function loadAlbum() {
   const box = $("feedBox");
@@ -2317,7 +2324,7 @@ $("sStage").addEventListener("click", e => {
   if (e.clientX < r.left + r.width / 3) { if (sv.i > 0) { sv.i--; showStory(); } }
   else if (sv.i + 1 < sv.list.length) { sv.i++; showStory(); }
   else closeStory();
-}); 
+});
 $("sDel").addEventListener("click", () => {
   if (!sv || !confirm("Удалить эту историю?")) return;
   const s = sv.list[sv.i];
@@ -2651,7 +2658,7 @@ $("gcBack").addEventListener("click", () => {
   renderGroupHead();
   renderGroupTab();
 });
-$("gForm").addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
+  $("gForm").addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
 $("gPhotoBtn").addEventListener("click", () => $("gPhotoInput").click());
 $("gPhotoInput").addEventListener("change", function () {
   const f = this.files && this.files[0];
@@ -2854,4 +2861,3 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
 </script>
 </body>
 </html>
-       
