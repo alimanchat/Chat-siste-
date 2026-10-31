@@ -187,6 +187,16 @@ button{cursor:pointer;border:none}
 .cp-tabs button.on,.gtabs button.on,.atabs button.on{background:#e6f7d6;color:#2a9d0a;box-shadow:0 0 12px #5bd21a66}
 .cp-tabs button.on small,.gtabs button.on small,.atabs button.on small{font-weight:bold}
 .cp-tabs button:active,.gtabs button:active,.atabs button:active{background:#d2f2b4;color:#1f8a05}
+.tr-flags{display:none;flex-wrap:wrap;gap:8px;margin-top:8px}
+.tr-flags.show{display:flex}
+.tr-flag{padding:0;background:transparent;border:none;line-height:0;border-radius:4px}
+.tr-flag svg{width:36px;height:24px;border-radius:4px;box-shadow:0 0 0 1px #8884;display:block}
+.tr-flag:active svg{outline:2px solid #5bd21a}
+.chatbar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #eee}
+.chatbar input{flex:1;min-width:0;padding:11px 14px;border:1px solid #ddd;border-radius:22px;background:#f4f6f3;font-size:15px;outline:none}
+.chatbar input:focus{border-color:#5BB60F}
+.chip{padding:9px 13px;border-radius:20px;background:#eef2ea;color:#444;font-size:14px;flex-shrink:0;transition:background .15s,color .15s}
+.chip.on{background:#e6f7d6;color:#2a9d0a;font-weight:bold;box-shadow:0 0 10px #5bd21a55}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -238,7 +248,11 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   </div>
 
   <section class="view active" id="chatsView">
-    <div class="section-title">Сообщения</div>
+    <div class="chatbar">
+      <input id="chatSearch" type="search" placeholder="Поиск сообщений" autocomplete="off">
+      <button type="button" class="chip" id="chipGroup">Группа</button>
+      <button type="button" class="chip" id="chipChannel">Канал</button>
+    </div>
     <div class="contact-list" id="contactList"></div>
   </section>
 
@@ -248,6 +262,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div style="padding:12px">
       <button class="primary-button" id="addContactButton">➕ Добавить контакт</button>
       <button class="primary-button" id="groupCreateBtn" style="margin-top:8px">👥 Создать группу</button>
+      <button class="primary-button" id="channelCreateBtn" style="margin-top:8px">📢 Создать канал</button>
     </div>
   </section>
 
@@ -336,6 +351,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <input id="gInput" type="text" placeholder="Написать сообщение" autocomplete="off" maxlength="2000">
       <button class="send-button" type="submit" aria-label="Отправить">↑</button>
     </form>
+    <div id="gNote" style="display:none;padding:14px;text-align:center;color:#777;background:#fff;border-top:1px solid #eee">📢 Это канал: писать может только админ</div>
   </section>
 
   <section class="view" id="profileView">
@@ -470,9 +486,9 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 
   <div class="modal" id="gCreateModal">
     <div class="modal-card">
-      <h3>Новая группа</h3>
+      <h3 id="gCreateTitle">Новая группа</h3>
       <input id="gNewName" maxlength="40" placeholder="Название группы">
-      <div style="margin:8px 0;color:#666">Выбери участников:</div>
+      <div id="gCreateHint" style="margin:8px 0;color:#666">Выбери участников:</div>
       <div id="gNewList" style="max-height:40vh;overflow-y:auto"></div>
       <div class="modal-actions">
         <button class="secondary-button" id="gCreateCancel">Отмена</button>
@@ -639,7 +655,7 @@ function markRead(id) {
   if (!db || !myKey() || !id) return;
   set(ref(db, "reads/" + chatIdWith(id) + "/" + myKey()), serverTimestamp()).catch(() => {});
 }
-function isBlocked(id) { return state.blocked.indexOf(id) !== -1; }
+  function isBlocked(id) { return state.blocked.indexOf(id) !== -1; }
 
 // ---------- Firebase ----------
 let db = null;
@@ -689,6 +705,15 @@ const FLAGS = {
   kz: '<rect width="30" height="20" fill="#00AFCA"/><circle cx="15" cy="8" r="3.4" fill="#FEC50C"/><circle cx="15" cy="8" r="4.7" fill="none" stroke="#FEC50C" stroke-width="1.2" stroke-dasharray="1 1"/><path d="M8 15.4 Q15 12.4 22 15.4 Q15 17.4 8 15.4Z" fill="#FEC50C"/>',
   tj: '<rect width="30" height="5.7" fill="#CC0000"/><rect y="5.7" width="30" height="8.6" fill="#fff"/><rect y="14.3" width="30" height="5.7" fill="#006600"/><path d="M12 11.4 L12.8 8.6 L14 10.2 L15 7.8 L16 10.2 L17.2 8.6 L18 11.4 Z" fill="#F8C300"/>'
 };
+Object.assign(FLAGS, {
+  us: '<rect width="30" height="20" fill="#fff"/><rect y="0.00" width="30" height="1.54" fill="#B22234"/><rect y="3.08" width="30" height="1.54" fill="#B22234"/><rect y="6.16" width="30" height="1.54" fill="#B22234"/><rect y="9.24" width="30" height="1.54" fill="#B22234"/><rect y="12.32" width="30" height="1.54" fill="#B22234"/><rect y="15.40" width="30" height="1.54" fill="#B22234"/><rect y="18.48" width="30" height="1.54" fill="#B22234"/><rect width="13" height="10.8" fill="#3C3B6E"/><circle cx="2.0" cy="2.0" r="0.6" fill="#fff"/><circle cx="4.6" cy="2.0" r="0.6" fill="#fff"/><circle cx="7.2" cy="2.0" r="0.6" fill="#fff"/><circle cx="9.8" cy="2.0" r="0.6" fill="#fff"/><circle cx="2.0" cy="4.6" r="0.6" fill="#fff"/><circle cx="4.6" cy="4.6" r="0.6" fill="#fff"/><circle cx="7.2" cy="4.6" r="0.6" fill="#fff"/><circle cx="9.8" cy="4.6" r="0.6" fill="#fff"/><circle cx="2.0" cy="7.2" r="0.6" fill="#fff"/><circle cx="4.6" cy="7.2" r="0.6" fill="#fff"/><circle cx="7.2" cy="7.2" r="0.6" fill="#fff"/><circle cx="9.8" cy="7.2" r="0.6" fill="#fff"/><circle cx="2.0" cy="9.8" r="0.6" fill="#fff"/><circle cx="4.6" cy="9.8" r="0.6" fill="#fff"/><circle cx="7.2" cy="9.8" r="0.6" fill="#fff"/><circle cx="9.8" cy="9.8" r="0.6" fill="#fff"/>',
+  tr: '<rect width="30" height="20" fill="#E30A17"/><circle cx="11" cy="10" r="5" fill="#fff"/><circle cx="12.5" cy="10" r="4" fill="#E30A17"/><polygon points="17.20,7.60 17.74,9.26 19.48,9.26 18.07,10.28 18.61,11.94 17.20,10.92 15.79,11.94 16.33,10.28 14.92,9.26 16.66,9.26" fill="#fff"/>',
+  cn: '<rect width="30" height="20" fill="#DE2910"/><polygon points="6.00,2.40 6.81,4.89 9.42,4.89 7.31,6.42 8.12,8.91 6.00,7.38 3.88,8.91 4.69,6.42 2.58,4.89 5.19,4.89" fill="#FFDE00"/><polygon points="11.50,1.30 11.75,2.06 12.55,2.06 11.90,2.53 12.15,3.29 11.50,2.82 10.85,3.29 11.10,2.53 10.45,2.06 11.25,2.06" fill="#FFDE00"/><polygon points="13.40,3.50 13.65,4.26 14.45,4.26 13.80,4.73 14.05,5.49 13.40,5.02 12.75,5.49 13.00,4.73 12.35,4.26 13.15,4.26" fill="#FFDE00"/><polygon points="13.40,6.50 13.65,7.26 14.45,7.26 13.80,7.73 14.05,8.49 13.40,8.02 12.75,8.49 13.00,7.73 12.35,7.26 13.15,7.26" fill="#FFDE00"/><polygon points="11.50,8.70 11.75,9.46 12.55,9.46 11.90,9.93 12.15,10.69 11.50,10.22 10.85,10.69 11.10,9.93 10.45,9.46 11.25,9.46" fill="#FFDE00"/>',
+  pk: '<rect width="30" height="20" fill="#01411C"/><rect width="7.5" height="20" fill="#fff"/><circle cx="18.5" cy="10" r="5" fill="#fff"/><circle cx="20" cy="9" r="4.2" fill="#01411C"/><polygon points="22.30,5.60 22.75,6.98 24.20,6.98 23.03,7.84 23.48,9.22 22.30,8.36 21.12,9.22 21.57,7.84 20.40,6.98 21.85,6.98" fill="#fff"/>',
+  in: '<rect width="30" height="6.7" fill="#FF9933"/><rect y="6.7" width="30" height="6.6" fill="#fff"/><rect y="13.3" width="30" height="6.7" fill="#138808"/><circle cx="15" cy="10" r="2.3" fill="none" stroke="#000080" stroke-width="0.6"/><circle cx="15" cy="10" r="0.5" fill="#000080"/>',
+  bd: '<rect width="30" height="20" fill="#006A4E"/><circle cx="13.5" cy="10" r="5.2" fill="#F42A41"/>',
+  sa: '<rect width="30" height="20" fill="#006C35"/><rect x="8" y="6" width="14" height="1.6" rx="0.8" fill="#fff"/><rect x="10" y="9" width="10" height="1.4" rx="0.7" fill="#fff"/><rect x="7" y="14" width="16" height="1.2" rx="0.6" fill="#fff"/><rect x="21" y="13.4" width="2.6" height="2.4" fill="#fff"/>'
+});
   const flagSvg = id => '<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + FLAGS[id] + '</svg>';
 const showName = (n, k) => n || "+" + k;
 const myKey = () => state.profile.phone;
@@ -860,7 +885,7 @@ function openContact(contactId) {
   renderMessages();
 }
 
-function makeContactButton(contact, showLastMessage) {
+function makeContactButton(contact, showLastMessage, preview) {
   const button = document.createElement("button");
   button.className = "contact";
   button.appendChild(makeAvatar(contact.photo, contact.name));
@@ -874,6 +899,7 @@ function makeContactButton(contact, showLastMessage) {
   last.textContent = showLastMessage
     ? (messages.length ? messages[messages.length - 1].text : "Начните общение")
     : "Открыть переписку";
+  if (preview) last.textContent = preview;
   info.append(name, last);
   button.appendChild(info);
   if (showLastMessage) {
@@ -915,11 +941,13 @@ function renderList(listId, emptyText, showLast) {
   state.contacts.forEach(c => list.appendChild(makeContactButton(c, showLast)));
 }
 
-function makeGroupButton(g) {
+function gEmoji(g) { return g.type === "channel" ? "📢" : "👥"; }
+
+function makeGroupButton(g, preview) {
   const b = document.createElement("button");
   b.className = "contact";
   const av = makeAvatar(g.photo, "");
-  if (!g.photo) av.textContent = "👥";
+  if (!g.photo) av.textContent = gEmoji(g);
   b.appendChild(av);
   const info = document.createElement("div");
   info.className = "contact-info";
@@ -927,25 +955,46 @@ function makeGroupButton(g) {
   n.textContent = g.name;
   const sm = document.createElement("small");
   const msgs = state.messages[g.id] || [];
-  sm.textContent = msgs.length ? msgs[msgs.length - 1].text : "Группа · участников: " + (g.members ? g.members.length : 0);
+  sm.textContent = preview || (msgs.length ? msgs[msgs.length - 1].text : (g.type === "channel" ? "Канал · подписчиков: " : "Группа · участников: ") + (g.members ? g.members.length : 0));
   info.append(n, sm);
   b.appendChild(info);
   b.addEventListener("click", () => openGroup(g.id));
   return b;
 }
 
+let chatFilter = "";
 function renderChats() {
   const list = $("contactList");
   list.replaceChildren();
-  if (!state.groups.length && !state.contacts.length) {
+  const q = $("chatSearch").value.trim().toLowerCase();
+  const hit = id => q ? (state.messages[id] || []).slice().reverse().find(m => String(m.text).toLowerCase().indexOf(q) !== -1) : null;
+  const has = (name, id) => !q || String(name).toLowerCase().indexOf(q) !== -1 || !!hit(id);
+  const prev = id => { const h = hit(id); return h ? "🔎 " + h.text : undefined; };
+  let n = 0;
+  state.groups.forEach(g => {
+    const isCh = g.type === "channel";
+    if (chatFilter === "group" && isCh) return;
+    if (chatFilter === "channel" && !isCh) return;
+    if (!has(g.name, g.id)) return;
+    list.appendChild(makeGroupButton(g, prev(g.id)));
+    n++;
+  });
+  if (!chatFilter) {
+    state.contacts.forEach(c => {
+      if (!has(c.name, c.id)) return;
+      list.appendChild(makeContactButton(c, true, prev(c.id)));
+      n++;
+    });
+  }
+  if (!n) {
     const empty = document.createElement("div");
     empty.className = "empty";
-    empty.textContent = "Пока нет контактов. Нажмите ➕, чтобы добавить первый контакт.";
+    if (q) empty.textContent = "Ничего не найдено.";
+    else if (chatFilter === "group") empty.textContent = "Групп пока нет. Создай группу на вкладке «Контакты».";
+    else if (chatFilter === "channel") empty.textContent = "Каналов пока нет. Создай канал на вкладке «Контакты».";
+    else empty.textContent = "Пока нет контактов. Нажмите ➕, чтобы добавить первый контакт.";
     list.appendChild(empty);
-    return;
   }
-  state.groups.forEach(g => list.appendChild(makeGroupButton(g)));
-  state.contacts.forEach(c => list.appendChild(makeContactButton(c, true)));
 }
 
 function renderContacts() {
@@ -1960,66 +2009,36 @@ function makeRecorder(stream, kind) {
 }
 
 // ===== LimeChat: Перевод сообщений =====
+const TR_LANGS = [
+  { code: "ru", name: "Русский", flag: "ru" },
+  { code: "ky", name: "Кыргызский", flag: "kg" },
+  { code: "en", name: "Английский", flag: "us" },
+  { code: "tr", name: "Турецкий", flag: "tr" },
+  { code: "uz", name: "Узбекский", flag: "uz" },
+  { code: "zh-CN", name: "Китайский", flag: "cn" },
+  { code: "ur", name: "Урду", flag: "pk" },
+  { code: "hi", name: "Хинди", flag: "in" },
+  { code: "bn", name: "Бенгальский", flag: "bd" },
+  { code: "ar", name: "Арабский", flag: "sa" }
+];
 
-async function translateMessage(text, resultBox, button) {
-  const languages = {
-  "1": ["ru", "Русский"],
-  "2": ["ky", "Кыргызский"],
-  "3": ["en", "Английский"],
-  "4": ["tr", "Турецкий"],
-  "5": ["uz", "Узбекский"],
-  "6": ["zh-CN", "Китайский"],
-  "7": ["ur", "Урду (Пакистан)"],
-  "8": ["hi", "Хинди (Индия)"],
-  "9": ["bn", "Бенгальский (Бангладеш)"],
-  "10": ["ar", "Арабский"]
-};
-
-const choice = prompt(
-  "Выбери язык перевода:\n" +
-  "1 — Русский 🇷🇺\n" +
-  "2 — Кыргызский 🇰🇬\n" +
-  "3 — Английский 🇺🇸\n" +
-  "4 — Турецкий 🇹🇷\n" +
-  "5 — Узбекский 🇺🇿\n" +
-  "6 — Китайский 🇨🇳\n" +
-  "7 — Урду (Пакистан) 🇵🇰\n" +
-  "8 — Хинди (Индия) 🇮🇳\n" +
-  "9 — Бенгальский (Бангладеш) 🇧🇩\n" +
-  "10 — Арабский 🇸🇦"
-);
-  if (!languages[choice]) return;
-
-  const [lang, name] = languages[choice];
-
+async function translateMessage(text, l, resultBox, button) {
   button.textContent = "Перевожу...";
-
   try {
-    const url =
-      "https://translate.googleapis.com/translate_a/single" +
-      "?client=gtx&sl=auto&tl=" + lang +
-      "&dt=t&q=" + encodeURIComponent(text);
-
+    const url = "https://translate.googleapis.com/translate_a/single?client=gtx&sl=auto&tl=" + l.code + "&dt=t&q=" + encodeURIComponent(text);
     const response = await fetch(url);
-
     if (!response.ok) throw new Error("Ошибка сервера");
-
     const data = await response.json();
-
-    const translated = data[0]
-      .map(part => part[0] || "")
-      .join("");
-
-    resultBox.textContent = "🌐 " + name + ": " + translated;
+    const translated = data[0].map(part => part[0] || "").join("");
+    resultBox.textContent = "🌐 " + l.name + ": " + translated;
     resultBox.classList.add("show");
-
     button.textContent = "🌐 Перевести ещё";
-
   } catch (error) {
     alert("Не удалось перевести. Попробуй ещё раз.");
     button.textContent = "🌐 Перевести";
   }
 }
+
   function buildBody(message, item, cid) {
   const t = item.type;
   if (t === "voice" && item.mid) {
@@ -2091,21 +2110,29 @@ const choice = prompt(
   } else {
     message.textContent = item.text;
 
-    const translateBtn = document.createElement("button");
-    translateBtn.className = "translate-button";
-    translateBtn.type = "button";
-    translateBtn.textContent = "🌐 Перевести";
-
+    const trBtn = document.createElement("button");
+    trBtn.className = "translate-button";
+    trBtn.type = "button";
+    trBtn.textContent = "🌐 Перевести";
+    const flagsRow = document.createElement("div");
+    flagsRow.className = "tr-flags";
     const resultBox = document.createElement("div");
     resultBox.className = "translation-result";
-
-    translateBtn.addEventListener("click", (e) => {
-      e.stopPropagation();
-      translateMessage(item.text, resultBox, translateBtn);
+    TR_LANGS.forEach(l => {
+      const fb = document.createElement("button");
+      fb.type = "button";
+      fb.className = "tr-flag";
+      fb.title = l.name;
+      fb.setAttribute("aria-label", l.name);
+      fb.innerHTML = flagSvg(l.flag);
+      fb.addEventListener("click", () => { flagsRow.classList.remove("show"); translateMessage(item.text, l, resultBox, trBtn); });
+      flagsRow.appendChild(fb);
     });
-
-    message.appendChild(translateBtn);
-    message.appendChild(resultBox);
+    trBtn.addEventListener("click", () => flagsRow.classList.toggle("show"));
+    const trWrap = document.createElement("div");
+    trWrap.addEventListener("click", e => e.stopPropagation());
+    trWrap.append(trBtn, flagsRow, resultBox);
+    message.appendChild(trWrap);
 
     message.addEventListener("click", () => askDelete(item));
   }
@@ -2113,7 +2140,7 @@ const choice = prompt(
 
 // --- голосовое
 let vrec = null;
-function stopVoice(send) {
+ function stopVoice(send) {
   const r = vrec;
   if (!r) return;
   r.send = send;
@@ -2534,6 +2561,7 @@ function listenGroup(gid) {
     g.photo = typeof v.photo === "string" && /^data:image\//.test(v.photo) ? v.photo : "";
     g.admin = v.admin;
     g.members = Object.keys(v.members);
+    g.type = v.type === "channel" ? "channel" : "group";
     if (pendingOpen === gid) { pendingOpen = null; openGroup(gid); return; }
     if (currentView === "chatsView") renderChats();
     if (currentView === "groupView" && gcur === gid) { renderGroupHead(); renderGroupTab(); }
@@ -2566,7 +2594,7 @@ function renderGroupHead() {
   if (!g) return;
   $("gName").textContent = g.name;
   const av = makeAvatar(g.photo, "");
-  if (!g.photo) av.textContent = "👥";
+  if (!g.photo) av.textContent = gEmoji(g);
   av.id = "gAvatar";
   av.classList.add("profile-photo");
   av.style.margin = "0";
@@ -2698,6 +2726,8 @@ function renderGroupMsgs() {
 function sendGroupMsg() {
   const inp = $("gInput");
   if (!inp || !gcur) return;
+  const gg = gById(gcur);
+  if (gg && gg.type === "channel" && gg.admin !== myKey()) return;
   const text = inp.value.trim();
   if (!text) return;
   if (!db) { alert("Нет подключения."); return; }
@@ -2744,9 +2774,13 @@ function fillGroupChatHead() {
   const g = gById(gcur);
   if (!g) return;
   $("gcName").textContent = g.name;
-  $("gcSub").textContent = "участников: " + g.members.length;
+  const ch = g.type === "channel";
+  $("gcSub").textContent = (ch ? "подписчиков: " : "участников: ") + g.members.length;
+  const ro = ch && g.admin !== myKey();
+  $("gForm").style.display = ro ? "none" : "";
+  $("gNote").style.display = ro ? "block" : "none";
   const av = makeAvatar(g.photo, "");
-  if (!g.photo) av.textContent = "👥";
+  if (!g.photo) av.textContent = gEmoji(g);
   av.id = "gcAvatar";
   $("gcAvatar").replaceWith(av);
 }
@@ -2773,8 +2807,14 @@ $("gPhotoInput").addEventListener("change", function () {
   compress(f, 256, url => set(ref(db, "groups/" + gid + "/photo"), url).catch(() => alert("Не удалось сохранить фото.")));
 });
 
-$("groupCreateBtn").addEventListener("click", () => {
+let gMode = "group";
+function openGroupCreate(mode) {
   if (!state.contacts.length) { alert("Сначала добавь контакты."); return; }
+  gMode = mode;
+  const ch = mode === "channel";
+  $("gCreateTitle").textContent = ch ? "Новый канал" : "Новая группа";
+  $("gNewName").placeholder = ch ? "Название канала" : "Название группы";
+  $("gCreateHint").textContent = ch ? "Выбери подписчиков:" : "Выбери участников:";
   $("gNewName").value = "";
   const list = $("gNewList");
   list.replaceChildren();
@@ -2789,18 +2829,20 @@ $("groupCreateBtn").addEventListener("click", () => {
     list.appendChild(lab);
   });
   $("gCreateModal").classList.add("show");
-});
+}
+$("groupCreateBtn").addEventListener("click", () => openGroupCreate("group"));
+$("channelCreateBtn").addEventListener("click", () => openGroupCreate("channel"));
 $("gCreateCancel").addEventListener("click", () => $("gCreateModal").classList.remove("show"));
 $("gCreateOk").addEventListener("click", async () => {
   const name = $("gNewName").value.trim();
   const ids = Array.from($("gNewList").querySelectorAll("input:checked")).map(x => x.value);
-  if (!name) { alert("Введи название группы."); return; }
-  if (!ids.length) { alert("Выбери хотя бы одного участника."); return; }
+  if (!name) { alert(gMode === "channel" ? "Введи название канала." : "Введи название группы."); return; }
+  if (!ids.length) { alert(gMode === "channel" ? "Выбери хотя бы одного подписчика." : "Выбери хотя бы одного участника."); return; }
   if (!db) { alert("Нет подключения."); return; }
   const me = myKey(), all = [me].concat(ids), members = {};
   all.forEach(p => { members[p] = true; });
   try {
-    const gr = push(ref(db, "groups"), { name: name, admin: me, photo: "", members: members, ts: serverTimestamp() });
+    const gr = push(ref(db, "groups"), { name: name, admin: me, type: gMode, photo: "", members: members, ts: serverTimestamp() });
     await gr;
     const gid = gr.key;
     pendingOpen = gid;
@@ -2878,6 +2920,16 @@ $("addFlag").addEventListener("click", () => openCountryPicker(c => { addC = c; 
 paintCountry($("loginFlag"), $("loginCode"), $("loginPhone"), loginC);
 paintCountry($("addFlag"), $("addCode"), $("newContactName"), addC);
 $("loginLogo").src = $("logo").src;
+
+$("chatSearch").addEventListener("input", renderChats);
+function setChip(f) {
+  chatFilter = chatFilter === f ? "" : f;
+  $("chipGroup").classList.toggle("on", chatFilter === "group");
+  $("chipChannel").classList.toggle("on", chatFilter === "channel");
+  renderChats();
+}
+$("chipGroup").addEventListener("click", () => setChip("group"));
+$("chipChannel").addEventListener("click", () => setChip("channel"));
 
 // ---------- Запуск ----------
 loadState();
@@ -2965,4 +3017,4 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
   }
 </script>
 </body>
-</html>
+</html> 
