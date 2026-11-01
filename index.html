@@ -144,7 +144,7 @@ button{cursor:pointer;border:none}
 #gChatView .header .avatar{width:44px;height:44px;font-size:22px}
 #gChatView .header-info strong{display:block;font-size:18px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 #gChatView .header-info small{display:block;margin:2px 0 0;font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-#gForm input{padding-right:58px!important}
+#gForm input{padding-right:100px!important}
 #cpStories{padding:0 2px}
 #cpStories .scard{flex:0 0 130px;height:200px;border-radius:20px}
 #cpStories .pill{font-size:11px;padding:4px 8px;white-space:nowrap}
@@ -192,11 +192,32 @@ button{cursor:pointer;border:none}
 .tr-flag{padding:0;background:transparent;border:none;line-height:0;border-radius:4px}
 .tr-flag svg{width:36px;height:24px;border-radius:4px;box-shadow:0 0 0 1px #8884;display:block}
 .tr-flag:active svg{outline:2px solid #5bd21a}
-.chatbar{display:flex;align-items:center;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #eee}
-.chatbar input{flex:1;min-width:0;padding:11px 14px;border:1px solid #ddd;border-radius:22px;background:#f4f6f3;font-size:15px;outline:none}
+.chatbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #eee}
+.chatbar input{flex:1 1 100%;min-width:0;padding:11px 14px;border:1px solid #ddd;border-radius:22px;background:#f4f6f3;font-size:15px;outline:none}
 .chatbar input:focus{border-color:#5BB60F}
-.chip{padding:9px 13px;border-radius:20px;background:#eef2ea;color:#444;font-size:14px;flex-shrink:0;transition:background .15s,color .15s}
+.chip{flex:1;padding:9px 10px;text-align:center;border-radius:20px;background:#eef2ea;color:#444;font-size:14px;transition:background .15s,color .15s}
 .chip.on{background:#e6f7d6;color:#2a9d0a;font-weight:bold;box-shadow:0 0 10px #5bd21a55}
+.kb-btn{position:absolute;right:62px;bottom:calc(max(10px,env(safe-area-inset-bottom)) + 6px);width:36px;height:36px;background:transparent;font-size:22px;border-radius:50%;padding:0}
+#vkb{display:none;background:#eef0ec;border-top:1px solid #d5d9d0;padding:6px 6px calc(6px + env(safe-area-inset-bottom))}
+.vk-top{display:flex;gap:6px;align-items:stretch;margin-bottom:6px}
+.vk-lang{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;padding:5px 2px;border-radius:12px;background:#fff;color:#444;font-size:11px}
+.vk-lang svg{width:32px;height:21px;border-radius:4px;box-shadow:0 0 0 1px #8884;display:block}
+.vk-lang.on{background:#e6f7d6;color:#2a9d0a;font-weight:bold;box-shadow:0 0 10px #5bd21a55}
+.vk-close{width:46px;border-radius:12px;background:#fff;color:#a33;font-size:20px;flex-shrink:0}
+.vk-cand{display:none;align-items:center;gap:6px;overflow-x:auto;white-space:nowrap;padding:4px 2px 6px;min-height:42px}
+.vk-cand .buf{color:#2a7d0a;font-weight:bold;margin-right:4px}
+.vk-cand button{padding:6px 12px;border-radius:10px;background:#fff;font-size:20px;flex-shrink:0}
+.vk-keys{display:grid;grid-template-columns:repeat(auto-fill,minmax(40px,1fr));gap:5px;max-height:34vh;overflow-y:auto;padding:2px 0}
+.vk-keys.rows{display:block}
+.vk-keys .vk-row{display:flex;gap:5px;justify-content:center;margin-bottom:5px}
+.vk-keys .vk-row .vkey{flex:1;max-width:44px}
+.vkey{height:42px;border-radius:9px;background:#fff;border:1px solid #d9ddd5;font-size:20px;color:#222;padding:0}
+.vkey:active{background:#d2f2b4}
+.vk-bottom{display:flex;gap:6px;margin-top:6px}
+.vk-bottom .vk-space{flex:1;font-size:15px;color:#666}
+.vk-bottom .vkey{width:60px}
+.vk-bottom .vk-space{width:auto}
+.vk-bottom .vk-send{background:#4CC81A;color:#05220a;font-weight:bold;border-color:#4CC81A}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -248,8 +269,10 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   </div>
 
   <section class="view active" id="chatsView">
+    <div class="section-title">Сообщения</div>
     <div class="chatbar">
       <input id="chatSearch" type="search" placeholder="Поиск сообщений" autocomplete="off">
+      <button type="button" class="chip" id="chipContact">Контакты</button>
       <button type="button" class="chip" id="chipGroup">Группа</button>
       <button type="button" class="chip" id="chipChannel">Канал</button>
     </div>
@@ -283,6 +306,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <button type="button" id="attCam">📷<small>Камера</small></button>
       <button type="button" id="attPhoto">🖼️<small>Фото</small></button>
       <button type="button" id="attContact">👥<small>Контакт</small></button>
+      <button type="button" id="attKb">⌨️<small>Клавиатура</small></button>
     </div>
     <div id="recBar">
       <button type="button" id="recCancel" style="background:#888" aria-label="Отмена">✖</button>
@@ -349,6 +373,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div class="messages" id="gMsgs"></div>
     <form class="composer" id="gForm">
       <input id="gInput" type="text" placeholder="Написать сообщение" autocomplete="off" maxlength="2000">
+      <button class="kb-btn" type="button" id="gKb" aria-label="Клавиатура языков">⌨️</button>
       <button class="send-button" type="submit" aria-label="Отправить">↑</button>
     </form>
     <div id="gNote" style="display:none;padding:14px;text-align:center;color:#777;background:#fff;border-top:1px solid #eee">📢 Это канал: писать может только админ</div>
@@ -411,6 +436,17 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <p class="empty">Онлайн-игры скоро появятся. Напиши, во что хочешь играть! 🎮</p>
     </div>
   </section>
+
+  <div id="vkb">
+    <div class="vk-top" id="vkTop"></div>
+    <div class="vk-cand" id="vkCand"></div>
+    <div class="vk-keys" id="vkKeys"></div>
+    <div class="vk-bottom">
+      <button type="button" class="vkey" id="vkBack" aria-label="Стереть">⌫</button>
+      <button type="button" class="vkey vk-space" id="vkSpace">пробел</button>
+      <button type="button" class="vkey vk-send" id="vkEnter" aria-label="Отправить">↑</button>
+    </div>
+  </div>
 
   <nav class="bottom-nav">
     <button class="nav-button active" data-view="chatsView" aria-label="Чат"><svg class="ni" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M24 5C13.5 5 5 12.6 5 22c0 3.9 1.5 7.5 4 10.3L6.8 41l8.9-2.2c2.5 1 5.3 1.5 8.3 1.5 10.5 0 19-7.6 19-17S34.5 5 24 5z"/><g fill="currentColor" stroke="none"><circle cx="15.5" cy="22.5" r="2.6"/><circle cx="24" cy="22.5" r="2.6"/><circle cx="32.5" cy="22.5" r="2.6"/></g></svg><small>Сообщения</small></button>
@@ -605,7 +641,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
-(function () {
+ (function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -655,7 +691,7 @@ function markRead(id) {
   if (!db || !myKey() || !id) return;
   set(ref(db, "reads/" + chatIdWith(id) + "/" + myKey()), serverTimestamp()).catch(() => {});
 }
-  function isBlocked(id) { return state.blocked.indexOf(id) !== -1; }
+function isBlocked(id) { return state.blocked.indexOf(id) !== -1; }
 
 // ---------- Firebase ----------
 let db = null;
@@ -850,6 +886,7 @@ function updateHeader() {
 function showView(viewId) {
   if (viewId === "chatView" && !state.activeContact) viewId = "chatsView";
   closeAttach();
+  if (viewId !== "chatView" && viewId !== "gChatView") closeVkb();
   if (viewId !== "chatView") { stopVoice(false); closeVid(); }
   currentView = viewId;
   document.querySelector(".app > .header").style.display = (viewId === "cpView" || viewId === "profileView" || viewId === "chatView" || viewId === "groupView" || viewId === "gChatView") ? "none" : "";
@@ -973,13 +1010,14 @@ function renderChats() {
   let n = 0;
   state.groups.forEach(g => {
     const isCh = g.type === "channel";
+    if (chatFilter === "contact") return;
     if (chatFilter === "group" && isCh) return;
     if (chatFilter === "channel" && !isCh) return;
     if (!has(g.name, g.id)) return;
     list.appendChild(makeGroupButton(g, prev(g.id)));
     n++;
   });
-  if (!chatFilter) {
+  if (!chatFilter || chatFilter === "contact") {
     state.contacts.forEach(c => {
       if (!has(c.name, c.id)) return;
       list.appendChild(makeContactButton(c, true, prev(c.id)));
@@ -990,6 +1028,7 @@ function renderChats() {
     const empty = document.createElement("div");
     empty.className = "empty";
     if (q) empty.textContent = "Ничего не найдено.";
+    else if (chatFilter === "contact") empty.textContent = "Личных чатов пока нет. Добавь контакт на вкладке «Контакты».";
     else if (chatFilter === "group") empty.textContent = "Групп пока нет. Создай группу на вкладке «Контакты».";
     else if (chatFilter === "channel") empty.textContent = "Каналов пока нет. Создай канал на вкладке «Контакты».";
     else empty.textContent = "Пока нет контактов. Нажмите ➕, чтобы добавить первый контакт.";
@@ -1460,8 +1499,8 @@ $("cpBlock").addEventListener("click", () => {
   }
   saveState();
   $("cpName").textContent = c.name + (isBlocked(cpId) ? " 🚫" : "");
-});
-$("cpBack").addEventListener("click", () => {
+}); 
+ $("cpBack").addEventListener("click", () => {
   if (cpFrom === "statusView") showView("statusView");
   else if (cpFrom === "groupView" && gcur) { showView("groupView"); renderGroupHead(); renderGroupTab(); }
   else showView("chatView");
@@ -2039,6 +2078,32 @@ async function translateMessage(text, l, resultBox, button) {
   }
 }
 
+function makeTranslateUI(text) {
+  const trBtn = document.createElement("button");
+  trBtn.className = "translate-button";
+  trBtn.type = "button";
+  trBtn.textContent = "🌐 Перевести";
+  const flagsRow = document.createElement("div");
+  flagsRow.className = "tr-flags";
+  const resultBox = document.createElement("div");
+  resultBox.className = "translation-result";
+  TR_LANGS.forEach(l => {
+    const fb = document.createElement("button");
+    fb.type = "button";
+    fb.className = "tr-flag";
+    fb.title = l.name;
+    fb.setAttribute("aria-label", l.name);
+    fb.innerHTML = flagSvg(l.flag);
+    fb.addEventListener("click", () => { flagsRow.classList.remove("show"); translateMessage(text, l, resultBox, trBtn); });
+    flagsRow.appendChild(fb);
+  });
+  trBtn.addEventListener("click", () => flagsRow.classList.toggle("show"));
+  const trWrap = document.createElement("div");
+  trWrap.addEventListener("click", e => e.stopPropagation());
+  trWrap.append(trBtn, flagsRow, resultBox);
+  return trWrap;
+}
+
   function buildBody(message, item, cid) {
   const t = item.type;
   if (t === "voice" && item.mid) {
@@ -2110,29 +2175,7 @@ async function translateMessage(text, l, resultBox, button) {
   } else {
     message.textContent = item.text;
 
-    const trBtn = document.createElement("button");
-    trBtn.className = "translate-button";
-    trBtn.type = "button";
-    trBtn.textContent = "🌐 Перевести";
-    const flagsRow = document.createElement("div");
-    flagsRow.className = "tr-flags";
-    const resultBox = document.createElement("div");
-    resultBox.className = "translation-result";
-    TR_LANGS.forEach(l => {
-      const fb = document.createElement("button");
-      fb.type = "button";
-      fb.className = "tr-flag";
-      fb.title = l.name;
-      fb.setAttribute("aria-label", l.name);
-      fb.innerHTML = flagSvg(l.flag);
-      fb.addEventListener("click", () => { flagsRow.classList.remove("show"); translateMessage(item.text, l, resultBox, trBtn); });
-      flagsRow.appendChild(fb);
-    });
-    trBtn.addEventListener("click", () => flagsRow.classList.toggle("show"));
-    const trWrap = document.createElement("div");
-    trWrap.addEventListener("click", e => e.stopPropagation());
-    trWrap.append(trBtn, flagsRow, resultBox);
-    message.appendChild(trWrap);
+    message.appendChild(makeTranslateUI(item.text));
 
     message.addEventListener("click", () => askDelete(item));
   }
@@ -2140,7 +2183,7 @@ async function translateMessage(text, l, resultBox, button) {
 
 // --- голосовое
 let vrec = null;
- function stopVoice(send) {
+function stopVoice(send) {
   const r = vrec;
   if (!r) return;
   r.send = send;
@@ -2293,7 +2336,7 @@ $("attContact").addEventListener("click", () => {
   });
   $("pickModal").classList.add("show");
 });
-$("closePick").addEventListener("click", () => $("pickModal").classList.remove("show"));
+  $("closePick").addEventListener("click", () => $("pickModal").classList.remove("show"));
 $("imgModal").addEventListener("click", function () { this.classList.remove("show"); $("imgFull").src = ""; });
 
 // ---------- Истории ----------
@@ -2706,6 +2749,7 @@ function renderGroupMsgs() {
     const bubble = document.createElement("div");
     bubble.className = "message" + (m.mine ? " mine" : "");
     bubble.textContent = m.text;
+    bubble.appendChild(makeTranslateUI(m.text));
     bubble.addEventListener("click", () => {
       if (!confirm("Удалить это сообщение?")) return;
       state.hidden[m.key] = 1;
@@ -2924,12 +2968,215 @@ $("loginLogo").src = $("logo").src;
 $("chatSearch").addEventListener("input", renderChats);
 function setChip(f) {
   chatFilter = chatFilter === f ? "" : f;
+  $("chipContact").classList.toggle("on", chatFilter === "contact");
   $("chipGroup").classList.toggle("on", chatFilter === "group");
   $("chipChannel").classList.toggle("on", chatFilter === "channel");
   renderChats();
 }
+$("chipContact").addEventListener("click", () => setChip("contact"));
 $("chipGroup").addEventListener("click", () => setChip("group"));
 $("chipChannel").addEventListener("click", () => setChip("channel"));
+
+// ---------- Экранная клавиатура: китайский, урду, бенгальский, хинди ----------
+const VK_LANGS = [
+  { id: "zh", flag: "cn", label: "中文" },
+  { id: "ur", flag: "pk", label: "اردو" },
+  { id: "bn", flag: "bd", label: "বাংলা" },
+  { id: "hi", flag: "in", label: "हिन्दी" }
+];
+const VK_KEYS = {
+  hi: "अ आ इ ई उ ऊ ऋ ए ऐ ओ औ अं अः ा ि ी ु ू ृ े ै ो ौ ं ः ँ ् ़ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह ळ क्ष त्र ज्ञ श्र ड़ ढ़ ० १ २ ३ ४ ५ ६ ७ ८ ९ । , . ? !".split(" "),
+  bn: "অ আ ই ঈ উ ঊ ঋ এ ঐ ও ঔ া ি ী ু ূ ৃ ে ৈ ো ৌ ং ঃ ঁ ্ ক খ গ ঘ ঙ চ ছ জ ঝ ঞ ট ঠ ড ঢ ণ ত থ দ ধ ন প ফ ব ভ ম য র ল শ ষ স হ ড় ঢ় য় ৎ ০ ১ ২ ৩ ৪ ৫ ৬ ৭ ৮ ৯ । , . ? !".split(" "),
+  ur: "ا ب پ ت ٹ ث ج چ ح خ د ڈ ذ ر ڑ ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن ں و ہ ھ ء ی ے ئ آ ؤ أ َ ُ ِ ْ ّ ۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ ۸ ۹ ۔ ، ؟ ! .".split(" ")
+};
+const ZH_ROWS = [
+  "1234567890".split(""),
+  "qwertyuiop".split(""),
+  "asdfghjkl".split(""),
+  "zxcvbnm".split(""),
+  "，。？！、：；（）".split("")
+];
+const ZH_LOCAL = {
+  nihao: ["你好"], ni: ["你", "尼", "泥"], wo: ["我", "窝"], ta: ["他", "她", "它"], hao: ["好", "号", "毫"],
+  ai: ["爱", "哎", "挨"], woaini: ["我爱你"], xiexie: ["谢谢"], xie: ["谢", "写", "些"], zaijian: ["再见"], zai: ["在", "再", "载"],
+  jian: ["见", "间", "件"], bukeqi: ["不客气"], duibuqi: ["对不起"], meiguanxi: ["没关系"], wanan: ["晚安"], zaoshanghao: ["早上好"],
+  haode: ["好的"], hen: ["很", "狠"], shi: ["是", "时", "事", "十"], bu: ["不", "部", "布"], de: ["的", "得", "地"], ma: ["吗", "妈", "马"],
+  ne: ["呢"], a: ["啊", "阿"], men: ["们", "门"], women: ["我们"], nimen: ["你们"], tamen: ["他们", "她们"], jintian: ["今天"],
+  mingtian: ["明天"], zuotian: ["昨天"], pengyou: ["朋友"], jiaren: ["家人"], haoma: ["好吗"], qing: ["请", "清", "情"],
+  wenhao: ["问好"], you: ["有", "又", "友"], mei: ["没", "每", "美"], yao: ["要", "药"], qu: ["去", "取"], lai: ["来"], chi: ["吃", "迟"],
+  he: ["和", "喝", "河"], hui: ["回", "会"], jia: ["家", "加", "假"], xiang: ["想", "向", "像"], ke: ["可", "课", "客"], yi: ["一", "以", "已"],
+  er: ["二", "而"], san: ["三", "散"], si: ["四", "死"], wu: ["五", "无", "午"], liu: ["六", "流"], qi: ["七", "起", "气"], ba: ["八", "吧", "把"],
+  jiu: ["九", "就", "久"], zhongguo: ["中国"], zhong: ["中", "种", "重"], guo: ["国", "过", "果"], ren: ["人", "认"], da: ["大", "打", "答"],
+  xiao: ["小", "笑", "校"], tian: ["天", "田", "甜"], shenme: ["什么"], weishenme: ["为什么"], zenme: ["怎么"], duoshao: ["多少"], xihuan: ["喜欢"]
+};
+const vk = { lang: "zh", target: null, host: null, buf: "", req: 0 };
+
+function vkInsert(txt) {
+  const el = vk.target;
+  if (!el) return;
+  const st = typeof el.selectionStart === "number" ? el.selectionStart : el.value.length;
+  const en = typeof el.selectionEnd === "number" ? el.selectionEnd : st;
+  el.value = el.value.slice(0, st) + txt + el.value.slice(en);
+  const p = st + txt.length;
+  try { el.setSelectionRange(p, p); } catch (e) {}
+  el.focus();
+  el.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function vkBackspace() {
+  const el = vk.target;
+  if (!el) return;
+  if (vk.buf) { vk.buf = vk.buf.slice(0, -1); vkCandidates(); return; }
+  let st = typeof el.selectionStart === "number" ? el.selectionStart : el.value.length;
+  const en = typeof el.selectionEnd === "number" ? el.selectionEnd : st;
+  if (st === en) {
+    if (st === 0) return;
+    const hi = el.value.charCodeAt(st - 2), lo = el.value.charCodeAt(st - 1);
+    st -= (st >= 2 && hi >= 0xD800 && hi <= 0xDBFF && lo >= 0xDC00 && lo <= 0xDFFF) ? 2 : 1;
+  }
+  el.value = el.value.slice(0, st) + el.value.slice(en);
+  try { el.setSelectionRange(st, st); } catch (e) {}
+  el.focus();
+  el.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function vkZhLocal(buf) {
+  if (ZH_LOCAL[buf]) return ZH_LOCAL[buf].slice();
+  const out = [];
+  Object.keys(ZH_LOCAL).forEach(k => { if (k.indexOf(buf) === 0) ZH_LOCAL[k].forEach(c => { if (out.indexOf(c) === -1 && out.length < 12) out.push(c); }); });
+  return out;
+}
+
+async function vkCandidates() {
+  const box = $("vkCand");
+  box.replaceChildren();
+  if (vk.lang !== "zh") { box.style.display = "none"; return; }
+  box.style.display = "flex";
+  if (!vk.buf) {
+    const hint = document.createElement("span");
+    hint.style.cssText = "color:#888;font-size:13px";
+    hint.textContent = "Пиши пиньинь латиницей, например: nihao";
+    box.appendChild(hint);
+    return;
+  }
+  const buf = vk.buf, my = ++vk.req;
+  const show = list => {
+    if (my !== vk.req) return;
+    box.replaceChildren();
+    const b = document.createElement("span");
+    b.className = "buf";
+    b.textContent = buf;
+    box.appendChild(b);
+    list.slice(0, 12).forEach(c => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = c;
+      btn.addEventListener("click", () => { vkInsert(c); vk.buf = ""; vkCandidates(); });
+      box.appendChild(btn);
+    });
+  };
+  show(vkZhLocal(buf));
+  try {
+    const url = "https://inputtools.google.com/request?text=" + encodeURIComponent(buf) + "&itc=zh-t-i0-pinyin&num=10&cp=0&cs=1&ie=utf-8&oe=utf-8&app=demopage";
+    const r = await fetch(url);
+    const d = await r.json();
+    if (d && d[0] === "SUCCESS" && d[1] && d[1][0] && Array.isArray(d[1][0][1]) && d[1][0][1].length) show(d[1][0][1]);
+  } catch (e) {}
+}
+
+function vkRenderKeys() {
+  const box = $("vkKeys");
+  box.replaceChildren();
+  const mk = (ch, fn) => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "vkey";
+    b.textContent = ch;
+    b.addEventListener("mousedown", e => e.preventDefault());
+    b.addEventListener("click", fn);
+    return b;
+  };
+  if (vk.lang === "zh") {
+    box.classList.add("rows");
+    ZH_ROWS.forEach((row, ri) => {
+      const rd = document.createElement("div");
+      rd.className = "vk-row";
+      row.forEach(ch => rd.appendChild(mk(ch, () => {
+        if (/[a-z]/.test(ch)) { vk.buf += ch; vkCandidates(); }
+        else { if (vk.buf) { const l = vkZhLocal(vk.buf); vkInsert(l[0] || vk.buf); vk.buf = ""; vkCandidates(); } vkInsert(ch); }
+      })));
+      box.appendChild(rd);
+    });
+  } else {
+    box.classList.remove("rows");
+    VK_KEYS[vk.lang].forEach(ch => box.appendChild(mk(ch, () => vkInsert(ch))));
+  }
+}
+
+function setVkLang(id) {
+  vk.lang = id;
+  vk.buf = "";
+  document.querySelectorAll("#vkTop .vk-lang").forEach(b => b.classList.toggle("on", b.dataset.k === id));
+  if (vk.target) vk.target.dir = id === "ur" ? "rtl" : "auto";
+  vkRenderKeys();
+  vkCandidates();
+}
+
+function openVkb(target, host) {
+  closeVkb();
+  vk.target = target;
+  vk.host = host;
+  target.setAttribute("inputmode", "none");
+  host.appendChild($("vkb"));
+  $("vkb").style.display = "block";
+  setVkLang(vk.lang);
+  target.focus();
+}
+
+function closeVkb() {
+  if (!vk.target) return;
+  vk.target.removeAttribute("inputmode");
+  vk.target.dir = "auto";
+  vk.target = null;
+  vk.buf = "";
+  $("vkb").style.display = "none";
+}
+
+(function buildVkTop() {
+  const top = $("vkTop");
+  VK_LANGS.forEach(l => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "vk-lang";
+    b.dataset.k = l.id;
+    b.innerHTML = flagSvg(l.flag);
+    const sm = document.createElement("span");
+    sm.textContent = l.label;
+    b.appendChild(sm);
+    b.addEventListener("click", () => setVkLang(l.id));
+    top.appendChild(b);
+  });
+  const x = document.createElement("button");
+  x.type = "button";
+  x.className = "vk-close";
+  x.setAttribute("aria-label", "Закрыть клавиатуру");
+  x.textContent = "✕";
+  x.addEventListener("click", closeVkb);
+  top.appendChild(x);
+})();
+
+$("vkBack").addEventListener("click", vkBackspace);
+$("vkSpace").addEventListener("click", () => {
+  if (vk.lang === "zh" && vk.buf) { const l = vkZhLocal(vk.buf); vkInsert(l[0] || vk.buf); vk.buf = ""; vkCandidates(); return; }
+  vkInsert(" ");
+});
+$("vkEnter").addEventListener("click", () => {
+  if (vk.lang === "zh" && vk.buf) { const l = vkZhLocal(vk.buf); vkInsert(l[0] || vk.buf); vk.buf = ""; vkCandidates(); }
+  const f = vk.target && vk.target.form;
+  if (f) f.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
+});
+$("attKb").addEventListener("click", () => { closeAttach(); openVkb($("messageInput"), $("chatView")); });
+$("gKb").addEventListener("click", () => openVkb($("gInput"), $("gChatView")));
 
 // ---------- Запуск ----------
 loadState();
@@ -3017,4 +3264,4 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
   }
 </script>
 </body>
-</html> 
+</html>
