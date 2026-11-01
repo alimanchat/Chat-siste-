@@ -3,6 +3,14 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="LimeChat">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#ffffff">
+<meta name="format-detection" content="telephone=no">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<link rel="icon" href="apple-touch-icon.png">
 <title>LimeChat</title>
 <style>
 *{box-sizing:border-box}
@@ -193,7 +201,7 @@ button{cursor:pointer;border:none}
 .tr-flag svg{width:36px;height:24px;border-radius:4px;box-shadow:0 0 0 1px #8884;display:block}
 .tr-flag:active svg{outline:2px solid #5bd21a}
 .chatbar{display:flex;flex-wrap:wrap;align-items:center;gap:8px;padding:10px 12px;background:#fff;border-bottom:1px solid #eee}
-.chatbar input{flex:1 1 100%;min-width:0;padding:11px 14px;border:1px solid #ddd;border-radius:22px;background:#f4f6f3;font-size:15px;outline:none}
+.chatbar input{flex:1 1 100%;min-width:0;padding:11px 14px;border:1px solid #ddd;border-radius:22px;background:#f4f6f3;font-size:16px;outline:none}
 .chatbar input:focus{border-color:#5BB60F}
 .chip{flex:1;padding:9px 10px;text-align:center;border-radius:20px;background:#eef2ea;color:#444;font-size:14px;transition:background .15s,color .15s}
 .chip.on{background:#e6f7d6;color:#2a9d0a;font-weight:bold;box-shadow:0 0 10px #5bd21a55}
@@ -218,6 +226,34 @@ button{cursor:pointer;border:none}
 .vk-bottom .vkey{width:60px}
 .vk-bottom .vk-space{width:auto}
 .vk-bottom .vk-send{background:#4CC81A;color:#05220a;font-weight:bold;border-color:#4CC81A}
+html{-webkit-text-size-adjust:100%;text-size-adjust:100%}
+button,input,select,label{-webkit-tap-highlight-color:transparent}
+button{touch-action:manipulation;-webkit-appearance:none;appearance:none}
+input:not([type=checkbox]):not([type=file]):not([type=radio]){-webkit-appearance:none;appearance:none}
+#recBar .rec-tx{width:auto;height:40px;border-radius:20px;padding:0 12px;font-size:14px;background:#eef2ea;color:#333;display:flex;align-items:center;gap:6px}
+#recBar .rec-tx svg{width:24px;height:16px;border-radius:3px;box-shadow:0 0 0 1px #8884;display:block}
+.message.vmsg{padding:8px 12px 6px;min-width:250px}
+.vm{display:flex;align-items:center;gap:10px}
+.vm-av{position:relative;width:46px;height:46px;flex-shrink:0}
+.vm-av .avatar{width:46px;height:46px;font-size:22px}
+.vm-mic{position:absolute;right:-7px;bottom:-4px;width:20px;height:20px;color:#6b7b69;filter:drop-shadow(0 0 2px #fff)}
+.vm-play{width:34px;height:34px;color:#6b7b69;background:transparent;padding:0;flex-shrink:0}
+.vm-play svg{width:100%;height:100%;display:block}
+.vm-mid{flex:1;min-width:0}
+.vm-wave{position:relative;display:flex;align-items:center;gap:2px;height:30px;padding:0 5px}
+.vm-bar{flex:1;min-width:2px;border-radius:2px;background:#b8c4b4}
+.vm-bar.on{background:#6b7b69}
+.message.mine .vm-bar{background:#a9c9a4}
+.message.mine .vm-bar.on{background:#5d8a56}
+.vm-dot{position:absolute;top:50%;width:11px;height:11px;border-radius:50%;background:#6b7b69;transform:translate(-50%,-50%);left:5px}
+.vm-dur{font-size:13px;color:#6b7b69;margin-top:2px}
+.vm-tx{margin-top:6px;font-size:13px;color:#555;overflow-wrap:anywhere}
+.vm-hint{margin-top:4px;font-size:11px;color:#9aa595}
+.vrow .mt,.vrow .tick{display:none}
+.vm-foot{display:flex;justify-content:space-between;align-items:center;gap:8px}
+.vm-meta{font-size:11px;color:#777;display:flex;gap:4px;align-items:center;white-space:nowrap}
+.vm-tick{color:#999;font-size:12px}
+.vm-tick.read{color:#4a90e2}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -226,7 +262,7 @@ button{cursor:pointer;border:none}
 body{padding:15px}
 .app{height:calc(100dvh - 30px);border-radius:15px;box-shadow:0 3px 20px #00000010}
 }
-/* LimeChat Translation */
+  /* LimeChat Translation */
 .translation-result {
   display: none;
   margin-top: 9px;
@@ -269,7 +305,6 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   </div>
 
   <section class="view active" id="chatsView">
-    <div class="section-title">Сообщения</div>
     <div class="chatbar">
       <input id="chatSearch" type="search" placeholder="Поиск сообщений" autocomplete="off">
       <button type="button" class="chip" id="chipContact">Контакты</button>
@@ -285,7 +320,6 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div style="padding:12px">
       <button class="primary-button" id="addContactButton">➕ Добавить контакт</button>
       <button class="primary-button" id="groupCreateBtn" style="margin-top:8px">👥 Создать группу</button>
-      <button class="primary-button" id="channelCreateBtn" style="margin-top:8px">📢 Создать канал</button>
     </div>
   </section>
 
@@ -308,9 +342,11 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <button type="button" id="attContact">👥<small>Контакт</small></button>
       <button type="button" id="attKb">⌨️<small>Клавиатура</small></button>
     </div>
+    <div id="recLangRow" class="tr-flags" style="padding:8px 12px;background:#fff;border-top:1px solid #eee"></div>
     <div id="recBar">
       <button type="button" id="recCancel" style="background:#888" aria-label="Отмена">✖</button>
       <div class="rt">🔴 <span id="recTime">0:00</span></div>
+      <button type="button" id="recTx" class="rec-tx">🌐 Текст</button>
       <button type="button" id="recSend" style="background:#2a9d4a" aria-label="Отправить">➤</button>
     </div>
     <form class="composer" id="messageForm">
@@ -571,7 +607,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <div class="mact" id="mAct"></div>
       <div id="mCmtWrap" style="display:none;margin-top:8px"><div id="mCmtList" style="max-height:26vh;overflow-y:auto;font-size:14px"></div></div>
       <form id="mCmtForm" style="display:flex;gap:8px;margin-top:10px">
-        <input id="mCmtInput" maxlength="300" placeholder="Написать комментарий..." autocomplete="off" style="flex:1;min-width:0;padding:11px 14px;border-radius:22px;border:none;background:#ffffff22;color:#fff;outline:none;font-size:15px">
+        <input id="mCmtInput" maxlength="300" placeholder="Написать комментарий..." autocomplete="off" style="flex:1;min-width:0;padding:11px 14px;border-radius:22px;border:none;background:#ffffff22;color:#fff;outline:none;font-size:16px">
         <button type="submit" aria-label="Отправить комментарий" style="width:44px;height:44px;border-radius:50%;background:#4CC81A;color:#05220a;font-size:22px;font-weight:bold;flex-shrink:0">↑</button>
       </form>
     </div>
@@ -641,7 +677,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
- (function () {
+(function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -792,7 +828,7 @@ function listenChat(contact) {
     if (!m || typeof m.text !== "string" || isBlocked(contact.id)) return;
     const list = state.messages[contact.id] || (state.messages[contact.id] = []);
     if (state.hidden[snap.key] || list.some(x => x.key === snap.key)) return;
-    list.push({ key: snap.key, text: m.text, mine: m.from === myKey(), time: fmtTime(m.ts), ts: m.ts, type: m.type, mid: m.mid, dur: m.dur, th: m.th, ct: m.ct });
+    list.push({ key: snap.key, text: m.text, mine: m.from === myKey(), time: fmtTime(m.ts), ts: m.ts, type: m.type, mid: m.mid, dur: m.dur, th: m.th, ct: m.ct, tx: m.tx });
     if (m.from !== myKey() && currentView === "chatView" && state.activeContact === contact.id && !document.hidden) markRead(contact.id);
     refreshAfterMessage(contact.id);
   });
@@ -1056,7 +1092,7 @@ function renderMessages() {
   const contact = state.contacts.find(c => c.id === state.activeContact);
   messages.forEach(item => {
     const row = document.createElement("div");
-    row.className = "mrow" + (item.mine ? " mine" : "");
+    row.className = "mrow" + (item.mine ? " mine" : "") + (item.type === "voice" && item.mid ? " vrow" : "");
     const col = document.createElement("div");
     col.className = "mcol";
     const message = document.createElement("div");
@@ -1499,8 +1535,8 @@ $("cpBlock").addEventListener("click", () => {
   }
   saveState();
   $("cpName").textContent = c.name + (isBlocked(cpId) ? " 🚫" : "");
-}); 
- $("cpBack").addEventListener("click", () => {
+});
+$("cpBack").addEventListener("click", () => {
   if (cpFrom === "statusView") showView("statusView");
   else if (cpFrom === "groupView" && gcur) { showView("groupView"); renderGroupHead(); renderGroupTab(); }
   else showView("chatView");
@@ -2049,16 +2085,16 @@ function makeRecorder(stream, kind) {
 
 // ===== LimeChat: Перевод сообщений =====
 const TR_LANGS = [
-  { code: "ru", name: "Русский", flag: "ru" },
-  { code: "ky", name: "Кыргызский", flag: "kg" },
-  { code: "en", name: "Английский", flag: "us" },
-  { code: "tr", name: "Турецкий", flag: "tr" },
-  { code: "uz", name: "Узбекский", flag: "uz" },
-  { code: "zh-CN", name: "Китайский", flag: "cn" },
-  { code: "ur", name: "Урду", flag: "pk" },
-  { code: "hi", name: "Хинди", flag: "in" },
-  { code: "bn", name: "Бенгальский", flag: "bd" },
-  { code: "ar", name: "Арабский", flag: "sa" }
+  { code: "ru", name: "Русский", flag: "ru", sr: "ru-RU" },
+  { code: "ky", name: "Кыргызский", flag: "kg", sr: "ky-KG" },
+  { code: "en", name: "Английский", flag: "us", sr: "en-US" },
+  { code: "tr", name: "Турецкий", flag: "tr", sr: "tr-TR" },
+  { code: "uz", name: "Узбекский", flag: "uz", sr: "uz-UZ" },
+  { code: "zh-CN", name: "Китайский", flag: "cn", sr: "zh-CN" },
+  { code: "ur", name: "Урду", flag: "pk", sr: "ur-PK" },
+  { code: "hi", name: "Хинди", flag: "in", sr: "hi-IN" },
+  { code: "bn", name: "Бенгальский", flag: "bd", sr: "bn-BD" },
+  { code: "ar", name: "Арабский", flag: "sa", sr: "ar-SA" }
 ];
 
 async function translateMessage(text, l, resultBox, button) {
@@ -2104,25 +2140,159 @@ function makeTranslateUI(text) {
   return trWrap;
 }
 
+const PLAY_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 4l13 8-13 8z" fill="currentColor"/></svg>';
+const PAUSE_SVG = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 4h4.5v16H6zM13.500 4H18v16h-4.500z" fill="currentColor"/></svg>';
+const MIC_SVG = '<svg class="vm-mic" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><rect x="9" y="2.5" width="6" height="11.500" rx="3" fill="currentColor"/><path d="M5.500 11.500a6.500 6.500 0 0 0 13 0M12 18v3.500"/></svg>';
+
+function waveHeights(seed, n) {
+  let h = 7;
+  String(seed).split("").forEach(ch => { h = (h * 31 + ch.charCodeAt(0)) >>> 0; });
+  const out = [];
+  for (let i = 0; i < n; i++) {
+    h = (Math.imul(h, 1664525) + 1013904223) >>> 0;
+    out.push(18 + Math.round(((h >>> 8) / 16777216) * 82));
+  }
+  return out;
+}
+
+function buildVoice(message, item, cid) {
+  message.classList.add("vmsg");
+  const total = Math.max(1, +item.dur || 1);
+  const box = document.createElement("div");
+  box.className = "vm";
+  const c = state.contacts.find(x => x.id === cid);
+  const avWrap = document.createElement("div");
+  avWrap.className = "vm-av";
+  avWrap.appendChild(item.mine ? makeAvatar(state.profile.photo, state.profile.name) : makeAvatar(c ? c.photo : "", c ? c.name : ""));
+  avWrap.insertAdjacentHTML("beforeend", MIC_SVG);
+  const play = document.createElement("button");
+  play.type = "button";
+  play.className = "vm-play";
+  play.setAttribute("aria-label", "Воспроизвести");
+  play.innerHTML = PLAY_SVG;
+  const mid = document.createElement("div");
+  mid.className = "vm-mid";
+  const wave = document.createElement("div");
+  wave.className = "vm-wave";
+  const bars = waveHeights(item.key || item.mid, 30).map(hh => {
+    const b = document.createElement("span");
+    b.className = "vm-bar";
+    b.style.height = hh + "%";
+    wave.appendChild(b);
+    return b;
+  });
+  const dot = document.createElement("span");
+  dot.className = "vm-dot";
+  wave.appendChild(dot);
+  const dur = document.createElement("div");
+  dur.className = "vm-dur";
+  dur.textContent = fmtDur(total);
+  const foot = document.createElement("div");
+  foot.className = "vm-foot";
+  const meta = document.createElement("span");
+  meta.className = "vm-meta";
+  meta.textContent = item.time || "";
+  if (item.mine) {
+    const rd = isRead(item, cid);
+    const tk = document.createElement("span");
+    tk.className = "vm-tick" + (rd ? " read" : "");
+    tk.textContent = rd ? "✓✓" : "✓";
+    meta.appendChild(tk);
+  }
+  foot.append(dur, meta);
+  mid.append(wave, foot);
+  box.append(avWrap, play, mid);
+  message.appendChild(box);
+
+  const setProg = r => {
+    r = Math.max(0, Math.min(1, r));
+    const k = Math.round(r * bars.length);
+    bars.forEach((b, i) => b.classList.toggle("on", i < k));
+    dot.style.left = "calc(5px + (100% - 10px) * " + r + ")";
+  };
+  setProg(0);
+  let au = null;
+  play.addEventListener("click", async () => {
+    if (au) {
+      if (au.paused) { au.play(); play.innerHTML = PAUSE_SVG; } else { au.pause(); play.innerHTML = PLAY_SVG; }
+      return;
+    }
+    play.style.opacity = ".5";
+    const pre = new Audio("data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=");
+    pre.play().catch(() => {});
+    const d = await loadMedia(cid, item.mid);
+    play.style.opacity = "";
+    if (!okData(d, "audio|video")) { dur.textContent = "Не удалось загрузить"; return; }
+    au = pre;
+    au.src = d;
+    au.ontimeupdate = () => { setProg(au.currentTime / total); dur.textContent = fmtDur(au.currentTime); };
+    au.onended = () => { play.innerHTML = PLAY_SVG; setProg(0); dur.textContent = fmtDur(total); };
+    au.play().then(() => { play.innerHTML = PAUSE_SVG; }).catch(() => { au = null; dur.textContent = "Не удалось воспроизвести"; });
+  });
+  if (typeof item.tx === "string" && item.tx.trim()) {
+    const tx = document.createElement("div");
+    tx.className = "vm-tx";
+    tx.textContent = "📝 " + item.tx;
+    message.appendChild(tx);
+    message.appendChild(makeTranslateUI(item.tx));
+  } else {
+    const hint = document.createElement("div");
+    hint.className = "vm-hint";
+    hint.textContent = "🌐 Нет текста для перевода";
+    message.appendChild(hint);
+  }
+  longPress(message, () => askDelete(item));
+}
+
+// --- распознавание речи при записи голосового (для перевода)
+const SR_API = window.SpeechRecognition || window.webkitSpeechRecognition;
+const srPref = { on: false, i: 0 };
+function srStart(r) {
+  if (!SR_API) return false;
+  srStop(r);
+  try {
+    const rec = new SR_API();
+    rec.lang = TR_LANGS[srPref.i].sr;
+    rec.continuous = true;
+    rec.interimResults = false;
+    rec.onresult = e => {
+      for (let i = e.resultIndex; i < e.results.length; i++) {
+        if (e.results[i].isFinal) r.tx += e.results[i][0].transcript + " ";
+      }
+    };
+    rec.onend = () => {
+      if (r.rec === rec && r.srRun) { try { rec.start(); } catch (e) {} }
+      else if (r.rec === rec && r.srDone) r.srDone();
+    };
+    rec.onerror = () => {};
+    r.rec = rec;
+    r.srRun = true;
+    rec.start();
+    return true;
+  } catch (e) {
+    r.rec = null;
+    r.srRun = false;
+    return false;
+  }
+}
+function srStop(r) {
+  r.srRun = false;
+  const rec = r.rec;
+  if (rec) {
+    try { rec.stop(); } catch (e) {}
+  }
+}
+function paintRecTx() {
+  const b = $("recTx");
+  if (srPref.on) b.innerHTML = flagSvg(TR_LANGS[srPref.i].flag) + "<span>Текст вкл</span>";
+  else b.innerHTML = "<span>🌐 Текст</span>";
+}
+
+
   function buildBody(message, item, cid) {
   const t = item.type;
   if (t === "voice" && item.mid) {
-    const b = document.createElement("button");
-    b.className = "vbtn";
-    const lab = p => (p ? "⏸" : "▶") + " 🎤 " + fmtDur(item.dur);
-    b.textContent = lab(false);
-    let au = null;
-    b.addEventListener("click", async () => {
-      if (au) { if (au.paused) { au.play(); b.textContent = lab(true); } else { au.pause(); b.textContent = lab(false); } return; }
-      b.textContent = "Загрузка...";
-      const d = await loadMedia(cid, item.mid);
-      if (!okData(d, "audio|video")) { b.textContent = "Не удалось загрузить"; return; }
-      au = new Audio(d);
-      au.onended = () => { b.textContent = lab(false); };
-      au.play().then(() => { b.textContent = lab(true); }).catch(() => { au = null; b.textContent = "Не удалось воспроизвести"; });
-    });
-    message.appendChild(b);
-    longPress(message, () => askDelete(item));
+    buildVoice(message, item, cid);
   } else if (t === "video" && item.mid) {
     message.classList.add("bare");
     const rv = document.createElement("div");
@@ -2140,7 +2310,7 @@ function makeTranslateUI(text) {
       vid.autoplay = true;
       rv.textContent = "";
       rv.appendChild(vid);
-      vid.play().catch(() => {});
+      vid.play().catch(() => { vid.controls = true; });
     });
     message.appendChild(rv);
     longPress(message, () => askDelete(item));
@@ -2189,6 +2359,8 @@ function stopVoice(send) {
   r.send = send;
   vrec = null;
   clearInterval(r.timer);
+  srStop(r);
+  $("recLangRow").classList.remove("show");
   $("recBar").style.display = "none";
   $("messageForm").style.display = "";
   try { if (r.mr.state !== "inactive") r.mr.stop(); } catch (e) {}
@@ -2205,7 +2377,7 @@ async function startVoice() {
   let mr;
   try { mr = makeRecorder(stream, "audio"); } catch (e) { stream.getTracks().forEach(t => t.stop()); alert("Запись не поддерживается в этом браузере."); return; }
   const chunks = [], t0 = Date.now();
-  const r = { mr: mr, send: false, timer: null };
+  const r = { mr: mr, send: false, timer: null, tx: "", rec: null, srRun: false, srDone: null };
   mr.ondataavailable = e => { if (e.data && e.data.size) chunks.push(e.data); };
   mr.onstop = async () => {
     stream.getTracks().forEach(t => t.stop());
@@ -2213,7 +2385,11 @@ async function startVoice() {
     if (!r.send || dur < 1 || !chunks.length) return;
     const type = (mr.mimeType || chunks[0].type || "audio/webm").split(";")[0];
     const data = await blobToData(new Blob(chunks, { type: type }));
-    sendRich(id, { type: "voice", text: "🎤 Голосовое сообщение", dur: Math.round(dur) }, data);
+    if (r.rec) { await new Promise(res => { r.srDone = res; setTimeout(res, 900); }); r.rec = null; }
+    const msg = { type: "voice", text: "🎤 Голосовое сообщение", dur: Math.round(dur) };
+    const txt = (r.tx || "").trim().slice(0, 500);
+    if (txt) msg.tx = txt;
+    sendRich(id, msg, data);
   };
   vrec = r;
   $("messageForm").style.display = "none";
@@ -2225,6 +2401,8 @@ async function startVoice() {
     if (sec >= 120) stopVoice(true);
   }, 250);
   mr.start();
+  paintRecTx();
+  if (srPref.on) srStart(r);
 }
 
 // --- кружок (видео до 1 минуты)
@@ -2336,7 +2514,7 @@ $("attContact").addEventListener("click", () => {
   });
   $("pickModal").classList.add("show");
 });
-  $("closePick").addEventListener("click", () => $("pickModal").classList.remove("show"));
+$("closePick").addEventListener("click", () => $("pickModal").classList.remove("show"));
 $("imgModal").addEventListener("click", function () { this.classList.remove("show"); $("imgFull").src = ""; });
 
 // ---------- Истории ----------
@@ -2454,7 +2632,8 @@ async function playStoryVideo(st) {
   if (!sv || sv.list[sv.i] !== st) return;
   if (!st.dv) { $("sCap").textContent = "Видео не загрузилось"; $("sCap").style.display = "block"; return; }
   sv0.src = st.dv;
-  sv0.play().catch(() => {});
+  sv0.muted = false;
+  sv0.play().catch(() => { sv0.muted = true; sv0.play().catch(() => {}); });
 }
 
 function showStory() {
@@ -2500,7 +2679,7 @@ $("sStage").addEventListener("click", e => {
   else if (sv.i + 1 < sv.list.length) { sv.i++; showStory(); }
   else closeStory();
 });
-$("sDel").addEventListener("click", () => {
+  $("sDel").addEventListener("click", () => {
   if (!sv || !confirm("Удалить эту историю?")) return;
   const s = sv.list[sv.i];
   remove(ref(db, "stories/" + s.owner + "/" + s.key)).catch(() => {});
@@ -2875,7 +3054,6 @@ function openGroupCreate(mode) {
   $("gCreateModal").classList.add("show");
 }
 $("groupCreateBtn").addEventListener("click", () => openGroupCreate("group"));
-$("channelCreateBtn").addEventListener("click", () => openGroupCreate("channel"));
 $("gCreateCancel").addEventListener("click", () => $("gCreateModal").classList.remove("show"));
 $("gCreateOk").addEventListener("click", async () => {
   const name = $("gNewName").value.trim();
@@ -3177,6 +3355,37 @@ $("vkEnter").addEventListener("click", () => {
 });
 $("attKb").addEventListener("click", () => { closeAttach(); openVkb($("messageInput"), $("chatView")); });
 $("gKb").addEventListener("click", () => openVkb($("gInput"), $("gChatView")));
+
+(function buildRecLang() {
+  const row = $("recLangRow");
+  TR_LANGS.forEach((l, i) => {
+    const fb = document.createElement("button");
+    fb.type = "button";
+    fb.className = "tr-flag";
+    fb.title = l.name;
+    fb.setAttribute("aria-label", l.name);
+    fb.innerHTML = flagSvg(l.flag);
+    fb.addEventListener("click", () => {
+      srPref.on = true;
+      srPref.i = i;
+      row.classList.remove("show");
+      paintRecTx();
+      if (vrec) srStart(vrec);
+    });
+    row.appendChild(fb);
+  });
+})();
+$("recTx").addEventListener("click", () => {
+  if (!SR_API) { alert("Этот браузер не умеет распознавать речь, поэтому перевод голосовых недоступен."); return; }
+  if (srPref.on) {
+    srPref.on = false;
+    if (vrec) { srStop(vrec); vrec.rec = null; }
+    $("recLangRow").classList.remove("show");
+    paintRecTx();
+  } else {
+    $("recLangRow").classList.toggle("show");
+  }
+});
 
 // ---------- Запуск ----------
 loadState();
