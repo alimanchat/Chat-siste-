@@ -254,6 +254,7 @@ input:not([type=checkbox]):not([type=file]):not([type=radio]){-webkit-appearance
 .vm-meta{font-size:11px;color:#777;display:flex;gap:4px;align-items:center;white-space:nowrap}
 .vm-tick{color:#999;font-size:12px}
 .vm-tick.read{color:#4a90e2}
+.i18n-wait .app{visibility:hidden}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -262,7 +263,7 @@ input:not([type=checkbox]):not([type=file]):not([type=radio]){-webkit-appearance
 body{padding:15px}
 .app{height:calc(100dvh - 30px);border-radius:15px;box-shadow:0 3px 20px #00000010}
 }
-  /* LimeChat Translation */
+/* LimeChat Translation */
 .translation-result {
   display: none;
   margin-top: 9px;
@@ -528,8 +529,17 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   <div class="modal" id="sideMenu">
     <div class="modal-card">
       <h3>Меню</h3>
-      <button class="primary-button" id="sideDelete" style="background:#a33">🗑 Удалить чат</button>
+      <button class="primary-button" id="sideLang">🌐 Язык сайта</button>
       <button class="secondary-button" id="closeSide" style="width:100%;margin-top:12px">Закрыть</button>
+    </div>
+  </div>
+
+  <div class="modal" id="uiLangModal">
+    <div class="modal-card">
+      <h3>🌐 Язык сайта</h3>
+      <div id="uiLangList" style="max-height:55vh;overflow-y:auto"></div>
+      <div style="color:#888;font-size:12px;margin-top:8px">Перевод интерфейса делается автоматически, нужен интернет.</div>
+      <button class="secondary-button" id="uiLangClose" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
   </div>
 
@@ -759,7 +769,7 @@ const COUNTRIES = [
   { id: "kz", name: "Казахстан", code: "7", len: 10 },
   { id: "tj", name: "Таджикистан", code: "992", len: 9 }
 ];
-const isKey = k => /^(996|998|992)\d{9}$/.test(String(k)) || /^7\d{10}$/.test(String(k));
+  const isKey = k => /^(996|998|992)\d{9}$/.test(String(k)) || /^7\d{10}$/.test(String(k));
 const countryOf = k => String(k).indexOf("998") === 0 ? COUNTRIES[2] : String(k).indexOf("992") === 0 ? COUNTRIES[4] : String(k).charAt(0) === "7" ? COUNTRIES[1] : COUNTRIES[0];
 const normPhone = (v, c) => {
   c = c || COUNTRIES[0];
@@ -1267,34 +1277,6 @@ $("closeMenu").addEventListener("click", () => {
 });
 
 $("menuDelete").addEventListener("click", deleteCurrentContact);
-$("sideDelete").addEventListener("click", () => {
-  $("sideMenu").classList.remove("show");
-  const list = $("delList");
-  list.replaceChildren();
-  if (!state.contacts.length) {
-    const e = document.createElement("div");
-    e.className = "empty";
-    e.textContent = "Чатов пока нет.";
-    list.appendChild(e);
-  }
-  state.contacts.forEach(c => {
-    const b = document.createElement("button");
-    b.className = "primary-button";
-    b.style.background = "#a33";
-    b.textContent = "🗑 " + c.name;
-    b.addEventListener("click", () => {
-      if (!confirm("Удалить чат «" + c.name + "»?")) return;
-      state.contacts = state.contacts.filter(x => x.id !== c.id);
-      delete state.messages[c.id];
-      saveState();
-      renderChats();
-      renderContacts();
-      $("delModal").classList.remove("show");
-    });
-    list.appendChild(b);
-  });
-  $("delModal").classList.add("show");
-});
 $("closeDel").addEventListener("click", () => $("delModal").classList.remove("show"));
 $("menuBlock").addEventListener("click", () => {
   $("menuModal").classList.remove("show");
@@ -1320,7 +1302,7 @@ document.querySelectorAll(".nav-button[data-view]").forEach(button => {
   });
 });
 
-["contactModal", "menuModal", "sideMenu", "delModal", "cpMenu", "chatMenuModal", "pickModal"].forEach(id => {
+["contactModal", "menuModal", "sideMenu", "delModal", "cpMenu", "chatMenuModal", "pickModal", "uiLangModal"].forEach(id => {
   $(id).addEventListener("click", function (event) {
     if (event.target === this) this.classList.remove("show");
   });
@@ -1788,7 +1770,7 @@ function showMedia() {
   if (it.owner !== me) act.append(mbtn);
   act.append(vw);
 }
-$("mBack").addEventListener("click", closeMedia);
+  $("mBack").addEventListener("click", closeMedia);
 $("mPrev").addEventListener("click", () => mediaStep(-1));
 $("mNext").addEventListener("click", () => mediaStep(1));
 let mvX = null;
@@ -2679,7 +2661,7 @@ $("sStage").addEventListener("click", e => {
   else if (sv.i + 1 < sv.list.length) { sv.i++; showStory(); }
   else closeStory();
 });
-  $("sDel").addEventListener("click", () => {
+$("sDel").addEventListener("click", () => {
   if (!sv || !confirm("Удалить эту историю?")) return;
   const s = sv.list[sv.i];
   remove(ref(db, "stories/" + s.owner + "/" + s.key)).catch(() => {});
@@ -3386,6 +3368,183 @@ $("recTx").addEventListener("click", () => {
     $("recLangRow").classList.toggle("show");
   }
 });
+
+// ---------- Язык сайта ----------
+const UI_LANGS = [
+  { code: "ru", name: "Русский", flag: "ru" },
+  { code: "ky", name: "Кыргызча", flag: "kg" },
+  { code: "kk", name: "Қазақша", flag: "kz" },
+  { code: "uz", name: "Oʻzbekcha", flag: "uz" },
+  { code: "tg", name: "Тоҷикӣ", flag: "tj" },
+  { code: "en", name: "English", flag: "us" },
+  { code: "tr", name: "Türkçe", flag: "tr" },
+  { code: "zh-CN", name: "中文", flag: "cn" },
+  { code: "ur", name: "اردو", flag: "pk" },
+  { code: "hi", name: "हिन्दी", flag: "in" },
+  { code: "bn", name: "বাংলা", flag: "bd" },
+  { code: "ar", name: "العربية", flag: "sa" }
+];
+let uiLang = "ru";
+try { uiLang = localStorage.getItem("lc_ui") || "ru"; } catch (e) {}
+if (!UI_LANGS.some(l => l.code === uiLang)) uiLang = "ru";
+let uiCache = {};
+try { uiCache = JSON.parse(localStorage.getItem("lc_ui_c_" + uiLang) || "{}") || {}; } catch (e) { uiCache = {}; }
+const UI_SKIP = ".contact-info,.ro,.mcm,.ftitle,.fdesc,.vm-tx,.translation-result,.fown,.shead2 span,#cpName,#gName,#gcName,#chatName,#headerName,#sOwner,#mOwner,#mTitle,#mDesc,#sCap,#sInfo,#mCount,#pickList,#gNewList,#gAddList,#delList,#uiLangList,#countryList,#vkb,#cpContent .ro,script,style";
+const uiOrig = new WeakMap(), uiApplied = new WeakMap();
+const hasCyr = t => /[А-Яа-яЁё]/.test(t);
+const uiNorm = t => String(t).replace(/\s*\n\s*/g, " ").trim();
+
+function uiSkip(el) {
+  if (!el || !el.closest) return true;
+  const msg = el.closest(".message");
+  if (msg && !el.closest(".translate-button,.vm-hint")) return true;
+  return !!el.closest(UI_SKIP);
+}
+
+function uiCollect(root, items) {
+  if (!root) return;
+  if (root.nodeType === 3) {
+    const p = root.parentElement, v = root.nodeValue;
+    if (p && !uiSkip(p) && uiApplied.get(root) !== v && v.trim() && hasCyr(v)) items.push({ node: root, src: uiNorm(v), raw: v });
+    return;
+  }
+  if (root.nodeType !== 1 || uiSkip(root)) return;
+  const tw = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+  let n;
+  while ((n = tw.nextNode())) uiCollect(n, items);
+  const els = [root].concat(Array.from(root.querySelectorAll("[placeholder],[aria-label],[title]")));
+  els.forEach(el => {
+    if (uiSkip(el)) return;
+    ["placeholder", "aria-label", "title"].forEach(at => {
+      const v = el.getAttribute(at);
+      if (!v || !hasCyr(v)) return;
+      const ap = uiApplied.get(el);
+      if (ap && ap[at] === v) return;
+      items.push({ el: el, at: at, src: uiNorm(v), raw: v });
+    });
+  });
+}
+
+async function uiOne(s) {
+  try {
+    const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=" + uiLang + "&dt=t&q=" + encodeURIComponent(s));
+    const d = await r.json();
+    const t = d[0].map(p => p[0] || "").join("").trim();
+    if (t) uiCache[s] = t;
+  } catch (e) {}
+}
+
+async function uiChunk(arr) {
+  try {
+    const r = await fetch("https://translate.googleapis.com/translate_a/single?client=gtx&sl=ru&tl=" + uiLang + "&dt=t&q=" + encodeURIComponent(arr.join("\n")));
+    if (!r.ok) throw new Error("bad");
+    const d = await r.json();
+    const out = d[0].map(p => p[0] || "").join("").split("\n");
+    if (out.length === arr.length) { arr.forEach((s, i) => { uiCache[s] = out[i].trim() || s; }); return; }
+  } catch (e) {}
+  for (const s of arr) await uiOne(s);
+}
+
+async function uiFetch(list) {
+  const chunks = [];
+  let cur = [], len = 0;
+  list.forEach(s => {
+    if (len + s.length > 700 || cur.length >= 25) { chunks.push(cur); cur = []; len = 0; }
+    cur.push(s);
+    len += s.length + 1;
+  });
+  if (cur.length) chunks.push(cur);
+  let idx = 0;
+  const worker = async () => { while (idx < chunks.length) await uiChunk(chunks[idx++]); };
+  await Promise.all([worker(), worker(), worker()]);
+  try { localStorage.setItem("lc_ui_c_" + uiLang, JSON.stringify(uiCache)); } catch (e) {}
+}
+
+async function uiRun(root) {
+  if (uiLang === "ru") return;
+  const items = [];
+  uiCollect(root, items);
+  if (!items.length) return;
+  const need = Array.from(new Set(items.map(i => i.src))).filter(t => !uiCache[t]);
+  if (need.length) await uiFetch(need);
+  items.forEach(i => {
+    const tr = uiCache[i.src];
+    if (!tr) return;
+    if (i.node) {
+      if (!i.node.parentNode) return;
+      const lead = (i.raw.match(/^\s*/) || [""])[0], trail = (i.raw.match(/\s*$/) || [""])[0];
+      const nv = lead + tr + trail;
+      uiOrig.set(i.node, i.raw);
+      i.node.nodeValue = nv;
+      uiApplied.set(i.node, nv);
+    } else {
+      i.el.setAttribute(i.at, tr);
+      const ap = uiApplied.get(i.el) || {};
+      ap[i.at] = tr;
+      uiApplied.set(i.el, ap);
+    }
+  });
+}
+
+let uiPending = new Set(), uiTimer = null;
+const uiObs = new MutationObserver(muts => {
+  muts.forEach(m => {
+    if (m.type === "childList") m.addedNodes.forEach(n => uiPending.add(n));
+    else if (m.type === "characterData") uiPending.add(m.target);
+    else if (m.type === "attributes") uiPending.add(m.target);
+  });
+  clearTimeout(uiTimer);
+  uiTimer = setTimeout(() => {
+    const list = Array.from(uiPending);
+    uiPending = new Set();
+    list.forEach(n => { if (n.isConnected) uiRun(n); });
+  }, 80);
+});
+
+function uiInit() {
+  document.documentElement.lang = uiLang;
+  if (uiLang === "ru") return;
+  document.body.classList.add("i18n-wait");
+  uiObs.observe(document.body, { childList: true, subtree: true, characterData: true, attributes: true, attributeFilter: ["placeholder", "aria-label", "title"] });
+  uiRun(document.body).catch(() => {}).then(() => document.body.classList.remove("i18n-wait"));
+  setTimeout(() => document.body.classList.remove("i18n-wait"), 6000);
+  ["alert", "confirm", "prompt"].forEach(fn => {
+    const orig = window[fn].bind(window);
+    window[fn] = function (m, d) {
+      const k = uiNorm(m);
+      if (hasCyr(k) && !uiCache[k]) uiFetch([k]);
+      return orig(uiCache[k] || m, d);
+    };
+  });
+}
+
+function openUiLang() {
+  const list = $("uiLangList");
+  list.replaceChildren();
+  UI_LANGS.forEach(l => {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "crow";
+    b.innerHTML = flagSvg(l.flag);
+    const n = document.createElement("span");
+    n.textContent = l.name;
+    const k = document.createElement("b");
+    k.textContent = l.code === uiLang ? "✓" : "";
+    k.style.color = "#2a9d0a";
+    b.append(n, k);
+    b.addEventListener("click", () => {
+      $("uiLangModal").classList.remove("show");
+      if (l.code === uiLang) return;
+      try { localStorage.setItem("lc_ui", l.code); } catch (e) {}
+      location.reload();
+    });
+    list.appendChild(b);
+  });
+  $("uiLangModal").classList.add("show");
+}
+$("sideLang").addEventListener("click", () => { $("sideMenu").classList.remove("show"); openUiLang(); });
+$("uiLangClose").addEventListener("click", () => $("uiLangModal").classList.remove("show"));
+setTimeout(uiInit, 0);
 
 // ---------- Запуск ----------
 loadState();
