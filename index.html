@@ -7,10 +7,11 @@
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="LimeChat">
 <meta name="apple-mobile-web-app-status-bar-style" content="default">
-<meta name="theme-color" content="#ffffff">
+<meta name="theme-color" content="#4CC81A">
 <meta name="format-detection" content="telephone=no">
+<link rel="manifest" href="manifest.json">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
-<link rel="icon" href="apple-touch-icon.png">
+<link rel="icon" type="image/png" href="icon-192.png">
 <title>LimeChat</title>
 <style>
 *{box-sizing:border-box}
@@ -255,6 +256,16 @@ input:not([type=checkbox]):not([type=file]):not([type=radio]){-webkit-appearance
 .vm-tick{color:#999;font-size:12px}
 .vm-tick.read{color:#4a90e2}
 .i18n-wait .app{visibility:hidden}
+img.fl{display:block;object-fit:cover;border-radius:5px;box-shadow:0 0 0 1px #8884}
+.flagbtn img.fl,.crow img.fl{width:42px;height:28px;flex-shrink:0}
+.tr-flag img.fl{width:36px;height:24px}
+.vk-lang img.fl{width:32px;height:21px}
+.fl-glb{display:inline-flex;align-items:center;justify-content:center;font-size:20px;min-width:32px;height:24px;line-height:1}
+.crow .fl-glb,.flagbtn .fl-glb{width:42px;height:28px;font-size:24px;flex-shrink:0}
+.tr-more{padding:0 12px;height:24px;border-radius:12px;background:#eef2ea;color:#2a7d0a;font-size:13px;align-self:center}
+.vk-langs{display:flex;gap:6px;overflow-x:auto;flex:1;padding-bottom:2px;-webkit-overflow-scrolling:touch}
+.vk-langs .vk-lang{flex:0 0 58px}
+.vk-bottom #vkShift.on{background:#e6f7d6;color:#2a9d0a;border-color:#5bd21a}
 .fact{display:flex;gap:10px;align-items:center;margin-top:6px}
 .fact button{background:#eee;border-radius:18px;padding:7px 14px}
 .fact button.on{background:#d9fdd3}
@@ -439,6 +450,8 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <div class="row"><i>✈️</i><input id="pTelegram" maxlength="100" placeholder="Telegram (@имя)" autocapitalize="none" autocomplete="off"></div>
       <input type="file" id="albumInput" accept="image/*" style="display:none">
       <button class="primary-button" id="saveProfileButton">Сохранить профиль</button>
+      <button class="secondary-button" id="deleteAccountBtn" style="width:100%;margin-top:14px;color:#a33">🗑 Удалить аккаунт</button>
+      <div style="text-align:center;margin:14px 0 4px;font-size:13px"><a href="privacy.html" target="_blank" rel="noopener" style="color:#2a7d0a">Политика конфиденциальности</a> · <a href="terms.html" target="_blank" rel="noopener" style="color:#2a7d0a">Условия</a></div>
     </div>
   </section>
 
@@ -479,6 +492,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div class="vk-cand" id="vkCand"></div>
     <div class="vk-keys" id="vkKeys"></div>
     <div class="vk-bottom">
+      <button type="button" class="vkey" id="vkShift" aria-label="Заглавные">⇧</button>
       <button type="button" class="vkey" id="vkBack" aria-label="Стереть">⌫</button>
       <button type="button" class="vkey vk-space" id="vkSpace">пробел</button>
       <button type="button" class="vkey vk-send" id="vkEnter" aria-label="Отправить">↑</button>
@@ -516,12 +530,23 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
     <button class="primary-button" id="loginButton" style="background:#4CC81A;color:#05220a;font-weight:bold;max-width:380px;margin-top:16px">Войти</button>
     <div style="margin-top:12px;color:#9fd8a8;font-size:13px">Нажми на флаг, чтобы выбрать страну</div>
+    <div style="margin-top:14px;color:#9fd8a8;font-size:12px;max-width:340px;line-height:1.5">Нажимая «Войти», ты принимаешь <a href="terms.html" target="_blank" rel="noopener" style="color:#6BE82A">Условия использования</a> и <a href="privacy.html" target="_blank" rel="noopener" style="color:#6BE82A">Политику конфиденциальности</a></div>
+  </div>
+
+  <div class="modal" id="lpModal" style="z-index:30">
+    <div class="modal-card">
+      <h3 id="lpTitle">Язык</h3>
+      <input id="lpSearch" type="search" placeholder="Поиск языка" autocomplete="off" style="font-size:16px">
+      <div id="lpList" style="max-height:52vh;overflow-y:auto"></div>
+      <button class="secondary-button" id="lpClose" style="width:100%;margin-top:12px">Закрыть</button>
+    </div>
   </div>
 
   <div class="modal" id="countryModal" style="z-index:30">
     <div class="modal-card">
       <h3>Выбери страну</h3>
-      <div id="countryList"></div>
+      <input id="countrySearch" type="search" placeholder="Поиск: страна или код" autocomplete="off" style="font-size:16px">
+      <div id="countryList" style="max-height:52vh;overflow-y:auto"></div>
       <button class="secondary-button" id="countryClose" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
   </div>
@@ -670,6 +695,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div class="modal-card">
       <h3>Контакт</h3>
       <button class="primary-button" id="cpBlock">🚫 Заблокировать</button>
+      <button class="primary-button" id="cpReport">⚠️ Пожаловаться</button>
       <button class="primary-button" id="cpDelete" style="background:#a33">🗑 Удалить контакт</button>
       <button class="secondary-button" id="closeCpMenu" style="width:100%;margin-top:12px">Закрыть</button>
     </div>
@@ -704,7 +730,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     show("Ошибка: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
   });
 })();
-</script>
+ </script>
 <script type="module">
 let initializeApp, getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp;
 
@@ -762,24 +788,369 @@ if (!myUid) {
   try { localStorage.setItem(UID_KEY, myUid); } catch (e) {}
 }
 
-const COUNTRIES = [
-  { id: "kg", name: "Кыргызстан", code: "996", len: 9 },
-  { id: "ru", name: "Россия", code: "7", len: 10 },
-  { id: "uz", name: "Узбекистан", code: "998", len: 9 },
-  { id: "kz", name: "Казахстан", code: "7", len: 10 },
-  { id: "tj", name: "Таджикистан", code: "992", len: 9 }
-];
-  const isKey = k => /^(996|998|992)\d{9}$/.test(String(k)) || /^7\d{10}$/.test(String(k));
-const countryOf = k => String(k).indexOf("998") === 0 ? COUNTRIES[2] : String(k).indexOf("992") === 0 ? COUNTRIES[4] : String(k).charAt(0) === "7" ? COUNTRIES[1] : COUNTRIES[0];
+const WORLD_RAW = `KG|Кыргызстан|996|9
+RU|Россия|7|10
+KZ|Казахстан|7|10
+UZ|Узбекистан|998|9
+TJ|Таджикистан|992|9
+AF|Афганистан|93
+AL|Албания|355
+DZ|Алжир|213
+AD|Андорра|376
+AO|Ангола|244
+AG|Антигуа и Барбуда|1268
+AR|Аргентина|54
+AM|Армения|374
+AU|Австралия|61
+AT|Австрия|43
+AZ|Азербайджан|994
+BS|Багамы|1242
+BH|Бахрейн|973
+BD|Бангладеш|880
+BB|Барбадос|1246
+BY|Беларусь|375
+BE|Бельгия|32
+BZ|Белиз|501
+BJ|Бенин|229
+BT|Бутан|975
+BO|Боливия|591
+BA|Босния и Герцеговина|387
+BW|Ботсвана|267
+BR|Бразилия|55
+BN|Бруней|673
+BG|Болгария|359
+BF|Буркина-Фасо|226
+BI|Бурунди|257
+KH|Камбоджа|855
+CM|Камерун|237
+CA|Канада|1
+CV|Кабо-Верде|238
+CF|Центральноафриканская Республика|236
+TD|Чад|235
+CL|Чили|56
+CN|Китай|86
+CO|Колумбия|57
+KM|Коморы|269
+CG|Республика Конго|242
+CD|ДР Конго|243
+CR|Коста-Рика|506
+HR|Хорватия|385
+CU|Куба|53
+CY|Кипр|357
+CZ|Чехия|420
+DK|Дания|45
+DJ|Джибути|253
+DM|Доминика|1767
+DO|Доминиканская Республика|1809
+EC|Эквадор|593
+EG|Египет|20
+SV|Сальвадор|503
+GQ|Экваториальная Гвинея|240
+ER|Эритрея|291
+EE|Эстония|372
+SZ|Эсватини|268
+ET|Эфиопия|251
+FJ|Фиджи|679
+FI|Финляндия|358
+FR|Франция|33
+GA|Габон|241
+GM|Гамбия|220
+GE|Грузия|995
+DE|Германия|49
+GH|Гана|233
+GR|Греция|30
+GD|Гренада|1473
+GT|Гватемала|502
+GN|Гвинея|224
+GW|Гвинея-Бисау|245
+GY|Гайана|592
+HT|Гаити|509
+HN|Гондурас|504
+HK|Гонконг|852
+HU|Венгрия|36
+IS|Исландия|354
+IN|Индия|91
+ID|Индонезия|62
+IR|Иран|98
+IQ|Ирак|964
+IE|Ирландия|353
+IL|Израиль|972
+IT|Италия|39
+CI|Кот-д’Ивуар|225
+JM|Ямайка|1876
+JP|Япония|81
+JO|Иордания|962
+KE|Кения|254
+KI|Кирибати|686
+KW|Кувейт|965
+LA|Лаос|856
+LV|Латвия|371
+LB|Ливан|961
+LS|Лесото|266
+LR|Либерия|231
+LY|Ливия|218
+LI|Лихтенштейн|423
+LT|Литва|370
+LU|Люксембург|352
+MO|Макао|853
+MG|Мадагаскар|261
+MW|Малави|265
+MY|Малайзия|60
+MV|Мальдивы|960
+ML|Мали|223
+MT|Мальта|356
+MH|Маршалловы Острова|692
+MR|Мавритания|222
+MU|Маврикий|230
+MX|Мексика|52
+FM|Микронезия|691
+MD|Молдова|373
+MC|Монако|377
+MN|Монголия|976
+ME|Черногория|382
+MA|Марокко|212
+MZ|Мозамбик|258
+MM|Мьянма|95
+NA|Намибия|264
+NR|Науру|674
+NP|Непал|977
+NL|Нидерланды|31
+NZ|Новая Зеландия|64
+NI|Никарагуа|505
+NE|Нигер|227
+NG|Нигерия|234
+KP|КНДР|850
+MK|Северная Македония|389
+NO|Норвегия|47
+OM|Оман|968
+PK|Пакистан|92
+PW|Палау|680
+PS|Палестина|970
+PA|Панама|507
+PG|Папуа — Новая Гвинея|675
+PY|Парагвай|595
+PE|Перу|51
+PH|Филиппины|63
+PL|Польша|48
+PT|Португалия|351
+QA|Катар|974
+RO|Румыния|40
+RW|Руанда|250
+KN|Сент-Китс и Невис|1869
+LC|Сент-Люсия|1758
+VC|Сент-Винсент и Гренадины|1784
+WS|Самоа|685
+SM|Сан-Марино|378
+ST|Сан-Томе и Принсипи|239
+SA|Саудовская Аравия|966
+SN|Сенегал|221
+RS|Сербия|381
+SC|Сейшельские Острова|248
+SL|Сьерра-Леоне|232
+SG|Сингапур|65
+SK|Словакия|421
+SI|Словения|386
+SB|Соломоновы Острова|677
+SO|Сомали|252
+ZA|ЮАР|27
+KR|Южная Корея|82
+SS|Южный Судан|211
+ES|Испания|34
+LK|Шри-Ланка|94
+SD|Судан|249
+SR|Суринам|597
+SE|Швеция|46
+CH|Швейцария|41
+SY|Сирия|963
+TW|Тайвань|886
+TZ|Танзания|255
+TH|Таиланд|66
+TL|Восточный Тимор|670
+TG|Того|228
+TO|Тонга|676
+TT|Тринидад и Тобаго|1868
+TN|Тунис|216
+TR|Турция|90
+TM|Туркменистан|993
+TV|Тувалу|688
+UG|Уганда|256
+UA|Украина|380
+AE|ОАЭ|971
+GB|Великобритания|44
+US|США|1
+UY|Уругвай|598
+VU|Вануату|678
+VA|Ватикан|379
+VE|Венесуэла|58
+VN|Вьетнам|84
+YE|Йемен|967
+ZM|Замбия|260
+ZW|Зимбабве|263
+PR|Пуэрто-Рико|1787
+XK|Косово|383
+GL|Гренландия|299
+FO|Фарерские острова|298
+GI|Гибралтар|350
+GU|Гуам|1671
+BM|Бермуды|1441
+KY|Каймановы острова|1345
+AW|Аруба|297
+CW|Кюрасао|599
+RE|Реюньон|262
+MQ|Мартиника|596
+GP|Гваделупа|590
+PF|Французская Полинезия|689
+NC|Новая Каледония|687
+CK|Острова Кука|682`;
+const COUNTRIES = (() => {
+  const all = WORLD_RAW.split("\n").map(r => { const p = r.split("|"); return { id: p[0].toLowerCase(), name: p[1], code: p[2], len: p[3] ? +p[3] : 0 }; });
+  const top = all.slice(0, 5), rest = all.slice(5).sort((x, y) => x.name.localeCompare(y.name, "ru"));
+  return top.concat(rest);
+})();
+const CODE_MAP = {};
+COUNTRIES.forEach(c => { if (!CODE_MAP[c.code]) CODE_MAP[c.code] = c; });
+const isKey = k => /^[1-9]\d{7,14}$/.test(String(k));
+const countryOf = k => { k = String(k); for (let n = 4; n >= 1; n--) { const c = CODE_MAP[k.slice(0, n)]; if (c) return c; } return COUNTRIES[0]; };
 const normPhone = (v, c) => {
   c = c || COUNTRIES[0];
-  let d = String(v).replace(/\D/g, "");
-  if (isKey(d)) return d;
+  const raw = String(v).trim();
+  let d = raw.replace(/\D/g, "");
+  if (!d) return "";
+  if (/^(\+|00)/.test(raw)) { if (d.indexOf("00") === 0) d = d.slice(2); return isKey(d) ? d : ""; }
+  if (c.len && d.length === c.code.length + c.len && d.indexOf(c.code) === 0) return d;
   if (c.code === "7" && d.length === 11 && d.charAt(0) === "8") d = d.slice(1);
-  if (d.length === c.len + 1 && d.charAt(0) === "0") d = d.slice(1);
-  if (d.length === c.len) d = c.code + d;
+  d = d.replace(/^0+/, "");
+  d = c.code + d;
   return isKey(d) ? d : "";
 };
+const LANGS_ALL = (() => {
+  const all = `af|Африкаанс|za
+sq|Албанский|al
+am|Амхарский|et
+ar|Арабский|sa
+hy|Армянский|am
+az|Азербайджанский|az
+eu|Баскский|es
+be|Белорусский|by
+bn|Бенгальский|bd
+bs|Боснийский|ba
+bg|Болгарский|bg
+my|Бирманский|mm
+ca|Каталанский|es
+ceb|Себуанский|ph
+ny|Чичева|mw
+zh-CN|Китайский (упрощённый)|cn
+zh-TW|Китайский (традиционный)|tw
+co|Корсиканский|fr
+hr|Хорватский|hr
+cs|Чешский|cz
+da|Датский|dk
+nl|Нидерландский|nl
+en|Английский|us
+eo|Эсперанто|-
+et|Эстонский|ee
+tl|Филиппинский|ph
+fi|Финский|fi
+fr|Французский|fr
+fy|Фризский|nl
+gl|Галисийский|es
+ka|Грузинский|ge
+de|Немецкий|de
+el|Греческий|gr
+gu|Гуджарати|in
+ht|Гаитянский|ht
+ha|Хауса|ng
+haw|Гавайский|us
+iw|Иврит|il
+hi|Хинди|in
+hmn|Хмонг|-
+hu|Венгерский|hu
+is|Исландский|is
+ig|Игбо|ng
+id|Индонезийский|id
+ga|Ирландский|ie
+it|Итальянский|it
+ja|Японский|jp
+jw|Яванский|id
+kn|Каннада|in
+kk|Казахский|kz
+km|Кхмерский|kh
+rw|Киньяруанда|rw
+ko|Корейский|kr
+ku|Курдский|iq
+ky|Кыргызский|kg
+lo|Лаосский|la
+la|Латинский|va
+lv|Латышский|lv
+lt|Литовский|lt
+lb|Люксембургский|lu
+mk|Македонский|mk
+mg|Малагасийский|mg
+ms|Малайский|my
+ml|Малаялам|in
+mt|Мальтийский|mt
+mi|Маори|nz
+mr|Маратхи|in
+mn|Монгольский|mn
+ne|Непальский|np
+no|Норвежский|no
+or|Одия|in
+ps|Пушту|af
+fa|Персидский|ir
+pl|Польский|pl
+pt|Португальский|pt
+pa|Панджаби|in
+ro|Румынский|ro
+ru|Русский|ru
+sm|Самоанский|ws
+gd|Шотландский гэльский|gb
+sr|Сербский|rs
+st|Сесото|ls
+sn|Шона|zw
+sd|Синдхи|pk
+si|Сингальский|lk
+sk|Словацкий|sk
+sl|Словенский|si
+so|Сомали|so
+es|Испанский|es
+su|Сунданский|id
+sw|Суахили|ke
+sv|Шведский|se
+tg|Таджикский|tj
+ta|Тамильский|in
+tt|Татарский|ru
+te|Телугу|in
+th|Тайский|th
+tr|Турецкий|tr
+tk|Туркменский|tm
+uk|Украинский|ua
+ur|Урду|pk
+ug|Уйгурский|cn
+uz|Узбекский|uz
+vi|Вьетнамский|vn
+cy|Валлийский|gb
+xh|Коса|za
+yi|Идиш|-
+yo|Йоруба|ng
+zu|Зулу|za
+as|Ассамский|in
+ay|Аймара|bo
+dv|Мальдивский|mv
+ee|Эве|gh
+gn|Гуарани|py
+lg|Луганда|ug
+ln|Лингала|cd
+om|Оромо|et
+qu|Кечуа|pe
+sa|Санскрит|in
+ti|Тигринья|er
+ts|Тсонга|za
+ak|Акан|gh`.split("\n").map(r => { const p = r.split("|"); return { code: p[0], name: p[1], flag: p[2] === "-" ? "" : p[2] }; });
+  const first = ["ru", "ky", "en", "kk", "uz", "tg", "tr", "zh-CN", "ar", "hi", "ur", "bn", "fa"];
+  const top = first.map(c => all.find(l => l.code === c)).filter(Boolean);
+  const rest = all.filter(l => first.indexOf(l.code) === -1).sort((x, y) => x.name.localeCompare(y.name, "ru"));
+  return top.concat(rest);
+})();
 const FLAGS = {
   kg: '<rect width="30" height="20" fill="#E8112D"/><circle cx="15" cy="10" r="5" fill="#FFD400"/><circle cx="15" cy="10" r="2.6" fill="#E8112D"/><circle cx="15" cy="10" r="6.4" fill="none" stroke="#FFD400" stroke-width="1.6" stroke-dasharray="1 1"/>',
   ru: '<rect width="30" height="6.7" fill="#fff"/><rect y="6.7" width="30" height="6.7" fill="#0039A6"/><rect y="13.4" width="30" height="6.6" fill="#D52B1E"/>',
@@ -796,7 +1167,21 @@ Object.assign(FLAGS, {
   bd: '<rect width="30" height="20" fill="#006A4E"/><circle cx="13.5" cy="10" r="5.2" fill="#F42A41"/>',
   sa: '<rect width="30" height="20" fill="#006C35"/><rect x="8" y="6" width="14" height="1.6" rx="0.8" fill="#fff"/><rect x="10" y="9" width="10" height="1.4" rx="0.7" fill="#fff"/><rect x="7" y="14" width="16" height="1.2" rx="0.6" fill="#fff"/><rect x="21" y="13.4" width="2.6" height="2.4" fill="#fff"/>'
 });
-  const flagSvg = id => '<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + FLAGS[id] + '</svg>';
+const flagEmoji = id => (id && String(id).length === 2) ? String.fromCodePoint(...String(id).toUpperCase().split("").map(ch => 0x1F1E6 + ch.charCodeAt(0) - 65)) : "🌐";
+const flagSvg = id => {
+  if (id && FLAGS[id]) return '<svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">' + FLAGS[id] + '</svg>';
+  if (!id || String(id).length !== 2) return '<span class="fl-glb">🌐</span>';
+  return '<img class="fl" loading="lazy" alt="" data-iso="' + id + '" src="https://flagcdn.com/w40/' + id + '.png">';
+};
+document.addEventListener("error", e => {
+  const t = e.target;
+  if (t && t.tagName === "IMG" && t.classList.contains("fl")) {
+    const sp = document.createElement("span");
+    sp.className = "fl-glb";
+    sp.textContent = flagEmoji(t.getAttribute("data-iso"));
+    t.replaceWith(sp);
+  }
+}, true);
 const showName = (n, k) => n || "+" + k;
 const myKey = () => state.profile.phone;
 const chatIdWith = otherKey => [myKey(), otherKey].sort().join("__");
@@ -1245,7 +1630,7 @@ $("saveProfileButton").addEventListener("click", async function () {
   try { if (db) await saveRemote(); } catch (e) { alert("Не удалось сохранить на сервере."); return; }
   updateHeader();
   alert("Профиль сохранён! ❤️");
-});
+}); 
 $("addContactButton").addEventListener("click", openAddContact);
 $("backButton").addEventListener("click", function () {
   state.activeContact = null;
@@ -1432,7 +1817,7 @@ async function cpTab(t) {
   };
   if (t === "sms") {
     if (state.contacts.some(c => c.id === cpId)) { openContact(cpId); return; }
-    if (cpId !== myKey() && confirm("Добавить +" + cpId + " в контакты, чтобы написать?")) { $("newContactName").value = cpId; addContact(); }
+    if (cpId !== myKey() && confirm("Добавить +" + cpId + " в контакты, чтобы написать?")) { $("newContactName").value = "+" + cpId; addContact(); }
     return;
   }
   cpTabNow = t;
@@ -1734,7 +2119,7 @@ function showMedia() {
     if (!state.contacts.some(c => c.id === owner)) {
       if (!confirm("Добавить +" + owner + " в контакты, чтобы написать?")) return;
       closeMedia();
-      $("newContactName").value = owner;
+      $("newContactName").value = "+" + owner;
       addContact();
       return;
     }
@@ -1770,7 +2155,7 @@ function showMedia() {
   if (it.owner !== me) act.append(mbtn);
   act.append(vw);
 }
-  $("mBack").addEventListener("click", closeMedia);
+$("mBack").addEventListener("click", closeMedia);
 $("mPrev").addEventListener("click", () => mediaStep(-1));
 $("mNext").addEventListener("click", () => mediaStep(1));
 let mvX = null;
@@ -2066,6 +2451,39 @@ function makeRecorder(stream, kind) {
 }
 
 // ===== LimeChat: Перевод сообщений =====
+let lpCb = null;
+function openLangPick(title, cur, cb) {
+  lpCb = cb;
+  $("lpTitle").textContent = title;
+  const search = $("lpSearch");
+  search.value = "";
+  const render = () => {
+    const q = search.value.trim().toLowerCase();
+    const list = $("lpList");
+    list.replaceChildren();
+    const found = LANGS_ALL.filter(l => !q || l.name.toLowerCase().indexOf(q) !== -1 || l.code.toLowerCase().indexOf(q) === 0);
+    if (!found.length) { const e = document.createElement("div"); e.className = "empty"; e.textContent = "Ничего не найдено."; list.appendChild(e); return; }
+    found.forEach(l => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "crow notranslate" + (l.code === cur ? " cur" : "");
+      b.setAttribute("translate", "no");
+      b.innerHTML = flagSvg(l.flag);
+      const n = document.createElement("span");
+      n.textContent = l.name;
+      const k = document.createElement("b");
+      k.textContent = l.code === cur ? "✓" : l.code;
+      b.append(n, k);
+      b.addEventListener("click", () => { $("lpModal").classList.remove("show"); if (lpCb) lpCb(l); });
+      list.appendChild(b);
+    });
+  };
+  search.oninput = render;
+  render();
+  $("lpModal").classList.add("show");
+}
+$("lpClose").addEventListener("click", () => $("lpModal").classList.remove("show"));
+
 const TR_LANGS = [
   { code: "ru", name: "Русский", flag: "ru", sr: "ru-RU" },
   { code: "ky", name: "Кыргызский", flag: "kg", sr: "ky-KG" },
@@ -2115,6 +2533,12 @@ function makeTranslateUI(text) {
     fb.addEventListener("click", () => { flagsRow.classList.remove("show"); translateMessage(text, l, resultBox, trBtn); });
     flagsRow.appendChild(fb);
   });
+  const more = document.createElement("button");
+  more.type = "button";
+  more.className = "tr-more";
+  more.textContent = "⋯ Ещё языки";
+  more.addEventListener("click", () => openLangPick("Перевести на…", "", l => { flagsRow.classList.remove("show"); translateMessage(text, l, resultBox, trBtn); }));
+  flagsRow.appendChild(more);
   trBtn.addEventListener("click", () => flagsRow.classList.toggle("show"));
   const trWrap = document.createElement("div");
   trWrap.addEventListener("click", e => e.stopPropagation());
@@ -2191,7 +2615,7 @@ function buildVoice(message, item, cid) {
     const k = Math.round(r * bars.length);
     bars.forEach((b, i) => b.classList.toggle("on", i < k));
     dot.style.left = "calc(5px + (100% - 10px) * " + r + ")";
-  };
+  }; 
   setProg(0);
   let au = null;
   play.addEventListener("click", async () => {
@@ -2319,7 +2743,7 @@ function paintRecTx() {
       if (id === myKey()) { alert("Это твой номер."); return; }
       if (state.contacts.some(c => c.id === id)) { openContact(id); return; }
       if (!confirm("Добавить контакт +" + id + "?")) return;
-      $("newContactName").value = id;
+      $("newContactName").value = "+" + id;
       addContact();
     });
     message.appendChild(box);
@@ -3096,26 +3520,35 @@ let loginC = COUNTRIES[0], addC = COUNTRIES[0], pickCb = null;
 function paintCountry(btn, codeEl, inp, c) {
   btn.innerHTML = flagSvg(c.id);
   codeEl.textContent = "+" + c.code;
-  inp.maxLength = c.len + 4;
+  inp.maxLength = 22;
   inp.placeholder = c.len === 10 ? "000 000 0000" : "000 000 000";
 }
 function openCountryPicker(cb) {
   pickCb = cb;
-  const list = $("countryList");
-  list.replaceChildren();
-  COUNTRIES.forEach(c => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "crow";
-    b.innerHTML = flagSvg(c.id);
-    const n = document.createElement("span");
-    n.textContent = c.name;
-    const k = document.createElement("b");
-    k.textContent = "+" + c.code;
-    b.append(n, k);
-    b.addEventListener("click", () => { $("countryModal").classList.remove("show"); if (pickCb) pickCb(c); });
-    list.appendChild(b);
-  });
+  const search = $("countrySearch");
+  search.value = "";
+  const render = () => {
+    const q = search.value.trim().toLowerCase().replace(/^\+/, "");
+    const list = $("countryList");
+    list.replaceChildren();
+    const found = COUNTRIES.filter(c => !q || c.name.toLowerCase().indexOf(q) !== -1 || c.id === q || c.code.indexOf(q) === 0);
+    if (!found.length) { const e = document.createElement("div"); e.className = "empty"; e.textContent = "Ничего не найдено."; list.appendChild(e); return; }
+    found.forEach(c => {
+      const b = document.createElement("button");
+      b.type = "button";
+      b.className = "crow";
+      b.innerHTML = flagSvg(c.id);
+      const n = document.createElement("span");
+      n.textContent = c.name;
+      const k = document.createElement("b");
+      k.textContent = "+" + c.code;
+      b.append(n, k);
+      b.addEventListener("click", () => { $("countryModal").classList.remove("show"); if (pickCb) pickCb(c); });
+      list.appendChild(b);
+    });
+  };
+  search.oninput = render;
+  render();
   $("countryModal").classList.add("show");
 }
 $("countryClose").addEventListener("click", () => $("countryModal").classList.remove("show"));
@@ -3139,10 +3572,34 @@ $("chipChannel").addEventListener("click", () => setChip("channel"));
 
 // ---------- Экранная клавиатура: китайский, урду, бенгальский, хинди ----------
 const VK_LANGS = [
-  { id: "zh", flag: "cn", label: "中文" },
+  { id: "num", flag: "", label: "123" },
+  { id: "ru", flag: "ru", label: "Рус" },
+  { id: "en", flag: "us", label: "EN" },
+  { id: "ky", flag: "kg", label: "Кыр" },
+  { id: "kk", flag: "kz", label: "Қаз" },
+  { id: "uz", flag: "uz", label: "Oʻz" },
+  { id: "tg", flag: "tj", label: "Тоҷ" },
+  { id: "uk", flag: "ua", label: "Укр" },
+  { id: "tr", flag: "tr", label: "TR" },
+  { id: "lat", flag: "eu", label: "Euro" },
+  { id: "el", flag: "gr", label: "Ελλ" },
+  { id: "ar", flag: "sa", label: "عربي" },
+  { id: "fa", flag: "ir", label: "فارسی" },
   { id: "ur", flag: "pk", label: "اردو" },
+  { id: "he", flag: "il", label: "עברית" },
+  { id: "hi", flag: "in", label: "हिन्दी" },
   { id: "bn", flag: "bd", label: "বাংলা" },
-  { id: "hi", flag: "in", label: "हिन्दी" }
+  { id: "ta", flag: "in", label: "தமிழ்" },
+  { id: "te", flag: "in", label: "తెలుగు" },
+  { id: "gu", flag: "in", label: "ગુજ." },
+  { id: "pa", flag: "in", label: "ਪੰਜਾਬੀ" },
+  { id: "zh", flag: "cn", label: "中文" },
+  { id: "ja", flag: "jp", label: "あ" },
+  { id: "jk", flag: "jp", label: "カ" },
+  { id: "ko", flag: "kr", label: "한" },
+  { id: "th", flag: "th", label: "ไทย" },
+  { id: "ka", flag: "ge", label: "ქარ" },
+  { id: "hy", flag: "am", label: "Հայ" }
 ];
 const VK_KEYS = {
   hi: "अ आ इ ई उ ऊ ऋ ए ऐ ओ औ अं अः ा ि ी ु ू ृ े ै ो ौ ं ः ँ ् ़ क ख ग घ ङ च छ ज झ ञ ट ठ ड ढ ण त थ द ध न प फ ब भ म य र ल व श ष स ह ळ क्ष त्र ज्ञ श्र ड़ ढ़ ० १ २ ३ ४ ५ ६ ७ ८ ९ । , . ? !".split(" "),
@@ -3169,7 +3626,49 @@ const ZH_LOCAL = {
   jiu: ["九", "就", "久"], zhongguo: ["中国"], zhong: ["中", "种", "重"], guo: ["国", "过", "果"], ren: ["人", "认"], da: ["大", "打", "答"],
   xiao: ["小", "笑", "校"], tian: ["天", "田", "甜"], shenme: ["什么"], weishenme: ["为什么"], zenme: ["怎么"], duoshao: ["多少"], xihuan: ["喜欢"]
 };
-const vk = { lang: "zh", target: null, host: null, buf: "", req: 0 };
+const vk = { lang: "ru", target: null, host: null, buf: "", req: 0, caps: false };
+const R = t => t.split("");
+const G = t => t.split(" ");
+const LAT = [R("qwertyuiop"), R("asdfghjkl"), R("zxcvbnm")];
+const VKL = {
+  num: { t: "grid", keys: G('1 2 3 4 5 6 7 8 9 0 . , ? ! : ; - _ ( ) @ # / " \' + = % & * ~ ^ < > [ ] { } | € $ £ ¥ ₽ ₸ ₴ ₺ ₹ ₿ № § ° ©') },
+  ru: { t: "rows", caps: true, rows: [R("йцукенгшщзхъ"), R("фывапролджэ"), R("ячсмитьбюё")] },
+  uk: { t: "rows", caps: true, rows: [R("йцукенгшщзхї"), R("фівапролджє"), R("ґячсмитьбю'")] },
+  ky: { t: "rows", caps: true, rows: [R("йцукенгшщзхъ"), R("фывапролджэ"), R("ячсмитьбю"), R("ңөүё")] },
+  kk: { t: "rows", caps: true, rows: [R("йцукенгшщзхъ"), R("фывапролджэ"), R("ячсмитьбю"), R("әіңғүұқөһё")] },
+  tg: { t: "rows", caps: true, rows: [R("йцукенгшщзхъ"), R("фывапролджэ"), R("ячсмитьбю"), R("ғӣқӯҳҷё")] },
+  en: { t: "rows", caps: true, rows: LAT },
+  uz: { t: "rows", caps: true, rows: LAT.concat([R("ʻʼ")]) },
+  tr: { t: "rows", caps: true, rows: LAT.concat([R("ğüşıöç")]) },
+  lat: { t: "rows", caps: true, rows: LAT.concat([R("àáâãäåæçèéêë"), R("ìíîïñòóôõöø"), R("ùúûüýÿßœþð"), R("ąćęłńśźżčšžřěů"), R("ăâîșțőűāēīū")]) },
+  el: { t: "rows", caps: true, rows: [R("ςερτυθιοπ"), R("ασδφγηξκλ"), R("ζχψωβνμ")] },
+  ar: { t: "grid", keys: G("ا ب ت ث ج ح خ د ذ ر ز س ش ص ض ط ظ ع غ ف ق ك ل م ن ه و ي ء أ إ آ ؤ ئ ى ة ً ٌ ٍ َ ُ ِ ّ ْ ٠ ١ ٢ ٣ ٤ ٥ ٦ ٧ ٨ ٩ ، ؛ ؟") },
+  fa: { t: "grid", keys: G("ا ب پ ت ث ج چ ح خ د ذ ر ز ژ س ش ص ض ط ظ ع غ ف ق ک گ ل م ن و ه ی ء آ أ ؤ ئ ة ۀ َ ُ ِ ّ ْ ۰ ۱ ۲ ۳ ۴ ۵ ۶ ۷ ۸ ۹ ، ؛ ؟") },
+  he: { t: "grid", keys: G("א ב ג ד ה ו ז ח ט י כ ך ל מ ם נ ן ס ע פ ף צ ץ ק ר ש ת ־ ׳ ״ . , ? !") },
+  ta: { t: "grid", keys: G("அ ஆ இ ஈ உ ஊ எ ஏ ஐ ஒ ஓ ஔ ஃ ா ி ீ ு ூ ெ ே ை ொ ோ ௌ ் க ங ச ஞ ட ண த ந ப ம ய ர ல வ ழ ள ற ன ஜ ஷ ஸ ஹ க்ஷ ௦ ௧ ௨ ௩ ௪ ௫ ௬ ௭ ௮ ௯ . , ? !") },
+  te: { t: "grid", keys: G("అ ఆ ఇ ఈ ఉ ఊ ఋ ఎ ఏ ఐ ఒ ఓ ఔ ం ః ా ి ీ ు ూ ృ ె ే ై ొ ో ౌ ్ క ఖ గ ఘ ఙ చ ఛ జ ఝ ఞ ట ఠ డ ఢ ణ త థ ద ధ న ప ఫ బ భ మ య ర ల వ శ ష స హ ళ ఱ ౦ ౧ ౨ ౩ ౪ ౫ ౬ ౭ ౮ ౯ . , ? !") },
+  gu: { t: "grid", keys: G("અ આ ઇ ઈ ઉ ઊ ઋ એ ઐ ઓ ઔ ં ઃ ા િ ી ુ ૂ ૃ ે ૈ ો ૌ ્ ક ખ ગ ઘ ઙ ચ છ જ ઝ ઞ ટ ઠ ડ ઢ ણ ત થ દ ધ ન પ ફ બ ભ મ ય ર લ વ શ ષ સ હ ળ ક્ષ જ્ઞ ૦ ૧ ૨ ૩ ૪ ૫ ૬ ૭ ૮ ૯ . , ? !") },
+  pa: { t: "grid", keys: G("ਅ ਆ ਇ ਈ ਉ ਊ ਏ ਐ ਓ ਔ ਾ ਿ ੀ ੁ ੂ ੇ ੈ ੋ ੌ ਂ ੍ ਕ ਖ ਗ ਘ ਙ ਚ ਛ ਜ ਝ ਞ ਟ ਠ ਡ ਢ ਣ ਤ ਥ ਦ ਧ ਨ ਪ ਫ ਬ ਭ ਮ ਯ ਰ ਲ ਵ ਸ਼ ਸ ਹ ੦ ੧ ੨ ੩ ੪ ੫ ੬ ੭ ੮ ੯ . , ? !") },
+  th: { t: "grid", keys: G("ก ข ฃ ค ฅ ฆ ง จ ฉ ช ซ ฌ ญ ฎ ฏ ฐ ฑ ฒ ณ ด ต ถ ท ธ น บ ป ผ ฝ พ ฟ ภ ม ย ร ล ว ศ ษ ส ห ฬ อ ฮ ะ ั า ำ ิ ี ึ ื ุ ู เ แ โ ใ ไ ็ ่ ้ ๊ ๋ ์ ๆ ๐ ๑ ๒ ๓ ๔ ๕ ๖ ๗ ๘ ๙") },
+  ka: { t: "grid", keys: G("ა ბ გ დ ე ვ ზ თ ი კ ლ მ ნ ო პ ჟ რ ს ტ უ ფ ქ ღ ყ შ ჩ ც ძ წ ჭ ხ ჯ ჰ . , ? !") },
+  hy: { t: "grid", caps: true, keys: G("ա բ գ դ ե զ է ը թ ժ ի լ խ ծ կ հ ձ ղ ճ մ յ ն շ ո չ պ ջ ռ ս վ տ ր ց ւ փ ք օ ֆ և ։ , ? !") },
+  ja: { t: "grid", keys: G("あ い う え お か き く け こ さ し す せ そ た ち つ て と な に ぬ ね の は ひ ふ へ ほ ま み む め も や ゆ よ ら り る れ ろ わ を ん が ぎ ぐ げ ご ざ じ ず ぜ ぞ だ ぢ づ で ど ば び ぶ べ ぼ ぱ ぴ ぷ ぺ ぽ っ ゃ ゅ ょ ぁ ぃ ぅ ぇ ぉ ー 、 。 ？ ！") },
+  jk: { t: "grid", keys: G("ア イ ウ エ オ カ キ ク ケ コ サ シ ス セ ソ タ チ ツ テ ト ナ ニ ヌ ネ ノ ハ ヒ フ ヘ ホ マ ミ ム メ モ ヤ ユ ヨ ラ リ ル レ ロ ワ ヲ ン ガ ギ グ ゲ ゴ ザ ジ ズ ゼ ゾ ダ ヂ ヅ デ ド バ ビ ブ ベ ボ パ ピ プ ペ ポ ッ ャ ュ ョ ァ ィ ゥ ェ ォ ヴ ー ・ 、 。") },
+  ko: { t: "hangul", caps: true, rows: [R("ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔ"), R("ㅁㄴㅇㄹㅎㅗㅓㅏㅣ"), R("ㅋㅌㅊㅍㅠㅜㅡ")] },
+  zh: { t: "pinyin" }
+};
+Object.assign(VKL.hi = { t: "grid", keys: VK_KEYS.hi }, {});
+VKL.bn = { t: "grid", keys: VK_KEYS.bn };
+VKL.ur = { t: "grid", keys: VK_KEYS.ur };
+const H_SHIFT = { "ㅂ": "ㅃ", "ㅈ": "ㅉ", "ㄷ": "ㄸ", "ㄱ": "ㄲ", "ㅅ": "ㅆ", "ㅐ": "ㅒ", "ㅔ": "ㅖ" };
+const H_L = "ㄱㄲㄴㄷㄸㄹㅁㅂㅃㅅㅆㅇㅈㅉㅊㅋㅌㅍㅎ", H_V = "ㅏㅐㅑㅒㅓㅔㅕㅖㅗㅘㅙㅚㅛㅜㅝㅞㅟㅠㅡㅢㅣ";
+const H_T = ["", "ㄱ", "ㄲ", "ㄳ", "ㄴ", "ㄵ", "ㄶ", "ㄷ", "ㄹ", "ㄺ", "ㄻ", "ㄼ", "ㄽ", "ㄾ", "ㄿ", "ㅀ", "ㅁ", "ㅂ", "ㅄ", "ㅅ", "ㅆ", "ㅇ", "ㅈ", "ㅊ", "ㅋ", "ㅌ", "ㅍ", "ㅎ"];
+const H_VC = { "ㅗㅏ": "ㅘ", "ㅗㅐ": "ㅙ", "ㅗㅣ": "ㅚ", "ㅜㅓ": "ㅝ", "ㅜㅔ": "ㅞ", "ㅜㅣ": "ㅟ", "ㅡㅣ": "ㅢ" };
+const H_TC = { "ㄱㅅ": "ㄳ", "ㄴㅈ": "ㄵ", "ㄴㅎ": "ㄶ", "ㄹㄱ": "ㄺ", "ㄹㅁ": "ㄻ", "ㄹㅂ": "ㄼ", "ㄹㅅ": "ㄽ", "ㄹㅌ": "ㄾ", "ㄹㅍ": "ㄿ", "ㅀ": "ㅀ", "ㅂㅅ": "ㅄ" };
+delete H_TC["ㅀ"];
+H_TC["ㄹㅎ"] = "ㅀ";
+const hComp = (l, v, t) => String.fromCharCode(0xAC00 + (l * 21 + v) * 28 + t);
+const hDec = c => { if (!c) return null; const n = c.charCodeAt(0) - 0xAC00; if (n < 0 || n > 11171) return null; return { l: Math.floor(n / 588), v: Math.floor((n % 588) / 28), t: n % 28 }; };
 
 function vkInsert(txt) {
   const el = vk.target;
@@ -3189,6 +3688,22 @@ function vkBackspace() {
   if (vk.buf) { vk.buf = vk.buf.slice(0, -1); vkCandidates(); return; }
   let st = typeof el.selectionStart === "number" ? el.selectionStart : el.value.length;
   const en = typeof el.selectionEnd === "number" ? el.selectionEnd : st;
+  if (st === en && vk.lang === "ko" && st > 0) {
+    const d = hDec(el.value.charAt(st - 1));
+    if (d) {
+      let rep;
+      if (d.t) {
+        const tj = H_T[d.t];
+        const split = Object.keys(H_TC).find(k => H_TC[k] === tj);
+        rep = hComp(d.l, d.v, split ? H_T.indexOf(split.charAt(0)) : 0);
+      } else {
+        const vc = Object.keys(H_VC).find(k => H_VC[k] === H_V.charAt(d.v));
+        rep = vc ? hComp(d.l, H_V.indexOf(vc.charAt(0)), 0) : H_L.charAt(d.l);
+      }
+      vkReplaceLast(rep);
+      return;
+    }
+  }
   if (st === en) {
     if (st === 0) return;
     const hi = el.value.charCodeAt(st - 2), lo = el.value.charCodeAt(st - 1);
@@ -3244,9 +3759,60 @@ async function vkCandidates() {
   } catch (e) {}
 }
 
+function vkReplaceLast(str) {
+  const el = vk.target;
+  if (!el) return;
+  const st = typeof el.selectionStart === "number" ? el.selectionStart : el.value.length;
+  el.value = el.value.slice(0, st - 1) + str + el.value.slice(st);
+  const p = st - 1 + str.length;
+  try { el.setSelectionRange(p, p); } catch (e) {}
+  el.focus();
+  el.dispatchEvent(new Event("input", { bubbles: true }));
+}
+
+function hangulType(j) {
+  const el = vk.target;
+  if (!el) return;
+  const pos = typeof el.selectionStart === "number" ? el.selectionStart : el.value.length;
+  const prev = pos > 0 ? el.value.charAt(pos - 1) : "";
+  const d = hDec(prev);
+  const isV = H_V.indexOf(j) !== -1;
+  let rep = null;
+  if (isV) {
+    if (d && d.t) {
+      const tj = H_T[d.t];
+      const split = Object.keys(H_TC).find(k => H_TC[k] === tj);
+      if (split) rep = hComp(d.l, d.v, H_T.indexOf(split.charAt(0))) + hComp(H_L.indexOf(split.charAt(1)), H_V.indexOf(j), 0);
+      else { const li = H_L.indexOf(tj); if (li !== -1) rep = hComp(d.l, d.v, 0) + hComp(li, H_V.indexOf(j), 0); }
+    } else if (d) {
+      const cv = H_VC[H_V.charAt(d.v) + j];
+      if (cv) rep = hComp(d.l, H_V.indexOf(cv), 0);
+    } else if (prev && H_L.indexOf(prev) !== -1) {
+      rep = hComp(H_L.indexOf(prev), H_V.indexOf(j), 0);
+    }
+  } else if (d && !d.t) {
+    const ti = H_T.indexOf(j);
+    if (ti > 0) rep = hComp(d.l, d.v, ti);
+  } else if (d && d.t) {
+    const c = H_TC[H_T[d.t] + j];
+    if (c) rep = hComp(d.l, d.v, H_T.indexOf(c));
+  }
+  if (rep !== null) vkReplaceLast(rep); else vkInsert(j);
+}
+
+function vkType(ch) {
+  const L = VKL[vk.lang];
+  if (L && L.t === "hangul") hangulType(ch); else vkInsert(ch);
+  if (vk.caps) { vk.caps = false; vkRenderKeys(); }
+}
+
 function vkRenderKeys() {
   const box = $("vkKeys");
   box.replaceChildren();
+  const L = VKL[vk.lang] || VKL.en;
+  $("vkShift").style.display = L.caps ? "" : "none";
+  $("vkShift").classList.toggle("on", vk.caps);
+  const shown = ch => !L.caps || !vk.caps ? ch : (L.t === "hangul" ? (H_SHIFT[ch] || ch) : ch.toUpperCase());
   const mk = (ch, fn) => {
     const b = document.createElement("button");
     b.type = "button";
@@ -3256,9 +3822,9 @@ function vkRenderKeys() {
     b.addEventListener("click", fn);
     return b;
   };
-  if (vk.lang === "zh") {
+  if (L.t === "pinyin") {
     box.classList.add("rows");
-    ZH_ROWS.forEach((row, ri) => {
+    ZH_ROWS.forEach(row => {
       const rd = document.createElement("div");
       rd.className = "vk-row";
       row.forEach(ch => rd.appendChild(mk(ch, () => {
@@ -3267,17 +3833,29 @@ function vkRenderKeys() {
       })));
       box.appendChild(rd);
     });
+  } else if (L.t === "rows" || L.t === "hangul") {
+    box.classList.add("rows");
+    L.rows.forEach(row => {
+      const rd = document.createElement("div");
+      rd.className = "vk-row";
+      row.forEach(ch => { const c = shown(ch); rd.appendChild(mk(c, () => vkType(c))); });
+      box.appendChild(rd);
+    });
   } else {
     box.classList.remove("rows");
-    VK_KEYS[vk.lang].forEach(ch => box.appendChild(mk(ch, () => vkInsert(ch))));
+    L.keys.forEach(ch => { const c = shown(ch); box.appendChild(mk(c, () => vkType(c))); });
   }
 }
 
 function setVkLang(id) {
   vk.lang = id;
   vk.buf = "";
-  document.querySelectorAll("#vkTop .vk-lang").forEach(b => b.classList.toggle("on", b.dataset.k === id));
-  if (vk.target) vk.target.dir = id === "ur" ? "rtl" : "auto";
+  vk.caps = false;
+  document.querySelectorAll("#vkTop .vk-lang").forEach(b => {
+    b.classList.toggle("on", b.dataset.k === id);
+    if (b.dataset.k === id && b.scrollIntoView) { try { b.scrollIntoView({ block: "nearest", inline: "center" }); } catch (e) {} }
+  });
+  if (vk.target) vk.target.dir = (id === "ur" || id === "ar" || id === "fa" || id === "he") ? "rtl" : "auto";
   vkRenderKeys();
   vkCandidates();
 }
@@ -3304,18 +3882,21 @@ function closeVkb() {
 
 (function buildVkTop() {
   const top = $("vkTop");
+  const sc = document.createElement("div");
+  sc.className = "vk-langs";
   VK_LANGS.forEach(l => {
     const b = document.createElement("button");
     b.type = "button";
     b.className = "vk-lang";
     b.dataset.k = l.id;
-    b.innerHTML = flagSvg(l.flag);
+    b.innerHTML = l.flag ? flagSvg(l.flag) : '<span class="fl-glb">⌨️</span>';
     const sm = document.createElement("span");
     sm.textContent = l.label;
     b.appendChild(sm);
     b.addEventListener("click", () => setVkLang(l.id));
-    top.appendChild(b);
+    sc.appendChild(b);
   });
+  top.appendChild(sc);
   const x = document.createElement("button");
   x.type = "button";
   x.className = "vk-close";
@@ -3323,7 +3904,8 @@ function closeVkb() {
   x.textContent = "✕";
   x.addEventListener("click", closeVkb);
   top.appendChild(x);
-})();
+})(); 
+  $("vkShift").addEventListener("click", () => { vk.caps = !vk.caps; vkRenderKeys(); });
 
 $("vkBack").addEventListener("click", vkBackspace);
 $("vkSpace").addEventListener("click", () => {
@@ -3370,20 +3952,7 @@ $("recTx").addEventListener("click", () => {
 });
 
 // ---------- Язык сайта ----------
-const UI_LANGS = [
-  { code: "ru", name: "Русский", flag: "ru" },
-  { code: "ky", name: "Кыргызча", flag: "kg" },
-  { code: "kk", name: "Қазақша", flag: "kz" },
-  { code: "uz", name: "Oʻzbekcha", flag: "uz" },
-  { code: "tg", name: "Тоҷикӣ", flag: "tj" },
-  { code: "en", name: "English", flag: "us" },
-  { code: "tr", name: "Türkçe", flag: "tr" },
-  { code: "zh-CN", name: "中文", flag: "cn" },
-  { code: "ur", name: "اردو", flag: "pk" },
-  { code: "hi", name: "हिन्दी", flag: "in" },
-  { code: "bn", name: "বাংলা", flag: "bd" },
-  { code: "ar", name: "العربية", flag: "sa" }
-];
+const UI_LANGS = LANGS_ALL;
 let uiLang = "ru";
 try { uiLang = localStorage.getItem("lc_ui") || "ru"; } catch (e) {}
 if (!UI_LANGS.some(l => l.code === uiLang)) uiLang = "ru";
@@ -3519,32 +4088,48 @@ function uiInit() {
 }
 
 function openUiLang() {
-  const list = $("uiLangList");
-  list.replaceChildren();
-  UI_LANGS.forEach(l => {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "crow";
-    b.innerHTML = flagSvg(l.flag);
-    const n = document.createElement("span");
-    n.textContent = l.name;
-    const k = document.createElement("b");
-    k.textContent = l.code === uiLang ? "✓" : "";
-    k.style.color = "#2a9d0a";
-    b.append(n, k);
-    b.addEventListener("click", () => {
-      $("uiLangModal").classList.remove("show");
-      if (l.code === uiLang) return;
-      try { localStorage.setItem("lc_ui", l.code); } catch (e) {}
-      location.reload();
-    });
-    list.appendChild(b);
+  openLangPick("Язык сайта", uiLang, l => {
+    if (l.code === uiLang) return;
+    try { localStorage.setItem("lc_ui", l.code); } catch (e) {}
+    location.reload();
   });
-  $("uiLangModal").classList.add("show");
 }
 $("sideLang").addEventListener("click", () => { $("sideMenu").classList.remove("show"); openUiLang(); });
 $("uiLangClose").addEventListener("click", () => $("uiLangModal").classList.remove("show"));
 setTimeout(uiInit, 0);
+
+// ---------- Требования магазинов: жалобы и удаление аккаунта ----------
+$("cpReport").addEventListener("click", () => {
+  $("cpMenu").classList.remove("show");
+  if (!db || !cpId || !state.profile.phone) { alert("Нет подключения."); return; }
+  const reason = prompt("Что не так? Опиши коротко (спам, оскорбления, неприемлемое содержимое и т.д.):", "");
+  if (reason === null) return;
+  push(ref(db, "reports"), { from: state.profile.phone, target: cpId, reason: String(reason).trim().slice(0, 300), ts: serverTimestamp() })
+    .then(() => alert("Спасибо! Жалоба отправлена. Мы проверим её в течение 24 часов."))
+    .catch(() => alert("Не удалось отправить жалобу."));
+});
+
+$("deleteAccountBtn").addEventListener("click", async () => {
+  const me = state.profile.phone;
+  if (!me || !db) { alert("Нет подключения."); return; }
+  if (!confirm("Удалить аккаунт и все твои данные? Это нельзя отменить.")) return;
+  if (!confirm("Точно удалить? Профиль, альбом, истории и фото будут стёрты с сервера.")) return;
+  const btn = $("deleteAccountBtn");
+  btn.disabled = true;
+  btn.textContent = "Удаляю...";
+  const paths = ["users", "presence", "statuses", "stories", "storyvid", "albums", "albumvideo", "albumvmedia", "inbox", "usergroups", "calls"].map(p => p + "/" + me);
+  try {
+    await Promise.all(paths.map(p => remove(ref(db, p)).catch(() => {})));
+    const fs = await get(query(ref(db, "feed"), limitToLast(200)));
+    const jobs = [];
+    fs.forEach(ch => { const v = ch.val(); if (v && v.owner === me) jobs.push(remove(ref(db, "feed/" + ch.key)).catch(() => {})); });
+    state.groups.forEach(g => jobs.push(remove(ref(db, "groups/" + g.id + "/members/" + me)).catch(() => {})));
+    await Promise.all(jobs);
+  } catch (e) {}
+  try { localStorage.clear(); } catch (e) {}
+  alert("Аккаунт удалён.");
+  location.reload();
+});
 
 // ---------- Запуск ----------
 loadState();
@@ -3630,6 +4215,11 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
   } catch (e) {
     console.error(e);
   }
+</script>
+<script>
+if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) {
+  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+}
 </script>
 </body>
 </html>
