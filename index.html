@@ -756,7 +756,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   });
 })();
  </script>
- <script type="module">
+<script type="module">
 let initializeApp, getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp, runTransaction;
 
 // ===== 1. ВСТАВЬТЕ СЮДА КОНФИГ ИЗ FIREBASE =====
@@ -792,7 +792,7 @@ function isBlocked(id) { return state.blocked.indexOf(id) !== -1; }
 
 // ---------- Firebase ----------
 let db = null;
-async function loadFirebase() {
+ async function loadFirebase() {
   try {
     const a = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
     const d = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
@@ -1925,8 +1925,8 @@ $("cpDelete").addEventListener("click", () => {
   $("cpMenu").classList.remove("show");
   state.activeContact = cpId;
   deleteCurrentContact();
-});
-$("cpBlock").addEventListener("click", () => {
+}); 
+ $("cpBlock").addEventListener("click", () => {
   $("cpMenu").classList.remove("show");
   const c = state.contacts.find(x => x.id === cpId);
   if (!c) return;
@@ -1965,7 +1965,7 @@ $("albumInput").addEventListener("change", function () {
 });
 
 let feedTab = "photo";
-  async function loadAlbum() {
+async function loadAlbum() {
   const box = $("feedBox");
   document.querySelectorAll(".atabs button").forEach(b => b.classList.toggle("on", b.dataset.a === feedTab));
   $("albumAdd").textContent = feedTab === "video" ? "🎥 Добавить видео" : "➕ Добавить фото";
@@ -2795,7 +2795,7 @@ function paintRecTx() {
 
 // --- голосовое
 let vrec = null;
-function stopVoice(send) {
+  function stopVoice(send) {
   const r = vrec;
   if (!r) return;
   r.send = send;
@@ -2921,7 +2921,7 @@ $("vidGo").addEventListener("click", () => {
     if (sec >= lim) finishVid();
   }, 250);
 });
-  $("vidCancel").addEventListener("click", closeVid);
+$("vidCancel").addEventListener("click", closeVid);
 
 // --- кнопки меню вложений
 $("micBtn").addEventListener("click", startVoice);
@@ -3032,28 +3032,46 @@ async function loadStories() {
     e.textContent = "У тебя пока нет историй.";
     mine.appendChild(e);
   }
+  const clubsIn = state.groups.filter(g => g.type === "channel");
+  const cres = await Promise.all(clubsIn.map(g => get(ref(db, "clubstory/" + g.id)).then(sn => {
+    const a = [];
+    sn.forEach(ch => {
+      const v = ch.val();
+      if (v && (v.t === "video" || okData(v.d, "image"))) a.push(Object.assign({ key: ch.key, owner: "club_" + g.id, path: "clubstory/" + g.id + "/" + ch.key, vpath: "clubstoryv/" + g.id + "/" + ch.key, canDel: isClubAdmin(g), label: g.name, noViews: false }, v));
+    });
+    return [g, a];
+  }).catch(() => [g, []])));
+  cres.forEach(([g, arr]) => {
+    const live = arr.filter(x => Date.now() - (x.ts || Date.now()) < DAY).sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
+    if (isClubAdmin(g)) arr.filter(x => live.indexOf(x) === -1).forEach(x => {
+      remove(ref(db, "clubstory/" + g.id + "/" + x.key)).catch(() => {});
+      if (x.t === "video") remove(ref(db, "clubstoryv/" + g.id + "/" + x.key)).catch(() => {});
+    });
+    if (!live.length) return;
+    blocks.push([g.id, live, live.some(x => !(x.views || {})[me]), g]);
+  });
   blocks.sort((a, b) => (b[2] ? 1 : 0) - (a[2] ? 1 : 0));
-  blocks.forEach(([id, live]) => {
-    const c = state.contacts.find(x => x.id === id);
+  blocks.forEach(([id, live, , cg]) => {
+    const c = cg ? null : state.contacts.find(x => x.id === id);
     const head = document.createElement("div");
     head.className = "shead2";
     head.style.cursor = "pointer";
-    head.addEventListener("click", () => openCP(id, "statusView"));
-    head.appendChild(makeAvatar(c ? c.photo : "", c ? c.name : ""));
+    head.addEventListener("click", () => { if (cg) openGroup(cg.id); else openCP(id, "statusView"); });
+    head.appendChild(cg ? makeAvatar(cg.photo, cg.name) : makeAvatar(c ? c.photo : "", c ? c.name : ""));
     const nm = document.createElement("span");
-    nm.textContent = c ? c.name : "+" + id;
+    nm.textContent = cg ? cg.name : (c ? c.name : "+" + id);
     const hint = document.createElement("small");
     hint.textContent = live.length > 1 ? "листайте →" : "профиль →";
     head.append(nm, hint);
     const row = document.createElement("div");
     row.className = "srow";
-    live.forEach((x, i) => row.appendChild(storyCard(x, live, i, false)));
+    live.forEach((x, i) => row.appendChild(storyCard(x, live, i, cg ? isClubAdmin(cg) : false)));
     others.append(head, row);
   });
   if (!blocks.length) {
     const e = document.createElement("div");
     e.className = "empty";
-    e.textContent = "У контактов пока нет историй.";
+    e.textContent = "У контактов и клубов пока нет историй.";
     others.appendChild(e);
   }
 }
@@ -3181,7 +3199,7 @@ $("storyAdd").addEventListener("click", () => {
   if (!db || !state.profile.phone) { alert("Нет подключения."); return; }
   $("storyChoose").classList.add("show");
 });
-$("scClose").addEventListener("click", () => $("storyChoose").classList.remove("show"));
+  $("scClose").addEventListener("click", () => $("storyChoose").classList.remove("show"));
 $("scPhoto").addEventListener("click", () => { $("storyChoose").classList.remove("show"); $("storyInput").click(); });
 $("scVideo").addEventListener("click", () => { $("storyChoose").classList.remove("show"); $("storyVidInput").click(); });
 $("scCam").addEventListener("click", () => { $("storyChoose").classList.remove("show"); openVid("story"); });
@@ -3207,6 +3225,7 @@ $("storyVidInput").addEventListener("change", async function () {
 const gListening = {}, gNames = {};
 let gcur = null, gtab = "members", pendingOpen = null;
 let clubPv = null, clubsCache = [], clubsListening = false, clubsState = "load", clubUp = null, cmTok = 0;
+const thSynced = {};
 const MAX_CLUB_ADMINS = 15;
 const isClubAdmin = (g, p) => { p = p || myKey(); return !!g && (g.admin === p || (g.admins || []).indexOf(p) !== -1); };
 const gById = id => state.groups.find(g => g.id === id) || (clubPv && clubPv.id === id ? clubPv : null);
@@ -3235,6 +3254,7 @@ function listenGroup(gid) {
     g.admins = v.admins ? Object.keys(v.admins) : [];
     g.members = Object.keys(v.members);
     g.type = v.type === "channel" ? "channel" : "group";
+    if (g.type === "channel" && g.admin === me && g.photo) syncClubThumb(g);
     if (clubPv && clubPv.id === gid) clubPv = null;
     if (pendingOpen === gid) {
       pendingOpen = null;
@@ -3509,7 +3529,7 @@ $("gcBack").addEventListener("click", () => {
   renderGroupHead();
   renderGroupTab();
 });
-  $("gForm").addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
+ $("gForm").addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
 $("gPhotoBtn").addEventListener("click", () => $("gPhotoInput").click());
 $("gPhotoInput").addEventListener("change", function () {
   const f = this.files && this.files[0];
@@ -3572,6 +3592,21 @@ $("gCreateOk").addEventListener("click", async () => {
 });
 
 // ---------- Клубы (открытые для всех) ----------
+function syncClubThumb(g) {
+  if (!db || thSynced[g.id] === g.photo) return;
+  thSynced[g.id] = g.photo;
+  const img = new Image();
+  img.onload = () => {
+    const r = Math.min(1, 96 / Math.max(img.width, img.height));
+    const c = document.createElement("canvas");
+    c.width = Math.max(1, Math.round(img.width * r));
+    c.height = Math.max(1, Math.round(img.height * r));
+    c.getContext("2d").drawImage(img, 0, 0, c.width, c.height);
+    set(ref(db, "clubs/" + g.id + "/th"), c.toDataURL("image/jpeg", 0.6)).catch(() => {});
+  };
+  img.src = g.photo;
+}
+
 function bumpClub(id, d) {
   if (!db) return;
   runTransaction(ref(db, "clubs/" + id + "/count"), v => Math.max(0, (v || 0) + d)).catch(() => {});
@@ -3582,7 +3617,7 @@ function listenClubs() {
   clubsListening = true;
   onValue(query(ref(db, "clubs"), limitToLast(200)), sn => {
     const v = sn.val() || {};
-    clubsCache = Object.keys(v).filter(id => v[id] && v[id].name).map(id => ({ id: id, name: String(v[id].name), admin: v[id].admin, count: v[id].count || 0 })).reverse();
+    clubsCache = Object.keys(v).filter(id => v[id] && v[id].name).map(id => ({ id: id, name: String(v[id].name), admin: v[id].admin, count: v[id].count || 0, th: typeof v[id].th === "string" && /^data:image\//.test(v[id].th) ? v[id].th : "" })).reverse();
     clubsState = "ok";
     if (currentView === "chatsView" && chatFilter === "channel") renderChats();
   }, () => {
@@ -3595,8 +3630,8 @@ function listenClubs() {
 function makeClubButton(c, joined) {
   const b = document.createElement("button");
   b.className = "contact";
-  const av = makeAvatar("", "");
-  av.textContent = "📢";
+  const av = makeAvatar(c.th, "");
+  if (!c.th) av.textContent = "📢";
   b.appendChild(av);
   const info = document.createElement("div");
   info.className = "contact-info";
@@ -3608,7 +3643,7 @@ function makeClubButton(c, joined) {
   b.appendChild(info);
   b.addEventListener("click", () => openClub(c));
   return b;
-  }
+}
 
 async function openClub(c) {
   if (state.groups.some(g => g.id === c.id)) { openGroup(c.id); return; }
@@ -3808,8 +3843,8 @@ $("clubPhotoInput").addEventListener("change", function () {
   this.value = "";
   if (!f || !f.type.startsWith("image/") || !clubUp) return;
   compress(f, clubUp.target === "story" ? 720 : 800, url => publishClub("photo", url));
-});
-$("clubVidInput").addEventListener("change", async function () {
+}); 
+ $("clubVidInput").addEventListener("change", async function () {
   const f = this.files && this.files[0];
   this.value = "";
   if (!f || !f.type.startsWith("video/") || !clubUp) return;
@@ -4018,7 +4053,7 @@ const VKL = {
   ko: { t: "hangul", caps: true, rows: [R("ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔ"), R("ㅁㄴㅇㄹㅎㅗㅓㅏㅣ"), R("ㅋㅌㅊㅍㅠㅜㅡ")] },
   zh: { t: "pinyin" }
 };
-  Object.assign(VKL.hi = { t: "grid", keys: VK_KEYS.hi }, {});
+Object.assign(VKL.hi = { t: "grid", keys: VK_KEYS.hi }, {});
 VKL.bn = { t: "grid", keys: VK_KEYS.bn };
 VKL.ur = { t: "grid", keys: VK_KEYS.ur };
 const H_SHIFT = { "ㅂ": "ㅃ", "ㅈ": "ㅉ", "ㄷ": "ㄸ", "ㄱ": "ㄲ", "ㅅ": "ㅆ", "ㅐ": "ㅒ", "ㅔ": "ㅖ" };
@@ -4278,7 +4313,7 @@ $("vkEnter").addEventListener("click", () => {
   const f = vk.target && vk.target.form;
   if (f) f.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
 });
-$("attKb").addEventListener("click", () => { closeAttach(); openVkb($("messageInput"), $("chatView")); });
+  $("attKb").addEventListener("click", () => { closeAttach(); openVkb($("messageInput"), $("chatView")); });
 $("gKb").addEventListener("click", () => openVkb($("gInput"), $("gChatView")));
 
 (function buildRecLang() {
@@ -4446,7 +4481,7 @@ function uiInit() {
       return orig(uiCache[k] || m, d);
     };
   });
-  }
+}
 
 function openUiLang() {
   openLangPick("Язык сайта", uiLang, l => {
