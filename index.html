@@ -321,7 +321,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <input id="chatSearch" type="search" placeholder="Поиск сообщений" autocomplete="off">
       <button type="button" class="chip" id="chipContact">Контакты</button>
       <button type="button" class="chip" id="chipGroup">Группа</button>
-      <button type="button" class="chip" id="chipChannel">Канал</button>
+      <button type="button" class="chip" id="chipChannel">Клуб</button>
     </div>
     <div class="contact-list" id="contactList"></div>
   </section>
@@ -424,7 +424,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <button class="kb-btn" type="button" id="gKb" aria-label="Клавиатура языков">⌨️</button>
       <button class="send-button" type="submit" aria-label="Отправить">↑</button>
     </form>
-    <div id="gNote" style="display:none;padding:14px;text-align:center;color:#777;background:#fff;border-top:1px solid #eee">📢 Это канал: писать может только админ</div>
+    <div id="gNote" style="display:none;padding:14px;text-align:center;color:#777;background:#fff;border-top:1px solid #eee">📢 Это клуб: писать может только админ</div>
   </section>
 
   <section class="view" id="profileView">
@@ -713,7 +713,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
-(function () {
+  (function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -1423,7 +1423,7 @@ function makeGroupButton(g, preview) {
   n.textContent = g.name;
   const sm = document.createElement("small");
   const msgs = state.messages[g.id] || [];
-  sm.textContent = preview || (msgs.length ? msgs[msgs.length - 1].text : (g.type === "channel" ? "Канал · подписчиков: " : "Группа · участников: ") + (g.members ? g.members.length : 0));
+  sm.textContent = preview || (msgs.length ? msgs[msgs.length - 1].text : (g.type === "channel" ? "Клуб · участников: " : "Группа · участников: ") + (g.members ? g.members.length : 0));
   info.append(n, sm);
   b.appendChild(info);
   b.addEventListener("click", () => openGroup(g.id));
@@ -1461,9 +1461,21 @@ function renderChats() {
     if (q) empty.textContent = "Ничего не найдено.";
     else if (chatFilter === "contact") empty.textContent = "Личных чатов пока нет. Добавь контакт на вкладке «Контакты».";
     else if (chatFilter === "group") empty.textContent = "Групп пока нет. Создай группу на вкладке «Контакты».";
-    else if (chatFilter === "channel") empty.textContent = "Каналов пока нет. Создай канал на вкладке «Контакты».";
+    else if (chatFilter === "channel") empty.textContent = "Ты пока не состоишь ни в одном клубе. Нажми «Создай свой клуб» внизу.";
     else empty.textContent = "Пока нет контактов. Нажмите ➕, чтобы добавить первый контакт.";
     list.appendChild(empty);
+  }
+  if (chatFilter === "channel" && !q) {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "position:sticky;bottom:0;padding:12px;background:#fff";
+    const cb = document.createElement("button");
+    cb.type = "button";
+    cb.className = "primary-button";
+    cb.style.marginTop = "0";
+    cb.textContent = "➕ Создай свой клуб";
+    cb.addEventListener("click", () => openGroupCreate("channel"));
+    wrap.appendChild(cb);
+    list.appendChild(wrap);
   }
 }
 
@@ -1573,7 +1585,7 @@ function openAddContact() {
   paintCountry($("addFlag"), $("addCode"), $("newContactName"), addC);
   $("contactModal").classList.add("show");
   $("newContactName").focus();
-}
+  }
 
 function deleteCurrentContact() {
   if (!state.activeContact) { alert("Сначала открой контакт."); return; }
@@ -2392,7 +2404,7 @@ function renderCalls() {
     });
     list.appendChild(b);
   });
-}
+  }
 
 // ---------- Вложения, голос, кружки ----------
 const fmtDur = v => { v = Math.max(0, Math.round(+v || 0)); return Math.floor(v / 60) + ":" + String(v % 60).padStart(2, "0"); };
@@ -3085,7 +3097,7 @@ $("sStage").addEventListener("click", e => {
   else if (sv.i + 1 < sv.list.length) { sv.i++; showStory(); }
   else closeStory();
 });
-$("sDel").addEventListener("click", () => {
+  $("sDel").addEventListener("click", () => {
   if (!sv || !confirm("Удалить эту историю?")) return;
   const s = sv.list[sv.i];
   remove(ref(db, "stories/" + s.owner + "/" + s.key)).catch(() => {});
@@ -3404,7 +3416,7 @@ function fillGroupChatHead() {
   if (!g) return;
   $("gcName").textContent = g.name;
   const ch = g.type === "channel";
-  $("gcSub").textContent = (ch ? "подписчиков: " : "участников: ") + g.members.length;
+  $("gcSub").textContent = "участников: " + g.members.length;
   const ro = ch && g.admin !== myKey();
   $("gForm").style.display = ro ? "none" : "";
   $("gNote").style.display = ro ? "block" : "none";
@@ -3441,9 +3453,9 @@ function openGroupCreate(mode) {
   if (!state.contacts.length) { alert("Сначала добавь контакты."); return; }
   gMode = mode;
   const ch = mode === "channel";
-  $("gCreateTitle").textContent = ch ? "Новый канал" : "Новая группа";
-  $("gNewName").placeholder = ch ? "Название канала" : "Название группы";
-  $("gCreateHint").textContent = ch ? "Выбери подписчиков:" : "Выбери участников:";
+  $("gCreateTitle").textContent = ch ? "Новый клуб" : "Новая группа";
+  $("gNewName").placeholder = ch ? "Название клуба" : "Название группы";
+  $("gCreateHint").textContent = "Выбери участников:";
   $("gNewName").value = "";
   const list = $("gNewList");
   list.replaceChildren();
@@ -3464,8 +3476,8 @@ $("gCreateCancel").addEventListener("click", () => $("gCreateModal").classList.r
 $("gCreateOk").addEventListener("click", async () => {
   const name = $("gNewName").value.trim();
   const ids = Array.from($("gNewList").querySelectorAll("input:checked")).map(x => x.value);
-  if (!name) { alert(gMode === "channel" ? "Введи название канала." : "Введи название группы."); return; }
-  if (!ids.length) { alert(gMode === "channel" ? "Выбери хотя бы одного подписчика." : "Выбери хотя бы одного участника."); return; }
+  if (!name) { alert(gMode === "channel" ? "Введи название клуба." : "Введи название группы."); return; }
+  if (!ids.length) { alert(gMode === "channel" ? "Выбери хотя бы одного участника." : "Выбери хотя бы одного участника."); return; }
   if (!db) { alert("Нет подключения."); return; }
   const me = myKey(), all = [me].concat(ids), members = {};
   all.forEach(p => { members[p] = true; });
