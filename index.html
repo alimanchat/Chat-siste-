@@ -325,9 +325,6 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <button type="button" class="chip" id="chipChannel">Клуб</button>
     </div>
     <div class="contact-list" id="contactList"></div>
-    <div id="clubCreateBar" style="display:none;padding:10px 12px;background:#fff;border-top:1px solid #eee">
-      <button type="button" class="primary-button" id="clubCreateBtn" style="margin-top:0">➕ Создай свой клуб</button>
-    </div>
   </section>
 
   <section class="view" id="contactsView">
@@ -336,6 +333,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     <div style="padding:12px">
       <button class="primary-button" id="addContactButton">➕ Добавить контакт</button>
       <button class="primary-button" id="groupCreateBtn" style="margin-top:8px">👥 Создать группу</button>
+      <button class="primary-button" id="clubCreateBtn" style="margin-top:8px">📢 Создать клуб</button>
     </div>
   </section>
 
@@ -402,6 +400,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       <input type="file" id="gPhotoInput" accept="image/*" style="display:none">
       <h2 id="gName" style="margin:0"></h2>
       <div class="gtabs">
+        <button data-g="stories" style="display:none"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="20.5"/><circle cx="24" cy="24" r="11.5" stroke-dasharray="15 5 6 5 12 5"/><path d="M24 18v12M18 24h12"/></svg><small>Истории</small></button>
         <button data-g="members"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="17.5" cy="16" r="6.3"/><path d="M5.5 38c.9-7.2 6-10.6 12-10.6s11.100 3.400 12 10.600"/><circle cx="33.5" cy="18" r="5"/><path d="M32 28.2c5.800-.3 10.200 2.800 11 9.300"/></svg><small>Участники</small></button>
         <button data-g="admin"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="24" cy="24" r="20.5"/><circle cx="24" cy="19" r="6.2"/><path d="M10.2 37.3C13 31.6 18.3 28.6 24 28.6s11 3 13.8 8.7"/></svg><small>Админ</small></button>
         <button data-g="photo"><svg class="ti" viewBox="0 0 48 48" xmlns="http://www.w3.org/2000/svg" fill="none" stroke="currentColor" stroke-width="3.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 15.5h8.5l2.3-4.5h10.4l2.3 4.5H40a3.5 3.5 0 0 1 3.5 3.5v18a3.5 3.5 0 0 1-3.5 3.5H8A3.5 3.5 0 0 1 4.5 37V19A3.5 3.5 0 0 1 8 15.5z"/><circle cx="24" cy="28" r="8.2"/><circle cx="24" cy="28" r="4.2" fill="currentColor" stroke="none"/><circle cx="10.5" cy="21.5" r="1.4" fill="currentColor" stroke="none"/></svg><small>Фото</small></button>
@@ -410,7 +409,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
       </div>
       <div id="gContent" style="text-align:left"></div>
     </div>
-    <div style="padding:10px"><button class="primary-button" id="gAddMember" style="margin-top:0;display:none">+ Добавить контакт</button></div>
+    <div style="padding:10px"><button class="primary-button" id="gAddMember" style="margin-top:0;display:none">+ Добавить контакт</button><button class="primary-button" id="gJoinBtn" style="margin-top:0;display:none">➕ Вступить в клуб</button></div>
   </section>
 
   <section class="view" id="gChatView">
@@ -595,6 +594,28 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     </div>
   </div>
 
+  <input type="file" id="clubPhotoInput" accept="image/*" style="display:none">
+  <input type="file" id="clubVidInput" accept="video/*" style="display:none">
+  <div class="modal" id="clubChoose">
+    <div class="modal-card">
+      <h3 id="ccTitle">Новая история</h3>
+      <button class="primary-button" id="ccPhoto">🖼️ Фото из галереи</button>
+      <button class="primary-button" id="ccVideo">🎞️ Видео из галереи (до 1 мин)</button>
+      <button class="primary-button" id="ccCam">🎥 Снять видео (до 1 мин)</button>
+      <button class="secondary-button" id="ccClose" style="width:100%;margin-top:12px">Закрыть</button>
+    </div>
+  </div>
+  <div class="modal" id="clubAdminModal">
+    <div class="modal-card">
+      <h3>Добавить админа</h3>
+      <div id="clubAdminHint" style="margin:6px 0;color:#666"></div>
+      <div id="clubAdminList" style="max-height:45vh;overflow-y:auto"></div>
+      <div class="modal-actions">
+        <button class="secondary-button" id="clubAdminClose">Закрыть</button>
+      </div>
+    </div>
+  </div>
+
   <div class="modal" id="gCreateModal">
     <div class="modal-card">
       <h3 id="gCreateTitle">Новая группа</h3>
@@ -735,7 +756,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
   });
 })();
  </script>
-<script type="module">
+ <script type="module">
 let initializeApp, getDatabase, ref, push, set, get, remove, onChildAdded, onValue, onDisconnect, query, limitToLast, serverTimestamp, runTransaction;
 
 // ===== 1. ВСТАВЬТЕ СЮДА КОНФИГ ИЗ FIREBASE =====
@@ -748,7 +769,7 @@ const firebaseConfig = {
   messagingSenderId: "740490057583",
   appId: "1:740490057583:web:fddeb33ad95bf35047ba9a"
 };
-  // ================================================
+// ================================================
 
 (function () {
 "use strict";
@@ -1480,7 +1501,6 @@ function renderChats() {
     else empty.textContent = "Пока нет контактов. Нажмите ➕, чтобы добавить первый контакт.";
     list.appendChild(empty);
   }
-  $("clubCreateBar").style.display = (chatFilter === "channel" || chatFilter === "myclub") ? "block" : "none";
 }
 
 function renderContacts() {
@@ -1831,7 +1851,7 @@ async function cpTab(t) {
     d.textContent = txt;
     box.appendChild(d);
   };
-    if (t === "sms") {
+  if (t === "sms") {
     if (state.contacts.some(c => c.id === cpId)) { openContact(cpId); return; }
     if (cpId !== myKey() && confirm("Добавить +" + cpId + " в контакты, чтобы написать?")) { $("newContactName").value = "+" + cpId; addContact(); }
     return;
@@ -1945,7 +1965,7 @@ $("albumInput").addEventListener("change", function () {
 });
 
 let feedTab = "photo";
-async function loadAlbum() {
+  async function loadAlbum() {
   const box = $("feedBox");
   document.querySelectorAll(".atabs button").forEach(b => b.classList.toggle("on", b.dataset.a === feedTab));
   $("albumAdd").textContent = feedTab === "video" ? "🎥 Добавить видео" : "➕ Добавить фото";
@@ -2498,7 +2518,7 @@ function openLangPick(title, cur, cb) {
   render();
   $("lpModal").classList.add("show");
 }
-  $("lpClose").addEventListener("click", () => $("lpModal").classList.remove("show"));
+$("lpClose").addEventListener("click", () => $("lpModal").classList.remove("show"));
 
 const TR_LANGS = [
   { code: "ru", name: "Русский", flag: "ru", sr: "ru-RU" },
@@ -2832,14 +2852,15 @@ let wrec = null;
 async function openVid(mode) {
   const story = mode === "story";
   const album = mode === "album";
-  const id = (story || album) ? myKey() : state.activeContact;
+  const club = mode === "club";
+  const id = (story || album || club) ? myKey() : state.activeContact;
   if (!id || wrec) return;
   if (!db) { alert("Нет подключения."); return; }
-  if (!story && !album && isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
+  if (!story && !album && !club && isBlocked(id)) { alert("Контакт заблокирован. Сначала разблокируй его."); return; }
   closeAttach();
   let stream;
   try { stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: "user", width: { ideal: 360 }, height: { ideal: 360 } }, audio: true }); } catch (e) { alert("Нет доступа к камере или микрофону."); return; }
-  wrec = { stream: stream, id: id, mr: null, timer: null, t0: 0, send: false, story: story, album: album };
+  wrec = { stream: stream, id: id, mr: null, timer: null, t0: 0, send: false, story: story, album: album, club: club };
   $("vidPrev").srcObject = stream;
   $("vidTime").textContent = story ? "0:00 / 0:30" : "0:00 / 1:00";
   $("vidGo").textContent = "⏺";
@@ -2885,6 +2906,9 @@ $("vidGo").addEventListener("click", () => {
     } else if (r.album) {
       const th = await videoThumb(URL.createObjectURL(new Blob(chunks, { type: type })));
       postAlbumVideo(data, th, dur);
+    } else if (r.club) {
+      const th = await videoThumb(URL.createObjectURL(new Blob(chunks, { type: type })));
+      publishClub("video", data, th, dur);
     } else sendRich(r.id, { type: "video", text: "⭕ Видеосообщение", dur: Math.round(dur) }, data);
   };
   r.t0 = Date.now();
@@ -2897,7 +2921,7 @@ $("vidGo").addEventListener("click", () => {
     if (sec >= lim) finishVid();
   }, 250);
 });
-$("vidCancel").addEventListener("click", closeVid);
+  $("vidCancel").addEventListener("click", closeVid);
 
 // --- кнопки меню вложений
 $("micBtn").addEventListener("click", startVoice);
@@ -3046,7 +3070,7 @@ async function playStoryVideo(st) {
   sv0.removeAttribute("src");
   if (!st.dv) {
     try {
-      const sn = await get(ref(db, "storyvid/" + st.owner + "/" + st.key));
+      const sn = await get(ref(db, st.vpath || ("storyvid/" + st.owner + "/" + st.key)));
       const v = sn.val();
       st.dv = v && okData(v.d, "video") ? v.d : "";
     } catch (e) { st.dv = ""; }
@@ -3059,7 +3083,7 @@ async function playStoryVideo(st) {
 }
 
 function showStory() {
-  const s = sv.list[sv.i], me = state.profile.phone, own = s.owner === me;
+  const s = sv.list[sv.i], me = state.profile.phone, own = s.canDel !== undefined ? s.canDel : s.owner === me;
   const views = s.views || (s.views = {});
   const isV = s.t === "video";
   $("sImg").style.display = isV ? "none" : "";
@@ -3069,9 +3093,9 @@ function showStory() {
   $("sCap").textContent = s.cap || "";
   $("sCap").style.display = s.cap ? "block" : "none";
   const c = state.contacts.find(x => x.id === s.owner);
-  $("sOwner").textContent = own ? "Моя история" : (c ? c.name : "+" + s.owner);
-  if (!own && !views[me]) { views[me] = true; set(ref(db, "stories/" + s.owner + "/" + s.key + "/views/" + me), true).catch(() => {}); }
-  $("sInfo").textContent = own ? "👁 " + Object.keys(views).length : fmtTime(s.ts);
+  $("sOwner").textContent = s.label || (own ? "Моя история" : (c ? c.name : "+" + s.owner));
+  if (!own && !views[me] && !s.noViews) { views[me] = true; set(ref(db, (s.path || ("stories/" + s.owner + "/" + s.key)) + "/views/" + me), true).catch(() => {}); }
+  $("sInfo").textContent = own && !s.noViews ? "👁 " + Object.keys(views).length : fmtTime(s.ts);
   $("sDel").style.display = own ? "" : "none";
   const bars = $("sBars");
   bars.replaceChildren();
@@ -3086,6 +3110,7 @@ function closeStory() {
   $("sVid").removeAttribute("src");
   if (currentView === "statusView") loadStories();
   else if (currentView === "cpView" && cpId) loadCpStories(cpId);
+  else if (currentView === "groupView" && gcur) renderGroupTab();
 }
 
 $("sVid").addEventListener("ended", () => {
@@ -3104,8 +3129,8 @@ $("sStage").addEventListener("click", e => {
 $("sDel").addEventListener("click", () => {
   if (!sv || !confirm("Удалить эту историю?")) return;
   const s = sv.list[sv.i];
-  remove(ref(db, "stories/" + s.owner + "/" + s.key)).catch(() => {});
-  if (s.t === "video") remove(ref(db, "storyvid/" + s.owner + "/" + s.key)).catch(() => {});
+  remove(ref(db, s.path || ("stories/" + s.owner + "/" + s.key))).catch(() => {});
+  if (s.t === "video") remove(ref(db, s.vpath || ("storyvid/" + s.owner + "/" + s.key))).catch(() => {});
   sv.list.splice(sv.i, 1);
   if (!sv.list.length) { closeStory(); return; }
   if (sv.i >= sv.list.length) sv.i = sv.list.length - 1;
@@ -3181,7 +3206,9 @@ $("storyVidInput").addEventListener("change", async function () {
 // ---------- Группы ----------
 const gListening = {}, gNames = {};
 let gcur = null, gtab = "members", pendingOpen = null;
-let clubPv = null, clubsCache = [], clubsListening = false, clubsState = "load";
+let clubPv = null, clubsCache = [], clubsListening = false, clubsState = "load", clubUp = null, cmTok = 0;
+const MAX_CLUB_ADMINS = 15;
+const isClubAdmin = (g, p) => { p = p || myKey(); return !!g && (g.admin === p || (g.admins || []).indexOf(p) !== -1); };
 const gById = id => state.groups.find(g => g.id === id) || (clubPv && clubPv.id === id ? clubPv : null);
 const personName = p => p === myKey() ? (state.profile.name || "Я") + " (я)" : ((state.contacts.find(c => c.id === p) || {}).name || gNames[p] || "+" + p);
 
@@ -3205,12 +3232,13 @@ function listenGroup(gid) {
     g.name = v.name || "Группа";
     g.photo = typeof v.photo === "string" && /^data:image\//.test(v.photo) ? v.photo : "";
     g.admin = v.admin;
+    g.admins = v.admins ? Object.keys(v.admins) : [];
     g.members = Object.keys(v.members);
     g.type = v.type === "channel" ? "channel" : "group";
     if (clubPv && clubPv.id === gid) clubPv = null;
     if (pendingOpen === gid) {
       pendingOpen = null;
-      if (g.type === "channel") { gcur = gid; state.activeContact = null; openGroupChat(); } else openGroup(gid);
+      openGroup(gid);
       return;
     }
     if (currentView === "chatsView") renderChats();
@@ -3238,7 +3266,7 @@ function attachGroupMsgs(gid) {
 function openGroup(gid) {
   if (!gById(gid)) return;
   gcur = gid;
-  gtab = "members";
+  gtab = gById(gid).type === "channel" ? "stories" : "members";
   state.activeContact = null;
   showView("groupView");
   renderGroupHead();
@@ -3271,7 +3299,9 @@ function memberRow(g, p, noAction) {
   const n = document.createElement("strong");
   n.textContent = personName(p);
   const sm = document.createElement("small");
-  sm.textContent = (p === g.admin ? "админ · " : "") + "+" + p;
+  const showPh = g.type !== "channel" || isClubAdmin(g, me) || !!c || p === me;
+  const tag = isClubAdmin(g, p) ? "админ" : "";
+  sm.textContent = tag && showPh ? tag + " · +" + p : (tag || (showPh ? "+" + p : "участник"));
   info.append(n, sm);
   row.appendChild(info);
   if (!c && p !== me) {
@@ -3293,7 +3323,7 @@ function memberRow(g, p, noAction) {
       try {
         await remove(ref(db, "groups/" + g.id + "/members/" + p));
         await remove(ref(db, "usergroups/" + p + "/" + g.id));
-        if (g.type === "channel") bumpClub(g.id, -1);
+        if (g.type === "channel") { bumpClub(g.id, -1); remove(ref(db, "groups/" + g.id + "/admins/" + p)).catch(() => {}); }
       } catch (err) { alert("Не удалось удалить участника."); }
     });
     row.appendChild(x);
@@ -3308,6 +3338,8 @@ function memberRow(g, p, noAction) {
 function renderGroupTab() {
   const g = gById(gcur);
   if (!g) return;
+  document.querySelector('.gtabs button[data-g="stories"]').style.display = g.type === "channel" ? "" : "none";
+  $("gJoinBtn").style.display = g.preview ? "" : "none";
   document.querySelectorAll(".gtabs button").forEach(b => b.classList.toggle("on", b.dataset.g === gtab));
   $("gAddMember").style.display = (g.admin === myKey() && gtab === "members" && g.type !== "channel") ? "" : "none";
   const box = $("gContent");
@@ -3321,20 +3353,35 @@ function renderGroupTab() {
     b.addEventListener("click", fn);
     box.appendChild(b);
   };
+  const club = g.type === "channel";
   if (gtab === "members") {
-    g.members.slice().sort((a, b) => (b === g.admin) - (a === g.admin)).forEach(p => box.appendChild(memberRow(g, p)));
+    if (g.preview) say("Список участников виден только тем, кто вступил в клуб.");
+    else {
+      const rank = p => p === g.admin ? 2 : (isClubAdmin(g, p) ? 1 : 0);
+      g.members.slice().sort((a, b) => rank(b) - rank(a)).forEach(p => box.appendChild(memberRow(g, p)));
+    }
   } else if (gtab === "admin") {
     box.appendChild(memberRow(g, g.admin, true));
-    if (g.admin === myKey()) {
-      const cl = g.type === "channel";
-      act(cl ? "✏️ Переименовать клуб" : "✏️ Переименовать группу", "", renameGroup);
-      act(cl ? "🗑 Удалить клуб" : "🗑 Удалить группу", "#a33", deleteGroup);
-    } else act(g.type === "channel" ? "🚪 Выйти из клуба" : "🚪 Выйти из группы", "#a33", leaveGroup);
+    if (club) {
+      (g.admins || []).forEach(p => box.appendChild(adminRow(g, p)));
+      if (g.admin === myKey()) {
+        if ((g.admins || []).length < MAX_CLUB_ADMINS) act("➕ Добавить админа", "", openAdminPicker);
+        else say("Достигнут предел: " + MAX_CLUB_ADMINS + " админов.");
+        act("✏️ Переименовать клуб", "", renameGroup);
+        act("🗑 Удалить клуб", "#a33", deleteGroup);
+      } else if (!g.preview) act("🚪 Выйти из клуба", "#a33", leaveGroup);
+    } else if (g.admin === myKey()) {
+      act("✏️ Переименовать группу", "", renameGroup);
+      act("🗑 Удалить группу", "#a33", deleteGroup);
+    } else act("🚪 Выйти из группы", "#a33", leaveGroup);
+  } else if (gtab === "stories" && club) {
+    renderClubMedia(box, g, "story");
   } else if (gtab === "photo") {
-    if (g.photo) { const grid = document.createElement("div"); grid.className = "grid"; const im = document.createElement("img"); im.src = g.photo; im.alt = ""; grid.appendChild(im); box.appendChild(grid); }
+    if (club) renderClubMedia(box, g, "photo");
+    else if (g.photo) { const grid = document.createElement("div"); grid.className = "grid"; const im = document.createElement("img"); im.src = g.photo; im.alt = ""; grid.appendChild(im); box.appendChild(grid); }
     else say("Пока нет фото группы.");
   } else if (gtab === "video") {
-    say("Видео скоро появится.");
+    if (club) renderClubMedia(box, g, "video"); else say("Видео скоро появится.");
   }
 }
 
@@ -3409,7 +3456,10 @@ async function deleteGroup() {
   const g = gById(gcur);
   if (!g || !confirm((g.type === "channel" ? "Удалить клуб «" : "Удалить группу «") + g.name + "» для всех участников?")) return;
   try {
-    if (g.type === "channel") await remove(ref(db, "clubs/" + g.id));
+    if (g.type === "channel") {
+      await remove(ref(db, "clubs/" + g.id));
+      await Promise.all(["clubstory", "clubstoryv", "clubphoto", "clubvideo", "clubvideov"].map(b => remove(ref(db, b + "/" + g.id))));
+    }
     await Promise.all(g.members.map(p => remove(ref(db, "usergroups/" + p + "/" + g.id))));
     await remove(ref(db, "gchats/" + g.id));
     await remove(ref(db, "groups/" + g.id));
@@ -3422,11 +3472,11 @@ async function leaveGroup() {
   try {
     await remove(ref(db, "groups/" + g.id + "/members/" + myKey()));
     await remove(ref(db, "usergroups/" + myKey() + "/" + g.id));
-    if (g.type === "channel") bumpClub(g.id, -1);
+    if (g.type === "channel") { bumpClub(g.id, -1); remove(ref(db, "groups/" + g.id + "/admins/" + myKey())).catch(() => {}); }
   } catch (e) { alert("Не удалось выйти из группы."); }
 }
 
-$("gBack").addEventListener("click", () => { gcur = null; showView("chatsView"); });
+$("gBack").addEventListener("click", () => { gcur = null; clubPv = null; showView("chatsView"); });
 document.querySelectorAll(".gtabs button").forEach(b => b.addEventListener("click", () => {
   if (b.dataset.g === "sms") { openGroupChat(); return; }
   gtab = b.dataset.g;
@@ -3455,7 +3505,6 @@ function openGroupChat() {
 }
 
 $("gcBack").addEventListener("click", () => {
-  if (clubPv && clubPv.id === gcur) { clubPv = null; gcur = null; showView("chatsView"); return; }
   showView("groupView");
   renderGroupHead();
   renderGroupTab();
@@ -3494,7 +3543,7 @@ function openGroupCreate(mode) {
   });
   $("gCreateModal").classList.add("show");
 }
- $("groupCreateBtn").addEventListener("click", () => openGroupCreate("group"));
+$("groupCreateBtn").addEventListener("click", () => openGroupCreate("group"));
 $("clubCreateBtn").addEventListener("click", () => openGroupCreate("channel"));
 $("gCreateCancel").addEventListener("click", () => $("gCreateModal").classList.remove("show"));
 $("gCreateOk").addEventListener("click", async () => {
@@ -3559,20 +3608,28 @@ function makeClubButton(c, joined) {
   b.appendChild(info);
   b.addEventListener("click", () => openClub(c));
   return b;
-}
+  }
 
-function openClub(c) {
+async function openClub(c) {
   if (state.groups.some(g => g.id === c.id)) { openGroup(c.id); return; }
-  clubPv = { id: c.id, name: c.name, photo: "", admin: c.admin, members: [], count: c.count, type: "channel", preview: true };
+  if (!db) { alert("Нет подключения."); return; }
+  try {
+    const gp = "groups/" + c.id + "/";
+    const [nm, ad, ads, ph] = await Promise.all(["name", "admin", "admins", "photo"].map(k => get(ref(db, gp + k)).then(sn => sn.val())));
+    if (!nm) { alert("Клуб не найден."); return; }
+    clubPv = { id: c.id, name: String(nm), photo: typeof ph === "string" && /^data:image\//.test(ph) ? ph : "", admin: ad, admins: ads ? Object.keys(ads) : [], members: [], count: c.count, type: "channel", preview: true };
+  } catch (e) { alert("Не удалось открыть клуб."); return; }
   gcur = c.id;
+  gtab = "stories";
   state.activeContact = null;
   attachGroupMsgs(c.id);
-  showView("gChatView");
-  fillGroupChatHead();
-  renderGroupMsgs();
+  showView("groupView");
+  renderGroupHead();
+  renderGroupTab();
+  document.querySelector("#groupView .profile-content").scrollTop = 0;
 }
 
-$("gJoin").addEventListener("click", async () => {
+async function joinClub() {
   const g = clubPv;
   if (!g || !db) return;
   const me = myKey();
@@ -3581,7 +3638,208 @@ $("gJoin").addEventListener("click", async () => {
     await set(ref(db, "usergroups/" + me + "/" + g.id), true);
     bumpClub(g.id, 1);
   } catch (e) { alert("Не удалось вступить в клуб."); }
+}
+$("gJoin").addEventListener("click", joinClub);
+$("gJoinBtn").addEventListener("click", joinClub);
+
+function adminRow(g, p) {
+  const row = memberRow(g, p, true);
+  if (g.admin === myKey()) {
+    const x = document.createElement("button");
+    x.textContent = "✖";
+    x.setAttribute("aria-label", "Снять с админа");
+    x.style.cssText = "background:#eee;border-radius:50%;width:36px;height:36px;color:#a33;flex-shrink:0";
+    x.addEventListener("click", e => {
+      e.stopPropagation();
+      if (!confirm("Снять «" + personName(p) + "» с должности админа?")) return;
+      remove(ref(db, "groups/" + g.id + "/admins/" + p)).catch(() => alert("Не удалось снять админа."));
+    });
+    row.appendChild(x);
+  }
+  return row;
+}
+
+function openAdminPicker() {
+  const g = gById(gcur);
+  if (!g || g.preview || g.admin !== myKey()) return;
+  const list = $("clubAdminList");
+  list.replaceChildren();
+  $("clubAdminHint").textContent = "Можно добавить ещё: " + Math.max(0, MAX_CLUB_ADMINS - (g.admins || []).length);
+  const cand = g.members.filter(p => !isClubAdmin(g, p));
+  if (!cand.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = "Нет участников, которых можно сделать админом.";
+    list.appendChild(e);
+  }
+  cand.forEach(p => {
+    const b = document.createElement("button");
+    b.className = "primary-button";
+    b.style.cssText = "margin-top:6px;text-align:left";
+    b.textContent = "⭐ " + personName(p);
+    if (!state.contacts.some(c => c.id === p) && !gNames[p]) {
+      get(ref(db, "users/" + p + "/name")).then(sn => { const nm = sn.val(); if (nm) { gNames[p] = String(nm); b.textContent = "⭐ " + nm; } }).catch(() => {});
+    }
+    b.addEventListener("click", async () => {
+      if ((g.admins || []).length >= MAX_CLUB_ADMINS) { alert("Достигнут предел: " + MAX_CLUB_ADMINS + " админов."); return; }
+      try {
+        await set(ref(db, "groups/" + g.id + "/admins/" + p), true);
+        $("clubAdminModal").classList.remove("show");
+      } catch (e) { alert("Не удалось добавить админа."); }
+    });
+    list.appendChild(b);
+  });
+  $("clubAdminModal").classList.add("show");
+}
+$("clubAdminClose").addEventListener("click", () => $("clubAdminModal").classList.remove("show"));
+
+async function renderClubMedia(box, g, target) {
+  const tok = ++cmTok;
+  const tabName = target === "story" ? "stories" : target;
+  const adm = isClubAdmin(g);
+  if (adm) {
+    const b = document.createElement("button");
+    b.className = "primary-button";
+    b.style.marginTop = "0";
+    b.textContent = target === "story" ? "➕ Добавить историю" : target === "photo" ? "➕ Добавить фото" : "➕ Добавить видео";
+    b.addEventListener("click", () => clubAdd(target));
+    box.appendChild(b);
+  }
+  const hint = document.createElement("div");
+  hint.className = "empty";
+  hint.textContent = "Загрузка…";
+  box.appendChild(hint);
+  const base = target === "story" ? "clubstory" : target === "photo" ? "clubphoto" : "clubvideo";
+  let items = [];
+  try {
+    const sn = await get(query(ref(db, base + "/" + g.id), limitToLast(60)));
+    sn.forEach(ch => {
+      const v = ch.val();
+      if (v && (v.t === "video" || okData(v.d, "image"))) items.push(Object.assign({ key: ch.key, owner: "club_" + g.id }, v));
+    });
+  } catch (e) { hint.textContent = "Не удалось загрузить."; return; }
+  if (tok !== cmTok || gcur !== g.id || gtab !== tabName) return;
+  if (target === "story") {
+    const live = items.filter(x => Date.now() - (x.ts || Date.now()) < DAY);
+    if (adm) items.filter(x => live.indexOf(x) === -1).forEach(x => {
+      remove(ref(db, base + "/" + g.id + "/" + x.key)).catch(() => {});
+      if (x.t === "video") remove(ref(db, base + "v/" + g.id + "/" + x.key)).catch(() => {});
+    });
+    items = live.sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
+  } else items.reverse();
+  items.forEach(x => {
+    x.path = base + "/" + g.id + "/" + x.key;
+    x.vpath = base + "v/" + g.id + "/" + x.key;
+    x.canDel = adm;
+    x.label = g.name;
+    x.noViews = target !== "story";
+  });
+  hint.remove();
+  if (!items.length) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.textContent = target === "story" ? "Историй пока нет. Они исчезают через 24 часа." : target === "photo" ? "Пока нет фото клуба." : "Пока нет видео клуба.";
+    box.appendChild(e);
+    return;
+  }
+  if (target === "story") {
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "display:flex;flex-wrap:wrap;gap:12px;justify-content:center;margin-top:12px";
+    items.forEach((x, i) => wrap.appendChild(storyCard(x, items, i, adm)));
+    box.appendChild(wrap);
+  } else {
+    const grid = document.createElement("div");
+    grid.className = "mgrid";
+    grid.style.marginTop = "12px";
+    items.forEach((x, i) => {
+      const cell = document.createElement("div");
+      cell.className = "mcell";
+      const pic = x.t === "video" ? x.th : x.d;
+      if (okData(pic, "image")) {
+        const im = document.createElement("img");
+        im.src = pic;
+        im.alt = "";
+        im.loading = "lazy";
+        cell.appendChild(im);
+      }
+      if (x.t === "video") {
+        const vb = document.createElement("span");
+        vb.className = "vb";
+        vb.textContent = "▶ " + fmtDur(x.dur || 0);
+        cell.appendChild(vb);
+      }
+      cell.addEventListener("click", () => openStory(items, i));
+      grid.appendChild(cell);
+    });
+    box.appendChild(grid);
+  }
+}
+
+function clubAdd(target) {
+  const g = gById(gcur);
+  if (!g || !isClubAdmin(g) || !db) return;
+  clubUp = { gid: g.id, target: target };
+  if (target === "photo") { $("clubPhotoInput").click(); return; }
+  $("ccTitle").textContent = target === "story" ? "Новая история" : "Новое видео";
+  $("ccPhoto").style.display = target === "story" ? "" : "none";
+  $("clubChoose").classList.add("show");
+}
+$("ccClose").addEventListener("click", () => { $("clubChoose").classList.remove("show"); clubUp = null; });
+$("ccPhoto").addEventListener("click", () => { $("clubChoose").classList.remove("show"); $("clubPhotoInput").click(); });
+$("ccVideo").addEventListener("click", () => { $("clubChoose").classList.remove("show"); $("clubVidInput").click(); });
+$("ccCam").addEventListener("click", () => { $("clubChoose").classList.remove("show"); openVid("club"); });
+
+function videoLen(file) {
+  return new Promise(res => {
+    const v = document.createElement("video");
+    const u = URL.createObjectURL(file);
+    let fin = false;
+    const done = d => { if (fin) return; fin = true; URL.revokeObjectURL(u); res(d); };
+    v.preload = "metadata";
+    v.onloadedmetadata = () => done(isFinite(v.duration) ? v.duration : 0);
+    v.onerror = () => done(0);
+    setTimeout(() => done(0), 5000);
+    v.src = u;
+  });
+}
+
+$("clubPhotoInput").addEventListener("change", function () {
+  const f = this.files && this.files[0];
+  this.value = "";
+  if (!f || !f.type.startsWith("image/") || !clubUp) return;
+  compress(f, clubUp.target === "story" ? 720 : 800, url => publishClub("photo", url));
 });
+$("clubVidInput").addEventListener("change", async function () {
+  const f = this.files && this.files[0];
+  this.value = "";
+  if (!f || !f.type.startsWith("video/") || !clubUp) return;
+  if (f.size > 8 * 1024 * 1024) { alert("Видео больше 8 МБ. Выбери короче или сними камерой (до 1 мин)."); return; }
+  const d = await videoLen(f);
+  if (d > 61) { alert("Видео длиннее 1 минуты."); return; }
+  try {
+    const data = await blobToData(f);
+    const th = await videoThumb(URL.createObjectURL(f));
+    publishClub("video", data, th, d);
+  } catch (e) { alert("Не удалось прочитать видео."); }
+});
+
+async function publishClub(kind, data, th, dur) {
+  const u = clubUp, g = u && gById(u.gid);
+  clubUp = null;
+  if (!u || !g || !isClubAdmin(g) || !db) return;
+  const cap = (prompt("Подпись (можно пропустить):", "") || "").trim().slice(0, 100);
+  const base = u.target === "story" ? "clubstory" : u.target === "photo" ? "clubphoto" : "clubvideo";
+  try {
+    if (kind === "video") {
+      const k = push(ref(db, base + "/" + u.gid)).key;
+      await set(ref(db, base + "v/" + u.gid + "/" + k), { d: data });
+      await set(ref(db, base + "/" + u.gid + "/" + k), { t: "video", th: th || "", dur: Math.round(dur || 0), cap: cap, by: myKey(), ts: serverTimestamp() });
+    } else {
+      await push(ref(db, base + "/" + u.gid), { d: data, cap: cap, by: myKey(), ts: serverTimestamp() });
+    }
+    if (currentView === "groupView" && gcur === u.gid) renderGroupTab();
+  } catch (e) { alert("Не удалось добавить."); }
+}
 
 $("gAddMember").addEventListener("click", () => {
   const g = gById(gcur);
@@ -3760,7 +4018,7 @@ const VKL = {
   ko: { t: "hangul", caps: true, rows: [R("ㅂㅈㄷㄱㅅㅛㅕㅑㅐㅔ"), R("ㅁㄴㅇㄹㅎㅗㅓㅏㅣ"), R("ㅋㅌㅊㅍㅠㅜㅡ")] },
   zh: { t: "pinyin" }
 };
-Object.assign(VKL.hi = { t: "grid", keys: VK_KEYS.hi }, {});
+  Object.assign(VKL.hi = { t: "grid", keys: VK_KEYS.hi }, {});
 VKL.bn = { t: "grid", keys: VK_KEYS.bn };
 VKL.ur = { t: "grid", keys: VK_KEYS.ur };
 const H_SHIFT = { "ㅂ": "ㅃ", "ㅈ": "ㅉ", "ㄷ": "ㄸ", "ㄱ": "ㄲ", "ㅅ": "ㅆ", "ㅐ": "ㅒ", "ㅔ": "ㅖ" };
@@ -4188,7 +4446,7 @@ function uiInit() {
       return orig(uiCache[k] || m, d);
     };
   });
-}
+  }
 
 function openUiLang() {
   openLangPick("Язык сайта", uiLang, l => {
@@ -4325,4 +4583,4 @@ if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) {
 }
 </script>
 </body>
-</html> 
+</html>
