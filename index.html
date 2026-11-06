@@ -274,7 +274,7 @@ img.fl{display:block;object-fit:cover;border-radius:5px;box-shadow:0 0 0 1px #88
 body{padding:15px}
 .app{height:calc(100dvh - 30px);border-radius:15px;box-shadow:0 3px 20px #00000010}
 }
-/* LimeChat Translation */
+  /* LimeChat Translation */
 .translation-result {
   display: none;
   margin-top: 9px;
@@ -744,7 +744,7 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 </div>
 
 <script>
-(function () {
+  (function () {
   function show(msg) {
     var d = document.createElement("div");
     d.style.cssText = "position:fixed;left:0;right:0;top:0;z-index:99;background:#fee;color:#900;padding:8px;font:12px monospace;white-space:pre-wrap";
@@ -752,10 +752,12 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
     d.onclick = function () { d.remove(); };
     document.body.appendChild(d);
   }
+  var BUILD = "2026-11-06-b";
+  window.__BUILD = BUILD;
   window.__showErr = show;
   window.addEventListener("error", function (e) {
     if (e.target && e.target.tagName === "SCRIPT") show("Скрипт не загрузился");
-    else show("Ошибка: " + e.message + " (строка " + (e.lineno || "?") + ")");
+    else show("Ошибка: " + e.message + " (строка " + (e.lineno || "?") + ", сборка " + BUILD + ")");
   }, true);
   window.addEventListener("unhandledrejection", function (e) {
     show("Ошибка: " + (e.reason && e.reason.message ? e.reason.message : e.reason));
@@ -1054,7 +1056,7 @@ const normPhone = (v, c) => {
   d = c.code + d;
   return isKey(d) ? d : "";
 };
-const LANGS_ALL = (() => {
+  const LANGS_ALL = (() => {
   const all = `af|Африкаанс|za
 sq|Албанский|al
 am|Амхарский|et
@@ -1459,7 +1461,7 @@ function makeGroupButton(g, preview) {
   b.appendChild(info);
   b.addEventListener("click", () => openGroup(g.id));
   return b;
-  }
+}
 
 let chatFilter = "";
 function renderChats() {
@@ -1672,8 +1674,8 @@ $("saveProfileButton").addEventListener("click", async function () {
   try { if (db) await saveRemote(); } catch (e) { alert("Не удалось сохранить на сервере."); return; }
   updateHeader();
   alert("Профиль сохранён! ❤️");
-}); 
-$("addContactButton").addEventListener("click", openAddContact);
+});
+  $("addContactButton").addEventListener("click", openAddContact);
 $("backButton").addEventListener("click", function () {
   state.activeContact = null;
   showView("chatsView");
@@ -2091,7 +2093,7 @@ function setupComments(base, it) {
   mvCmt = { base: base, addRow: addRow, inc: () => { count++; btn.textContent = "💬 " + count; } };
   return btn;
 }
-$("mCmtForm").addEventListener("submit", e => {
+  $("mCmtForm").addEventListener("submit", e => {
   e.preventDefault();
   const inp = $("mCmtInput");
   const text = inp.value.trim().slice(0, 300);
@@ -2108,6 +2110,12 @@ function openMedia(list, i) {
   mv = { list: list, i: i };
   $("mediaModal").classList.add("show");
   showMedia();
+}
+function closeMedia() {
+  mv = null;
+  stopMv();
+  $("mImg").removeAttribute("src");
+  $("mediaModal").classList.remove("show");
 }
 function mediaStep(d) {
   if (!mv) return;
@@ -2265,10 +2273,11 @@ function showCall(text, ringing, video) {
   $("callModal").classList.add("show");
 }
 
-  function addIce(c) {
+function addIce(c) {
   if (pc && pc.remoteDescription) pc.addIceCandidate(c).catch(() => {});
   else pendingIce.push(c);
 }
+
 function flushIce() {
   pendingIce.forEach(c => pc.addIceCandidate(c).catch(() => {}));
   pendingIce = [];
@@ -2793,7 +2802,7 @@ function paintRecTx() {
 }
 
 // --- голосовое
- let vrec = null;
+let vrec = null;
 function stopVoice(send) {
   const r = vrec;
   if (!r) return;
@@ -4526,7 +4535,7 @@ const uiObs = new MutationObserver(muts => {
     uiPending = new Set();
     list.forEach(n => { if (n.isConnected) uiRun(n); });
   }, 80);
-});
+  });
 
 function uiInit() {
   document.documentElement.lang = uiLang;
@@ -4676,7 +4685,19 @@ if (state.profile.phone) fbReady.then(startOnline); else $("loginModal").classLi
 </script>
 <script>
 if ("serviceWorker" in navigator && /^https?:/.test(location.protocol)) {
-  window.addEventListener("load", function () { navigator.serviceWorker.register("sw.js").catch(function () {}); });
+  window.addEventListener("load", function () {
+    var B = window.__BUILD || "", seen = "";
+    try { seen = localStorage.getItem("lc_build") || ""; } catch (e) {}
+    var reg = function () { navigator.serviceWorker.register("sw.js").catch(function () {}); };
+    if (!B || seen === B) { reg(); return; }
+    // новая сборка: сбросить старый service worker и кэш, чтобы не показывалась старая версия
+    try { localStorage.setItem("lc_build", B); } catch (e) {}
+    navigator.serviceWorker.getRegistrations()
+      .then(function (rs) { return Promise.all(rs.map(function (r) { return r.unregister(); })); })
+      .then(function () { return window.caches ? caches.keys().then(function (ks) { return Promise.all(ks.map(function (k) { return caches.delete(k); })); }) : null; })
+      .catch(function () {})
+      .then(function () { if (seen) location.reload(); else reg(); });
+  });
 }
 </script>
 </body>
