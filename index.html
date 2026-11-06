@@ -2265,11 +2265,10 @@ function showCall(text, ringing, video) {
   $("callModal").classList.add("show");
 }
 
-function addIce(c) {
+  function addIce(c) {
   if (pc && pc.remoteDescription) pc.addIceCandidate(c).catch(() => {});
   else pendingIce.push(c);
 }
-
 function flushIce() {
   pendingIce.forEach(c => pc.addIceCandidate(c).catch(() => {}));
   pendingIce = [];
