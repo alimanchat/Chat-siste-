@@ -465,11 +465,17 @@ XkcUluU2C7o2YF46hE1BSD6ZTnFGNcMX1ajbNpU8xYwNOo0Mz1I79E8Uwa/fRtxTZJawA6jQ+0/BeDxV
 
   <section class="view" id="statusView">
     <div class="profile-content" style="flex:1;min-height:0;padding-top:14px">
-      <button class="dashed" id="storyAdd">+ Добавить историю</button>
-      <input type="file" id="storyInput" accept="image/*" style="display:none">
-      <input type="file" id="storyVidInput" accept="video/*" style="display:none">
-      <div class="shead"><b>Мои истории</b><span>исчезают через 24 ч</span></div>
-      <div class="srow" id="myStories"></div>
+      <div style="display:flex;gap:8px;margin-bottom:12px">
+        <button type="button" class="chip on" id="stChipC">Контакты</button>
+        <button type="button" class="chip" id="stChipK">Клубы</button>
+      </div>
+      <div id="stMine">
+        <button class="dashed" id="storyAdd">+ Добавить историю</button>
+        <input type="file" id="storyInput" accept="image/*" style="display:none">
+        <input type="file" id="storyVidInput" accept="video/*" style="display:none">
+        <div class="shead"><b>Мои истории</b><span>исчезают через 24 ч</span></div>
+        <div class="srow" id="myStories"></div>
+      </div>
       <div id="otherStories"></div>
     </div>
   </section>
@@ -792,7 +798,7 @@ function isBlocked(id) { return state.blocked.indexOf(id) !== -1; }
 
 // ---------- Firebase ----------
 let db = null;
- async function loadFirebase() {
+async function loadFirebase() {
   try {
     const a = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js");
     const d = await import("https://www.gstatic.com/firebasejs/10.12.0/firebase-database.js");
@@ -1626,7 +1632,7 @@ function deleteCurrentContact() {
   renderChats();
   renderContacts();
   showView("chatsView");
-}
+  }
 
 $("choosePhotoButton").addEventListener("click", () => $("photoInput").click());
 $("photoInput").addEventListener("change", function () {
@@ -1925,8 +1931,8 @@ $("cpDelete").addEventListener("click", () => {
   $("cpMenu").classList.remove("show");
   state.activeContact = cpId;
   deleteCurrentContact();
-}); 
- $("cpBlock").addEventListener("click", () => {
+});
+$("cpBlock").addEventListener("click", () => {
   $("cpMenu").classList.remove("show");
   const c = state.contacts.find(x => x.id === cpId);
   if (!c) return;
@@ -2548,7 +2554,7 @@ async function translateMessage(text, l, resultBox, button) {
     alert("Не удалось перевести. Попробуй ещё раз.");
     button.textContent = "🌐 Перевести";
   }
-}
+  }
 
 function makeTranslateUI(text) {
   const trBtn = document.createElement("button");
@@ -2795,7 +2801,7 @@ function paintRecTx() {
 
 // --- голосовое
 let vrec = null;
-  function stopVoice(send) {
+function stopVoice(send) {
   const r = vrec;
   if (!r) return;
   r.send = send;
@@ -3005,12 +3011,17 @@ function storyCard(s, list, i, own) {
   return card;
 }
 
+let stFeed = "contacts", gBackTo = null;
 async function loadStories() {
   const mine = $("myStories"), others = $("otherStories");
+  $("stMine").style.display = stFeed === "clubs" ? "none" : "";
+  $("stChipC").classList.toggle("on", stFeed !== "clubs");
+  $("stChipK").classList.toggle("on", stFeed === "clubs");
   mine.replaceChildren();
   others.replaceChildren();
   const me = state.profile.phone;
   if (!db || !me) return;
+  if (stFeed === "clubs") { await loadClubFeed(others, me); return; }
   const ids = [me].concat(state.contacts.filter(c => !isBlocked(c.id)).map(c => c.id));
   const res = await Promise.all(ids.map(id => get(ref(db, "stories/" + id)).then(sn => {
     const a = [];
@@ -3032,49 +3043,90 @@ async function loadStories() {
     e.textContent = "У тебя пока нет историй.";
     mine.appendChild(e);
   }
-  const clubsIn = state.groups.filter(g => g.type === "channel");
-  const cres = await Promise.all(clubsIn.map(g => get(ref(db, "clubstory/" + g.id)).then(sn => {
-    const a = [];
-    sn.forEach(ch => {
-      const v = ch.val();
-      if (v && (v.t === "video" || okData(v.d, "image"))) a.push(Object.assign({ key: ch.key, owner: "club_" + g.id, path: "clubstory/" + g.id + "/" + ch.key, vpath: "clubstoryv/" + g.id + "/" + ch.key, canDel: isClubAdmin(g), label: g.name, noViews: false }, v));
-    });
-    return [g, a];
-  }).catch(() => [g, []])));
-  cres.forEach(([g, arr]) => {
-    const live = arr.filter(x => Date.now() - (x.ts || Date.now()) < DAY).sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
-    if (isClubAdmin(g)) arr.filter(x => live.indexOf(x) === -1).forEach(x => {
-      remove(ref(db, "clubstory/" + g.id + "/" + x.key)).catch(() => {});
-      if (x.t === "video") remove(ref(db, "clubstoryv/" + g.id + "/" + x.key)).catch(() => {});
-    });
-    if (!live.length) return;
-    blocks.push([g.id, live, live.some(x => !(x.views || {})[me]), g]);
-  });
   blocks.sort((a, b) => (b[2] ? 1 : 0) - (a[2] ? 1 : 0));
-  blocks.forEach(([id, live, , cg]) => {
-    const c = cg ? null : state.contacts.find(x => x.id === id);
+  blocks.forEach(([id, live]) => {
+    const c = state.contacts.find(x => x.id === id);
     const head = document.createElement("div");
     head.className = "shead2";
     head.style.cursor = "pointer";
-    head.addEventListener("click", () => { if (cg) openGroup(cg.id); else openCP(id, "statusView"); });
-    head.appendChild(cg ? makeAvatar(cg.photo, cg.name) : makeAvatar(c ? c.photo : "", c ? c.name : ""));
+    head.addEventListener("click", () => openCP(id, "statusView"));
+    head.appendChild(makeAvatar(c ? c.photo : "", c ? c.name : ""));
     const nm = document.createElement("span");
-    nm.textContent = cg ? cg.name : (c ? c.name : "+" + id);
+    nm.textContent = c ? c.name : "+" + id;
     const hint = document.createElement("small");
     hint.textContent = live.length > 1 ? "листайте →" : "профиль →";
     head.append(nm, hint);
     const row = document.createElement("div");
     row.className = "srow";
-    live.forEach((x, i) => row.appendChild(storyCard(x, live, i, cg ? isClubAdmin(cg) : false)));
+    live.forEach((x, i) => row.appendChild(storyCard(x, live, i, false)));
     others.append(head, row);
   });
   if (!blocks.length) {
     const e = document.createElement("div");
     e.className = "empty";
-    e.textContent = "У контактов и клубов пока нет историй.";
+    e.textContent = "У контактов пока нет историй.";
     others.appendChild(e);
   }
 }
+
+// Лента клубов: видна всем, кто зарегистрирован в LimeChat
+async function loadClubFeed(others, me) {
+  listenClubs();
+  const say = t => { const e = document.createElement("div"); e.className = "empty"; e.textContent = t; others.appendChild(e); };
+  if (clubsState === "err") { say("Не удалось загрузить клубы. Проверь интернет."); return; }
+  if (clubsState === "load") { say("Загрузка…"); return; }
+  const cand = clubsCache.filter(c => c.st && Date.now() - c.st < DAY);
+  let err = false;
+  const res = await Promise.all(cand.map(c => get(ref(db, "clubstory/" + c.id)).then(sn => {
+    const g = gById(c.id), adm = !!g && !g.preview && isClubAdmin(g);
+    const a = [];
+    sn.forEach(ch => {
+      const v = ch.val();
+      if (v && (v.t === "video" || okData(v.d, "image"))) a.push(Object.assign({ key: ch.key, owner: "club_" + c.id, path: "clubstory/" + c.id + "/" + ch.key, vpath: "clubstoryv/" + c.id + "/" + ch.key, canDel: adm, label: c.name, noViews: false }, v));
+    });
+    return [c, a, adm];
+  }).catch(() => { err = true; return [c, [], false]; })));
+  if (currentView !== "statusView" || stFeed !== "clubs") return;
+  others.replaceChildren();
+  const blocks = [];
+  res.forEach(([c, arr, adm]) => {
+    const live = arr.filter(x => Date.now() - (x.ts || Date.now()) < DAY).sort((a, b) => (a.ts || Date.now()) - (b.ts || Date.now()));
+    if (adm) arr.filter(x => live.indexOf(x) === -1).forEach(x => {
+      remove(ref(db, "clubstory/" + c.id + "/" + x.key)).catch(() => {});
+      if (x.t === "video") remove(ref(db, "clubstoryv/" + c.id + "/" + x.key)).catch(() => {});
+    });
+    if (!live.length) return;
+    blocks.push({ c: c, live: live, adm: adm, fresh: live.some(x => !(x.views || {})[me]), last: live[live.length - 1].ts || 0 });
+  });
+  blocks.sort((a, b) => (b.fresh ? 1 : 0) - (a.fresh ? 1 : 0) || b.last - a.last);
+  blocks.forEach(b => {
+    const head = document.createElement("div");
+    head.className = "shead2";
+    head.style.cursor = "pointer";
+    head.addEventListener("click", () => openClub(b.c));
+    head.appendChild(makeAvatar(b.c.th, b.c.name));
+    const nm = document.createElement("span");
+    nm.textContent = b.c.name;
+    const hint = document.createElement("small");
+    hint.textContent = b.live.length > 1 ? "листайте →" : "профиль →";
+    head.append(nm, hint);
+    const row = document.createElement("div");
+    row.className = "srow";
+    b.live.forEach((x, i) => row.appendChild(storyCard(x, b.live, i, b.adm)));
+    others.append(head, row);
+  });
+  if (!blocks.length) say("Пока нет историй от клубов.");
+  if (err) {
+    const e = document.createElement("div");
+    e.className = "empty";
+    e.style.color = "#a33";
+    e.textContent = "Истории клубов не загрузились: нет доступа к базе (проверь правила Firebase для clubstory).";
+    others.appendChild(e);
+  }
+}
+
+$("stChipC").addEventListener("click", () => { stFeed = "contacts"; loadStories(); });
+$("stChipK").addEventListener("click", () => { stFeed = "clubs"; loadStories(); });
 
 function openStory(list, i) {
   sv = { list: list, i: i };
@@ -3199,7 +3251,7 @@ $("storyAdd").addEventListener("click", () => {
   if (!db || !state.profile.phone) { alert("Нет подключения."); return; }
   $("storyChoose").classList.add("show");
 });
-  $("scClose").addEventListener("click", () => $("storyChoose").classList.remove("show"));
+$("scClose").addEventListener("click", () => $("storyChoose").classList.remove("show"));
 $("scPhoto").addEventListener("click", () => { $("storyChoose").classList.remove("show"); $("storyInput").click(); });
 $("scVideo").addEventListener("click", () => { $("storyChoose").classList.remove("show"); $("storyVidInput").click(); });
 $("scCam").addEventListener("click", () => { $("storyChoose").classList.remove("show"); openVid("story"); });
@@ -3225,7 +3277,7 @@ $("storyVidInput").addEventListener("change", async function () {
 const gListening = {}, gNames = {};
 let gcur = null, gtab = "members", pendingOpen = null;
 let clubPv = null, clubsCache = [], clubsListening = false, clubsState = "load", clubUp = null, cmTok = 0;
-const thSynced = {};
+const thSynced = {}, stSynced = {};
 const MAX_CLUB_ADMINS = 15;
 const isClubAdmin = (g, p) => { p = p || myKey(); return !!g && (g.admin === p || (g.admins || []).indexOf(p) !== -1); };
 const gById = id => state.groups.find(g => g.id === id) || (clubPv && clubPv.id === id ? clubPv : null);
@@ -3255,6 +3307,7 @@ function listenGroup(gid) {
     g.members = Object.keys(v.members);
     g.type = v.type === "channel" ? "channel" : "group";
     if (g.type === "channel" && g.admin === me && g.photo) syncClubThumb(g);
+    if (g.type === "channel" && isClubAdmin(g, me)) syncClubSt(g);
     if (clubPv && clubPv.id === gid) clubPv = null;
     if (pendingOpen === gid) {
       pendingOpen = null;
@@ -3496,7 +3549,7 @@ async function leaveGroup() {
   } catch (e) { alert("Не удалось выйти из группы."); }
 }
 
-$("gBack").addEventListener("click", () => { gcur = null; clubPv = null; showView("chatsView"); });
+$("gBack").addEventListener("click", () => { const to = gBackTo || "chatsView"; gBackTo = null; gcur = null; clubPv = null; showView(to); });
 document.querySelectorAll(".gtabs button").forEach(b => b.addEventListener("click", () => {
   if (b.dataset.g === "sms") { openGroupChat(); return; }
   gtab = b.dataset.g;
@@ -3529,7 +3582,7 @@ $("gcBack").addEventListener("click", () => {
   renderGroupHead();
   renderGroupTab();
 });
- $("gForm").addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
+  $("gForm").addEventListener("submit", e => { e.preventDefault(); sendGroupMsg(); });
 $("gPhotoBtn").addEventListener("click", () => $("gPhotoInput").click());
 $("gPhotoInput").addEventListener("change", function () {
   const f = this.files && this.files[0];
@@ -3563,7 +3616,7 @@ function openGroupCreate(mode) {
   });
   $("gCreateModal").classList.add("show");
 }
-$("groupCreateBtn").addEventListener("click", () => openGroupCreate("group"));
+  $("groupCreateBtn").addEventListener("click", () => openGroupCreate("group"));
 $("clubCreateBtn").addEventListener("click", () => openGroupCreate("channel"));
 $("gCreateCancel").addEventListener("click", () => $("gCreateModal").classList.remove("show"));
 $("gCreateOk").addEventListener("click", async () => {
@@ -3592,6 +3645,17 @@ $("gCreateOk").addEventListener("click", async () => {
 });
 
 // ---------- Клубы (открытые для всех) ----------
+function syncClubSt(g) {
+  if (!db || stSynced[g.id]) return;
+  stSynced[g.id] = true;
+  get(query(ref(db, "clubstory/" + g.id), limitToLast(1))).then(sn => {
+    let t = 0;
+    sn.forEach(ch => { const v = ch.val(); if (v && v.ts) t = v.ts; });
+    if (!t) return;
+    return get(ref(db, "clubs/" + g.id + "/st")).then(s2 => { if ((s2.val() || 0) < t) return set(ref(db, "clubs/" + g.id + "/st"), t); });
+  }).catch(() => {});
+}
+
 function syncClubThumb(g) {
   if (!db || thSynced[g.id] === g.photo) return;
   thSynced[g.id] = g.photo;
@@ -3617,13 +3681,15 @@ function listenClubs() {
   clubsListening = true;
   onValue(query(ref(db, "clubs"), limitToLast(200)), sn => {
     const v = sn.val() || {};
-    clubsCache = Object.keys(v).filter(id => v[id] && v[id].name).map(id => ({ id: id, name: String(v[id].name), admin: v[id].admin, count: v[id].count || 0, th: typeof v[id].th === "string" && /^data:image\//.test(v[id].th) ? v[id].th : "" })).reverse();
+    clubsCache = Object.keys(v).filter(id => v[id] && v[id].name).map(id => ({ id: id, name: String(v[id].name), admin: v[id].admin, count: v[id].count || 0, st: +v[id].st || 0, th: typeof v[id].th === "string" && /^data:image\//.test(v[id].th) ? v[id].th : "" })).reverse();
     clubsState = "ok";
     if (currentView === "chatsView" && chatFilter === "channel") renderChats();
+    if (currentView === "statusView" && stFeed === "clubs") loadStories();
   }, () => {
     clubsState = "err";
     clubsListening = false;
     if (currentView === "chatsView" && chatFilter === "channel") renderChats();
+    if (currentView === "statusView" && stFeed === "clubs") loadStories();
   });
 }
 
@@ -3646,7 +3712,8 @@ function makeClubButton(c, joined) {
 }
 
 async function openClub(c) {
-  if (state.groups.some(g => g.id === c.id)) { openGroup(c.id); return; }
+  const from = currentView === "statusView" ? "statusView" : null;
+  if (state.groups.some(g => g.id === c.id)) { openGroup(c.id); gBackTo = from; return; }
   if (!db) { alert("Нет подключения."); return; }
   try {
     const gp = "groups/" + c.id + "/";
@@ -3659,6 +3726,7 @@ async function openClub(c) {
   state.activeContact = null;
   attachGroupMsgs(c.id);
   showView("groupView");
+  gBackTo = from;
   renderGroupHead();
   renderGroupTab();
   document.querySelector("#groupView .profile-content").scrollTop = 0;
@@ -3843,8 +3911,8 @@ $("clubPhotoInput").addEventListener("change", function () {
   this.value = "";
   if (!f || !f.type.startsWith("image/") || !clubUp) return;
   compress(f, clubUp.target === "story" ? 720 : 800, url => publishClub("photo", url));
-}); 
- $("clubVidInput").addEventListener("change", async function () {
+});
+$("clubVidInput").addEventListener("change", async function () {
   const f = this.files && this.files[0];
   this.value = "";
   if (!f || !f.type.startsWith("video/") || !clubUp) return;
@@ -3872,6 +3940,7 @@ async function publishClub(kind, data, th, dur) {
     } else {
       await push(ref(db, base + "/" + u.gid), { d: data, cap: cap, by: myKey(), ts: serverTimestamp() });
     }
+    if (u.target === "story") set(ref(db, "clubs/" + u.gid + "/st"), serverTimestamp()).catch(() => {});
     if (currentView === "groupView" && gcur === u.gid) renderGroupTab();
   } catch (e) { alert("Не удалось добавить."); }
 }
@@ -4313,7 +4382,7 @@ $("vkEnter").addEventListener("click", () => {
   const f = vk.target && vk.target.form;
   if (f) f.dispatchEvent(new Event("submit", { cancelable: true, bubbles: true }));
 });
-  $("attKb").addEventListener("click", () => { closeAttach(); openVkb($("messageInput"), $("chatView")); });
+$("attKb").addEventListener("click", () => { closeAttach(); openVkb($("messageInput"), $("chatView")); });
 $("gKb").addEventListener("click", () => openVkb($("gInput"), $("gChatView")));
 
 (function buildRecLang() {
